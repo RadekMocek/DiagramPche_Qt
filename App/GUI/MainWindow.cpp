@@ -1,19 +1,34 @@
+#include <QGraphicsView>
 #include <QGridLayout>
 #include <QMenuBar>
 #include <QMessageBox>
+#include <QPlainTextEdit>
 
-#include  "MainWindow.hpp"
+#include "MainWindow.hpp"
+#include "../Config.hpp"
+#include "../Helper/Print.hpp"
+#include "Scene.hpp"
+#include "SceneItem/SceneNode.hpp"
+#include "Viewer.hpp"
 
-MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent)
+GUIMainWindow::GUIMainWindow()
 {
     setWindowTitle("Untitled – DiagramPche :: Qt");
     resize(1366, 768);
 
     InitMainMenuBar();
     InitCentralWidget();
+
+    ParseAndUpdate();
 }
 
-void MainWindow::InitMainMenuBar()
+void GUIMainWindow::ParseAndUpdate()
+{
+    m_parser.Parse(m_source->toPlainText().toStdString());
+    m_scene->Hobluj(m_parser.m_result_nodes_pq);
+}
+
+void GUIMainWindow::InitMainMenuBar()
 {
     const QPointer main_menu_bar = new QMenuBar(this);
     setMenuBar(main_menu_bar);
@@ -52,7 +67,7 @@ void MainWindow::InitMainMenuBar()
     });
 }
 
-void MainWindow::InitCentralWidget()
+void GUIMainWindow::InitCentralWidget()
 {
     const QPointer central_widget = new QWidget();
     setCentralWidget(central_widget);
@@ -64,6 +79,16 @@ void MainWindow::InitCentralWidget()
     m_source->setPlainText(SOURCE_INIT);
     main_layout->addWidget(m_source, 0, 0);
 
-    m_canvas = new Canvas();
-    main_layout->addWidget(m_canvas, 0, 1);
+    connect(m_source, &QPlainTextEdit::textChanged, this, &GUIMainWindow::ParseAndUpdate);
+
+    m_scene = new GUIScene(this);
+    //m_scene->setSceneRect(0, 0, SCENE_SIZE, SCENE_SIZE);
+    //const auto view = new QGraphicsView(m_scene);
+    //view->setDragMode(QGraphicsView::NoDrag);
+    const auto viewer = new GUISceneViewer(m_scene);
+    main_layout->addWidget(viewer, 0, 1);
+
+    // Same width for both columns
+    main_layout->setColumnStretch(0, 1);
+    main_layout->setColumnStretch(1, 1);
 }

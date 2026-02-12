@@ -1,60 +1,78 @@
 #pragma once
 
+// Qt imports
 #include <QMainWindow>
 #include <QPointer>
-#include <QPlainTextEdit>
 
-#include "Canvas.hpp"
+// Qt fwd declrs
+QT_BEGIN_NAMESPACE
+class QPlainTextEdit;
+QT_END_NAMESPACE
 
-class MainWindow : public QMainWindow
+// App imports
+#include "../Logic/Parser.hpp"
+#include "SceneItem/SceneNode.hpp"
+
+// App fwd declrs
+class GUIScene;
+
+// =====================================
+class GUIMainWindow : public QMainWindow
 {
     Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget* parent = nullptr);
-    ~MainWindow() override = default;
-
-private slots:
+    GUIMainWindow();
+    ~GUIMainWindow() override = default;
 
 private:
+    // = Methods =
+    void ParseAndUpdate();
+
     void InitMainMenuBar();
     void InitCentralWidget();
 
+    // = Members=
+    // Text editor with the TOML describing the diagram
     QPointer<QPlainTextEdit> m_source;
-    QPointer<Canvas> m_canvas;
+    // This is where diagram will be rendered
+    QPointer<GUIScene> m_scene;
+
+    // TOML parser
+    Parser m_parser;
 
     // Temporary
     static constexpr auto SOURCE_INIT = R"""([variables]
 w = 110
 h = 72
 
-[node."0,0"]
+[node."0,0000000000000000000000000000000000000000000000000000000000"]
 
 [node.Cache]
 xy = [70, 70]
-size = ["w", "h"]
+#size = ["w", "h"]
 
 [node.ALU]
 pivot = "top"
 xy = ["Cache", "bottom", 0, 35]
-size = ["w", "h"]
+#size = ["w", "h"]
 z = 6
 color = "#006db6AF"
 
 [node."Řídící\njednotka"]
 pivot = "top"
 xy = ["ALU", "bottom", 0, 35]
-size = ["w", "h"]
+#size = ["w", "h"]
 
 [node."Datové\nregistry"]
 pivot = "left"
 xy = ["ALU", "right", 35, 0]
-size = ["w", "h"]
+#size = ["w", "h"]
 
 [node."Stavové\nregistry"]
 pivot = "left"
 xy = ["Řídící\njednotka", "right", 35, 0]
-size = ["w", "h"]
+#size = ["w", "h"]
 
 [[path]]
 start=["Cache", "left", 0, 0]
