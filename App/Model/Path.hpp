@@ -2,6 +2,8 @@
 
 #include <vector>
 
+#include <QColor>
+
 #include "Pathpoint.hpp"
 #include "Point.hpp"
 
@@ -13,7 +15,7 @@ struct Path
 
     int shift{};
 
-    std::tuple<unsigned char, unsigned char, unsigned char, unsigned char> color = {0, 0, 0, 255};
+    QColor color = {0, 0, 0, 255};
 
     bool do_start_arrow = false;
     bool do_end_arrow = true;

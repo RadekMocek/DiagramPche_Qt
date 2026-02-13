@@ -9,6 +9,8 @@
 #include "../Model/Node.hpp"
 #include "../Model/Path.hpp"
 
+class QColor;
+
 class Parser
 {
 public:
@@ -36,11 +38,7 @@ private:
     void SetPivotFromString(const toml::value<std::string>* value_str_ptr, Pivot& to_set);
     void SetIntFromIntOrVariable(const toml::node& value, int& to_set);
     void SetPositionPointFromArray(const toml::node& value, Point& to_set);
-
-    void SetColorFromArray(
-        const toml::node& value,
-        std::tuple<unsigned char, unsigned char, unsigned char, unsigned char>& to_set
-    );
+    void SetColorFromArray(const toml::node& value, QColor& to_set);
 
     int GetZFromInt(const toml::node& value, bool is_node);
 

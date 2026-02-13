@@ -35,6 +35,7 @@ private:
     // = Members=
     // Text editor with the TOML describing the diagram
     QPointer<QPlainTextEdit> m_source;
+
     // This is where diagram will be rendered
     QPointer<GUIScene> m_scene;
 

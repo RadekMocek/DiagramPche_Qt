@@ -1,9 +1,8 @@
 #pragma once
 
-#include <tuple>
+#include <QColor>
 
-constexpr std::tuple<unsigned char, unsigned char, unsigned char, unsigned char>
-GetTupleFromString(const std::string& color_str)
+constexpr QColor GetQColorFromString(const std::string& color_str)
 {
     if (color_str.length() == 9 && color_str[0] == '#') {
         unsigned int r = 0, g = 0, b = 0, a = 0;

@@ -25,5 +25,5 @@ private:
     QFont m_font;
     QFontMetrics m_font_metrics;
 
-    std::unordered_map<QString, SceneNode*> m_scene_nodes;
+    std::unordered_map<std::string, SceneNode*> m_scene_nodes;
 };

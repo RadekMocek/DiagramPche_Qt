@@ -2,6 +2,8 @@
 
 #include <string>
 
+#include <QColor>
+
 #include "Pivot.hpp"
 #include "Point.hpp"
 //#include "../Helper/DrawLayer.hpp"
@@ -22,7 +24,7 @@ struct Node
     Pivot pivot = TOPLEFT;
 
     // = Color =
-    std::tuple<unsigned char, unsigned char, unsigned char, unsigned char> color = {255, 255, 255, 255};
+    QColor color = {255, 255, 255, 255};
 
     // = Size =
     int width{};

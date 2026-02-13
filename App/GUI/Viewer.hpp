@@ -12,7 +12,8 @@ private:
     void mouseMoveEvent(QMouseEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
+    void wheelEvent(QWheelEvent* event) override;
 
-    bool _pan{};
-    int _panStartX{}, _panStartY{};
+    bool m_is_panning{};
+    int m_pan_start_x{}, m_pan_start_y{};
 };

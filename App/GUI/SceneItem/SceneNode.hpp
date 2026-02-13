@@ -2,19 +2,21 @@
 
 // Qt imports
 #include <QGraphicsItem>
-#include <QPainter>
+
+// Qt fwd declrs
+class QPainter;
 
 // App imports
+#include "App/Model/Node.hpp"
 #include "App/Model/Pivot.hpp"
 
 // App fwd declrs
-class Node;
 
 // ===================================
 class SceneNode : public QGraphicsItem
 {
 public:
-    explicit SceneNode(const QFont& font, const QString& text, QSizeF size);
+    explicit SceneNode(const Node& node, const QFont& font, const QFontMetrics& font_metrics);
 
     [[nodiscard]] QRectF boundingRect() const override;
 
@@ -23,7 +25,7 @@ public:
     [[nodiscard]] QPointF GetOffsetFromPivot(Pivot pivot) const;
 
 private:
+    Node m_node;
     QFont m_font;
-    QString m_text;
-    QSizeF m_size;
+    QFontMetrics m_font_metrics;
 };
