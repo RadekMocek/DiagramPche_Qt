@@ -15,6 +15,7 @@ QT_END_NAMESPACE
 
 // App fwd declrs
 class GUIScene;
+class GUISceneViewer;
 
 // =====================================
 class GUIMainWindow : public QMainWindow
@@ -40,6 +41,9 @@ private:
 
     // This is where diagram will be rendered
     QPointer<GUIScene> m_scene;
+
+    // Parent for the scene
+    QPointer<GUISceneViewer> m_viewer;
 
     // TOML parser
     Parser m_parser;

@@ -8,6 +8,7 @@
 #include "../Helper/Print.hpp"
 #include "Scene.hpp"
 #include "Viewer.hpp"
+#include "../Config.hpp"
 
 GUIMainWindow::GUIMainWindow()
 {
@@ -41,6 +42,12 @@ void GUIMainWindow::InitMainMenuBar()
     const QPointer view_menu = main_menu_bar->addMenu("View");
     // . Grid .
     const QPointer view_grid_action = view_menu->addAction("Grid");
+    view_grid_action->setCheckable(true);
+    view_grid_action->setChecked(DO_SHOW_GRID_INIT);
+    connect(view_grid_action, &QAction::toggled, [this](const bool is_checked) {
+        m_viewer->m_do_show_grid = is_checked;
+        m_scene->update();
+    });
 
     // .: Debug :.
     const QPointer debug_menu = main_menu_bar->addMenu("Debug");
@@ -86,10 +93,9 @@ void GUIMainWindow::InitCentralWidget()
 
     m_scene = new GUIScene(this);
     //m_scene->setSceneRect(0, 0, SCENE_SIZE, SCENE_SIZE);
-    //const auto view = new QGraphicsView(m_scene);
-    //view->setDragMode(QGraphicsView::NoDrag);
-    const auto viewer = new GUISceneViewer(m_scene);
-    main_layout->addWidget(viewer, 0, 1);
+
+    m_viewer = new GUISceneViewer(m_scene);
+    main_layout->addWidget(m_viewer, 0, 1);
 
     // Same width for both columns
     main_layout->setColumnStretch(0, 1);

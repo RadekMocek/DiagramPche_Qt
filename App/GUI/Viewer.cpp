@@ -1,8 +1,13 @@
-#include "../Helper/Print.hpp"
-#include "Viewer.hpp"
 #include <QMouseEvent>
 
-GUISceneViewer::GUISceneViewer(QGraphicsScene* scene, QWidget* parent) : QGraphicsView(scene, parent) {}
+#include "../Helper/Print.hpp"
+#include "Viewer.hpp"
+#include "../Config.hpp"
+
+GUISceneViewer::GUISceneViewer(QGraphicsScene* scene, QWidget* parent) : QGraphicsView(scene, parent)
+{
+    setViewportUpdateMode(QGraphicsView::FullViewportUpdate); // For the grid to work
+}
 
 void GUISceneViewer::mousePressEvent(QMouseEvent* event)
 {
@@ -65,4 +70,33 @@ void GUISceneViewer::wheelEvent(QWheelEvent* event)
     }
 
     setTransformationAnchor(anchor);
+}
+
+void GUISceneViewer::drawBackground(QPainter* painter, const QRectF& rect)
+{
+    painter->fillRect(rect, COLOR_CANVAS_BACKGROUND);
+    if (!m_do_show_grid) return;
+
+    painter->setRenderHint(QPainter::Antialiasing, true);
+
+    QPen pen(COLOR_GRID_LINE);
+    pen.setWidth(1);
+    painter->setPen(pen);
+
+    qreal x1, y1, x2, y2;
+    rect.getCoords(&x1, &y1, &x2, &y2);
+
+    const int left_gridline_index = static_cast<int>(std::ceil(x1 / GRID_STEP_BASE));
+    const int right_gridline_index = static_cast<int>(std::floor(x2 / GRID_STEP_BASE));
+    for (auto i = left_gridline_index; i <= right_gridline_index; ++i) {
+        const auto x = i * GRID_STEP_BASE;
+        painter->drawLine(x, y1, x, y2);
+    }
+
+    const int top_gridline_index = static_cast<int>(std::ceil(y1 / GRID_STEP_BASE));
+    const int bottom_gridline_index = static_cast<int>(std::floor(y2 / GRID_STEP_BASE));
+    for (auto i = top_gridline_index; i <= bottom_gridline_index; ++i) {
+        const auto y = i * GRID_STEP_BASE;
+        painter->drawLine(x1, y, x2, y);
+    }
 }
