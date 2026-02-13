@@ -74,15 +74,70 @@ void GUIScene::Hobluj(std::priority_queue<Node>& pq)
             break;
         }
 
+        // Final position rect
+        const QRectF rect(position, size);
+
         // Label position
         QPointF label_position = position + QPointF(NODE_PADDING, NODE_PADDING);
 
         // Custom label position?
         if (node.width > 0 || node.height > 0) {
-            // Custom width/height => `text_pos` makes sense
+            // Custom width/height => `label_pos` makes sense
+            switch (node.label_position) {
+            case TOPLEFT:
+                break;
+            case TOP:
+                label_position = {
+                    rect.center().x() - label_rect.width() / 2,
+                    label_position.y()
+                };
+                break;
+            case TOPRIGHT:
+                label_position = {
+                    rect.bottomRight().x() - label_rect.width() - NODE_PADDING,
+                    label_position.y()
+                };
+                break;
+            case RIGHT:
+                label_position = {
+                    rect.bottomRight().x() - label_rect.width() - NODE_PADDING,
+                    rect.center().y() - label_rect.height() / 2
+                };
+                break;
+            case BOTTOMRIGHT:
+                label_position = {
+                    rect.bottomRight().x() - label_rect.width() - NODE_PADDING,
+                    rect.bottomRight().y() - label_rect.height() - NODE_PADDING
+                };
+                break;
+            case BOTTOM:
+                label_position = {
+                    rect.center().x() - label_rect.width() / 2,
+                    rect.bottomRight().y() - label_rect.height() - NODE_PADDING
+                };
+                break;
+            case BOTTOMLEFT:
+                label_position = {
+                    label_position.x(),
+                    rect.bottomRight().y() - label_rect.height() - NODE_PADDING
+                };
+                break;
+            case LEFT:
+                label_position = {
+                    label_position.x(),
+                    rect.center().y() - label_rect.height() / 2
+                };
+                break;
+            case CENTER:
+                label_position = {
+                    rect.center().x() - label_rect.width() / 2,
+                    rect.center().y() - label_rect.height() / 2
+                };
+                break;
+            }
         }
 
-        auto* item = new SceneNode({QRectF(position, size), node.color, m_font, label_position, label_value});
+        auto* item = new SceneNode({rect, node.color, m_font, label_position, label_value});
         addItem(item);
         m_scene_nodes.insert({node.id, item});
     }

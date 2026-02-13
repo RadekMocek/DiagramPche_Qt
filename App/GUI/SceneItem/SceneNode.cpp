@@ -3,15 +3,14 @@
 #include "SceneNode.hpp"
 #include "../../Helper/Print.hpp"
 
-SceneNode::SceneNode(const SceneNodeCrate& crate)
+SceneNode::SceneNode(const SceneNodeCrate& crate) :
+    m_aabr(crate.aabr),
+    m_color(crate.color),
+    m_font(crate.font),
+    m_label_position(crate.label_position),
+    m_label_value(crate.label_value)
 {
-    m_aabr = crate.aabr;
-    m_color = crate.color;
-    m_font = crate.font;
-    m_label_position = crate.label_position;
-    m_label_value = crate.label_value;
-
-    Print(m_label_value.toStdString()<<" "<<m_aabr.left()<<" "<<m_aabr.top());
+    //
 }
 
 QRectF SceneNode::boundingRect() const

@@ -47,7 +47,15 @@ private:
 w = 110
 h = 72
 
-[node."0,0000000000000000000000000000000000000000000000000000000000"]
+[node."0,0"]
+
+[node.custom_size]
+value = "it is\nwhat\nit is"
+xy = ["Datové\nregistry", "top-right", -10, 10]
+pivot = "bottom-left"
+size = [200, 150]
+label_pos = "bottom-right"
+z = 3
 
 [node.Cache]
 xy = [70, 70]
