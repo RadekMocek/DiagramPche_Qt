@@ -11,3 +11,5 @@ constexpr bool DO_SHOW_GRID_INIT = true;
 constexpr qreal GRID_STEP_BASE = 100.0;
 //inline QColor COLOR_GRID_LINE = QColor::fromRgba64(200, 200, 200, 40);
 inline QColor COLOR_GRID_LINE = QColor::fromRgb(200, 200, 200);
+
+inline QColor COLOR_ERROR = QColor::fromRgb(211, 1, 2);

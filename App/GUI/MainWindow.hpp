@@ -6,6 +6,7 @@
 
 // Qt fwd declrs
 QT_BEGIN_NAMESPACE
+class QLabel;
 class QPlainTextEdit;
 QT_END_NAMESPACE
 
@@ -47,6 +48,8 @@ private:
 
     // TOML parser
     Parser m_parser;
+
+    QPointer<QLabel> m_error_label;
 
     // Temporary
     static constexpr auto SOURCE_INIT = R"""([variables]

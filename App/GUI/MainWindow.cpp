@@ -1,5 +1,6 @@
 #include <QGraphicsView>
 #include <QGridLayout>
+#include <QLabel>
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QPlainTextEdit>
@@ -25,6 +26,7 @@ void GUIMainWindow::ParseAndUpdate()
 {
     m_parser.Parse(m_source->toPlainText().toStdString());
     m_scene->Hobluj(m_parser.m_result_nodes_pq);
+    m_error_label->setText((m_parser.m_is_error) ? QString::fromStdString(m_parser.m_error_description) : "");
 }
 
 void GUIMainWindow::InitMainMenuBar()
@@ -96,6 +98,13 @@ void GUIMainWindow::InitCentralWidget()
 
     m_viewer = new GUISceneViewer(m_scene);
     main_layout->addWidget(m_viewer, 0, 1);
+
+    QPalette error_text_palette;
+    error_text_palette.setColor(QPalette::WindowText, COLOR_ERROR);
+
+    m_error_label = new QLabel();
+    m_error_label->setPalette(error_text_palette);
+    main_layout->addWidget(m_error_label, 1, 0, 1, 2);
 
     // Same width for both columns
     main_layout->setColumnStretch(0, 1);
