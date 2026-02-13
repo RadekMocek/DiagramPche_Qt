@@ -32,6 +32,8 @@ private:
     void InitMainMenuBar();
     void InitCentralWidget();
 
+    void LoadSourceFromFile(const char* filename);
+
     // = Members=
     // Text editor with the TOML describing the diagram
     QPointer<QPlainTextEdit> m_source;

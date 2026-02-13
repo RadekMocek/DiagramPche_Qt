@@ -5,10 +5,8 @@
 #include <QPlainTextEdit>
 
 #include "MainWindow.hpp"
-#include "../Config.hpp"
 #include "../Helper/Print.hpp"
 #include "Scene.hpp"
-#include "SceneItem/SceneNode.hpp"
 #include "Viewer.hpp"
 
 GUIMainWindow::GUIMainWindow()
@@ -49,12 +47,16 @@ void GUIMainWindow::InitMainMenuBar()
     // .: Render tests :.
     const QPointer render_tests_menu = debug_menu->addMenu("Render tests");
     const QPointer render_test_1_action = render_tests_menu->addAction("Z-axis, out-of-order");
+    connect(render_test_1_action, &QAction::triggered, [this] {
+        LoadSourceFromFile("./Resource/Example/Debug/Z-axis.toml");
+    });
 
     // .: Help :.
     const QPointer help_menu = main_menu_bar->addMenu("Help");
     // .: Examples :.
     const QPointer examples_menu = help_menu->addMenu("Examples");
     const QPointer example_1_action = examples_menu->addAction("Example 1");
+    connect(example_1_action, &QAction::triggered, [this] { LoadSourceFromFile("./Resource/Example/Example1.toml"); });
     // . About .
     const QPointer about_action = help_menu->addAction("About");
     connect(about_action, &QAction::triggered, [this] {
@@ -62,7 +64,8 @@ void GUIMainWindow::InitMainMenuBar()
         msgBox.setWindowTitle("About");
         msgBox.setTextFormat(Qt::RichText); // For <a href> to work
         msgBox.setText(
-            "DiagramPche :: Qt<br><a href='https://github.com/RadekMocek/DiagramPche_Qt'>https://github.com/RadekMocek/DiagramPche_Qt</a>");
+            "DiagramPche :: Qt<br><a href='https://github.com/RadekMocek/DiagramPche_Qt'>https://github.com/RadekMocek/DiagramPche_Qt</a>"
+        );
         msgBox.exec();
     });
 }

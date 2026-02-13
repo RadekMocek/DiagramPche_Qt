@@ -8,7 +8,10 @@
 
 inline QColor GetColorFromTuple(const std::tuple<unsigned char, unsigned char, unsigned char, unsigned char>& tup)
 {
-    Print("GetColorFromTuple>" << std::get<0>(tup) << " " << std::get<1>(tup) << " " << std::get<2>(tup) << " " << std::get<3>(tup));
+    Print("GetColorFromTuple>" << static_cast<int>(std::get<0>(tup))
+        << " " << static_cast<int>(std::get<1>(tup))
+        << " " << static_cast<int>(std::get<2>(tup))
+        << " " << static_cast<int>(std::get<3>(tup)));
     return QColor::fromRgba64(std::get<0>(tup), std::get<1>(tup), std::get<2>(tup), std::get<3>(tup));
 }
 
