@@ -1,9 +1,21 @@
 #pragma once
 
+#include <tuple>
+
 #include <QColor>
 
-constexpr QColor GetQColorFromString(const std::string& color_str)
+#include "Print.hpp"
+
+inline QColor GetColorFromTuple(const std::tuple<unsigned char, unsigned char, unsigned char, unsigned char>& tup)
 {
+    Print("GetColorFromTuple>" << std::get<0>(tup) << " " << std::get<1>(tup) << " " << std::get<2>(tup) << " " << std::get<3>(tup));
+    return QColor::fromRgba64(std::get<0>(tup), std::get<1>(tup), std::get<2>(tup), std::get<3>(tup));
+}
+
+inline std::tuple<unsigned char, unsigned char, unsigned char, unsigned char>
+GetTupleFromString(const std::string& color_str)
+{
+    Print("GetTupleFromString>" << color_str);
     if (color_str.length() == 9 && color_str[0] == '#') {
         unsigned int r = 0, g = 0, b = 0, a = 0;
         std::sscanf(color_str.c_str(), "#%2x%2x%2x%2x", &r, &g, &b, &a);

@@ -1,5 +1,6 @@
 #include "Scene.hpp"
 #include "../Model/Node.hpp"
+#include "App/Helper/Color.hpp"
 #include "App/Helper/Print.hpp"
 #include "SceneItem/SceneNode.hpp"
 
@@ -15,6 +16,7 @@ void GUIScene::Hobluj(std::priority_queue<Node>& pq)
     for (; !pq.empty(); pq.pop()) {
         constexpr auto NODE_PADDING = 18;
         const auto& node = pq.top();
+        Print("== " << node.id << " ==");
 
         // Qt friendly label
         const auto label_value = QString::fromStdString(node.value);
@@ -137,7 +139,7 @@ void GUIScene::Hobluj(std::priority_queue<Node>& pq)
             }
         }
 
-        auto* item = new SceneNode({rect, node.color, m_font, label_position, label_value});
+        auto* item = new SceneNode({rect, GetColorFromTuple(node.color), m_font, label_position, label_value});
         addItem(item);
         m_scene_nodes.insert({node.id, item});
     }

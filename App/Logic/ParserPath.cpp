@@ -94,7 +94,7 @@ void Parser::ParsePath(const toml::table* path_table, Path& curr_path)
         }
         // == z ==> integer
         else if (key_str == "z") {
-            //curr_path.z = GetZFromInt(value, false);
+            curr_path.z = GetZFromInt(value, false);
         }
         // == Unknown key ==> report error
         else ReportError(key.source(), std::format("Unknown key '{}'", key_str));

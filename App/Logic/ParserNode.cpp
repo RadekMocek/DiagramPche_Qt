@@ -50,7 +50,7 @@ void Parser::ParseNode(const toml::table* node_table, Node& curr_node)
         }
         // == z ==> integer
         else if (key_str == "z") {
-            //curr_node.z = GetZFromInt(value, true);
+            curr_node.z = GetZFromInt(value, true);
         }
         // == Unknown key ==> report error
         else ReportError(key.source(), std::format("Unknown key '{}'", key_str));

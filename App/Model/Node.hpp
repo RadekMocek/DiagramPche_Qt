@@ -2,11 +2,9 @@
 
 #include <string>
 
-#include <QColor>
-
 #include "Pivot.hpp"
 #include "Point.hpp"
-//#include "../Helper/DrawLayer.hpp"
+#include "App/Helper/DrawLayer.hpp"
 
 struct Node
 {
@@ -24,7 +22,7 @@ struct Node
     Pivot pivot = TOPLEFT;
 
     // = Color =
-    QColor color = {255, 255, 255, 255};
+    std::tuple<unsigned char, unsigned char, unsigned char, unsigned char> color = {255, 255, 255, 255};
 
     // = Size =
     int width{};
@@ -34,7 +32,7 @@ struct Node
     Pivot label_position = CENTER;
 
     // = Z =
-    //int z = DL_USER_CHANNEL_DEFAULT_NODE;
+    int z = DL_USER_CHANNEL_DEFAULT_NODE;
 
     // = Other internal =
     int draw_batch_number = 0;
