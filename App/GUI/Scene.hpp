@@ -17,9 +17,10 @@ class GUIScene : public QGraphicsScene
     Q_OBJECT
 
 public:
-    explicit GUIScene(QObject* parent = nullptr);
+    explicit GUIScene(const QFont& font, QObject* parent = nullptr);
 
-    void Hobluj(std::priority_queue<Node>& pq);
+    void Redraw(std::priority_queue<Node>& pq);
+    void GUISceneDrawNode(const Node& node);
 
 private:
     QFont m_font;

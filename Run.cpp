@@ -13,7 +13,7 @@ int main(int argc, char* argv[])
     QFont default_font;
     default_font.setFamily("Inconsolata Medium");
     default_font.setPixelSize(FONT_SIZE_DEFAULT);
-    app.setFont(default_font);
+    QApplication::setFont(default_font);
 
     GUIMainWindow window;
     window.show();

@@ -2,8 +2,8 @@
 
 ## TODO
 
-* Transparency issues?
 * App icon
+* All nodes disappear instead of showing last valid nodes when TOML parsing error occurs
 
 ## Dependencies
 

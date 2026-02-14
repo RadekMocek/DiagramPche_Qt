@@ -25,7 +25,8 @@ GUIMainWindow::GUIMainWindow()
 void GUIMainWindow::ParseAndUpdate()
 {
     m_parser.Parse(m_source->toPlainText().toStdString());
-    m_scene->Hobluj(m_parser.m_result_nodes_pq);
+    //Print(m_parser.m_result_nodes_pq.size());
+    m_scene->Redraw(m_parser.m_result_nodes_pq);
     m_error_label->setText((m_parser.m_is_error) ? QString::fromStdString(m_parser.m_error_description) : "");
 }
 
@@ -98,7 +99,10 @@ void GUIMainWindow::InitCentralWidget()
 
     connect(m_source, &QPlainTextEdit::textChanged, this, &GUIMainWindow::ParseAndUpdate);
 
-    m_scene = new GUIScene(this);
+    QFont scene_font;
+    scene_font.setFamily("Inconsolata Medium");
+    scene_font.setPixelSize(SCENE_FONT_SIZE_BASE);
+    m_scene = new GUIScene(scene_font, this);
     //m_scene->setSceneRect(0, 0, SCENE_SIZE, SCENE_SIZE);
 
     m_viewer = new GUISceneViewer(m_scene);
