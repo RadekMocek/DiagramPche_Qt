@@ -2,7 +2,6 @@
 
 // Std imports
 #include <queue>
-#include <vector>
 
 // Qt imports
 #include <QFontMetrics>
