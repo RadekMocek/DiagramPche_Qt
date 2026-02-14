@@ -1,17 +1,9 @@
 #pragma once
 
-// Qt imports
 #include <QGraphicsItem>
 
-
-// Qt fwd declrs
-class QPainter;
-
-// App imports
-#include "App/Model/SceneNodeCrate.hpp"
-#include "App/Model/Pivot.hpp"
-
-// App fwd declrs
+#include "../../Model/Pivot.hpp"
+#include "../../Model/SceneNodeCrate.hpp"
 
 // ===================================
 class SceneNode : public QGraphicsItem
@@ -29,8 +21,6 @@ private:
     [[nodiscard]] QPointF GetOffsetFromPivot(Pivot pivot) const;
 
     //
-
-    SceneNodeCrate m_crate;
 
     QRectF m_aabr;
     QColor m_color;

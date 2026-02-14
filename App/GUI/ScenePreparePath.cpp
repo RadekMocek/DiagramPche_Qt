@@ -1,7 +1,9 @@
 #include "Scene.hpp"
+#include "../Helper/AABR.hpp"
 #include "../Helper/Color.hpp"
 #include "../Model/Path.hpp"
 #include "SceneItem/SceneNode.hpp"
+#include "SceneItem/ScenePath.hpp"
 
 void GUIScene::GUIScenePreparePath(const Path& path)
 {
@@ -22,19 +24,23 @@ void GUIScene::GUIScenePreparePath(const Path& path)
         }
     }
 
+    // QGraphicsItem needs to have everything drawn in its boundingRect, which we must set correctly, so we remember the boundaries
+    AABRHelper aabr(start);
+
     // One path can have multiple ends defined by the user => one [[path]] can define multiple result_paths.
     // Every result_path will be defined as a list of points `QList<QPointF>` (start point, maybe some Pathpoints, end point).
-    // List of these lists will be given to the draw command.
+    // List of these lists will be given to the draw command, it needs a list of pairs, so there will be duplicates.
     QList<QList<QPointF>> result_paths;
 
     // Each inner vector starts with the start point; or, if shift != 0 && start point is relative, with OG start point followed by a shifted start point
     if (!do_start_shift) {
-        result_paths = QList<QList<QPointF>>(path.ends.size(), QList<QPointF>({start}));
+        result_paths = QList<QList<QPointF>>(path.ends.size(), QList<QPointF>());
     }
     else {
         const auto shifted_start = start + path.GetShiftVector(path.start.parent_pivot);
-        result_paths = QList<QList<QPointF>>(path.ends.size(), QList<QPointF>({start, shifted_start}));
+        result_paths = QList<QList<QPointF>>(path.ends.size(), QList({start, shifted_start}));
         start = shifted_start; // Do this so Pathpoints relative to start are relative to this
+        aabr.Update(start);
     }
 
     // Foreach end point
@@ -109,18 +115,29 @@ void GUIScene::GUIScenePreparePath(const Path& path)
             }
 
             // Pathpoint is ready now
+            result_pathpoints.append(prev);
             result_pathpoints.append(curr);
+            aabr.Update(curr);
 
             // Ready for the next iteration
             prev = curr;
         }
 
         // After the Pathpoints are ready add the endpoint(s)
+        result_pathpoints.append(prev);
         result_pathpoints.append(shifted_end);
+        aabr.Update(shifted_end);
         if (do_end_shift) {
+            result_pathpoints.append(shifted_end);
             result_pathpoints.append(end);
+            aabr.Update(end);
         }
     }
 
-    // Make a "draw command"
+    //
+    auto* item = new ScenePath({
+        aabr.ToQRectF(), result_paths, GetColorFromTuple(path.color), path.do_start_arrow, path.do_end_arrow
+    });
+    item->setZValue(DLUserChannelToRealChannel(path.z, false));
+    addItem(item);
 }

@@ -127,6 +127,7 @@ void GUIScene::GUIScenePrepareNode(const Node& node)
         }
     }
 
+    //
     auto* item = new SceneNode({rect, GetColorFromTuple(node.color), m_font, label_position, label_value});
     item->setZValue(DLUserChannelToRealChannel(node.z, true));
     addItem(item);
