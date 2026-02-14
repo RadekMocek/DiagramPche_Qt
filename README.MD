@@ -2,7 +2,9 @@
 
 ## TODO
 
+* Error highlight
 * App icon
+* Endless scrolling
 * All nodes disappear instead of showing last valid nodes when TOML parsing error occurs
 
 ## Dependencies

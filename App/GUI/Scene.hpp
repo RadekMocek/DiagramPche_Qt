@@ -9,6 +9,7 @@
 
 // App fwd declrs
 struct Node;
+struct Path;
 class SceneNode;
 
 // ===================================
@@ -19,8 +20,9 @@ class GUIScene : public QGraphicsScene
 public:
     explicit GUIScene(const QFont& font, QObject* parent = nullptr);
 
-    void Redraw(std::priority_queue<Node>& pq);
-    void GUISceneDrawNode(const Node& node);
+    void Redraw(std::priority_queue<Node>& nodes_pq, const std::vector<Path>& paths_vec);
+    void GUIScenePrepareNode(const Node& node);
+    void GUIScenePreparePath(const Path& path);
 
 private:
     QFont m_font;

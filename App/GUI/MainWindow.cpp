@@ -26,7 +26,7 @@ void GUIMainWindow::ParseAndUpdate()
 {
     m_parser.Parse(m_source->toPlainText().toStdString());
     //Print(m_parser.m_result_nodes_pq.size());
-    m_scene->Redraw(m_parser.m_result_nodes_pq);
+    m_scene->Redraw(m_parser.m_result_nodes_pq, m_parser.m_result_paths);
     m_error_label->setText((m_parser.m_is_error) ? QString::fromStdString(m_parser.m_error_description) : "");
 }
 

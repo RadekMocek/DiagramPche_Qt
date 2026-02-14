@@ -2,6 +2,8 @@
 
 #include <vector>
 
+#include <QPointF>
+
 #include "Pathpoint.hpp"
 #include "Point.hpp"
 #include "App/Helper/DrawLayer.hpp"
@@ -20,4 +22,32 @@ struct Path
     bool do_end_arrow = true;
 
     int z = DL_USER_CHANNEL_DEFAULT_PATH;
+
+    //
+    [[nodiscard]] constexpr QPointF GetShiftVector(const Pivot pivot) const
+    {
+        const auto sf = static_cast<qreal>(shift);
+        switch (pivot) {
+        default:
+            // Unreachable (?), fallthrough
+        case CENTER:
+            return {0, 0};
+        case TOPLEFT:
+            return {-sf, -sf};
+        case TOP:
+            return {0, -sf};
+        case TOPRIGHT:
+            return {+sf, -sf};
+        case RIGHT:
+            return {+sf, 0};
+        case BOTTOMRIGHT:
+            return {+sf, +sf};
+        case BOTTOM:
+            return {0, +sf};
+        case BOTTOMLEFT:
+            return {-sf, +sf};
+        case LEFT:
+            return {-sf, 0};
+        }
+    }
 };

@@ -1,7 +1,6 @@
 #include <QPainter>
 
 #include "SceneNode.hpp"
-#include "../../Helper/Print.hpp"
 
 SceneNode::SceneNode(const SceneNodeCrate& crate) :
     m_aabr(crate.aabr),

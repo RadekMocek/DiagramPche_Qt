@@ -4,7 +4,7 @@
 #include "../Helper/Color.hpp"
 #include "../Model/Node.hpp"
 
-void GUIScene::GUISceneDrawNode(const Node& node)
+void GUIScene::GUIScenePrepareNode(const Node& node)
 {
     // Qt friendly label
     const auto label_value = QString::fromStdString(node.value);
