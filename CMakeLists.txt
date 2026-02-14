@@ -38,6 +38,7 @@ if (MSVC)
     #set_target_properties("${CMAKE_PROJECT_NAME}" PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup") # No console
 endif ()
 
+# == Resources ==
 # Copy resources folder
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/Resource
         DESTINATION ${CMAKE_CURRENT_BINARY_DIR}

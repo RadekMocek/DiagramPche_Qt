@@ -16,7 +16,6 @@ void GUIScene::Hobluj(std::priority_queue<Node>& pq)
     for (; !pq.empty(); pq.pop()) {
         constexpr auto NODE_PADDING = 18;
         const auto& node = pq.top();
-        Print("== " << node.id << " ==");
 
         // Qt friendly label
         const auto label_value = QString::fromStdString(node.value);
