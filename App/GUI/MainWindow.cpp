@@ -32,6 +32,11 @@ void GUIMainWindow::ParseAndUpdate()
 void GUIMainWindow::InitMainMenuBar()
 {
     const QPointer main_menu_bar = new QMenuBar(this);
+
+    QFont menu_font = main_menu_bar->font();
+    menu_font.setPixelSize(FONT_SIZE_MAIN_MENU_BAR);
+    main_menu_bar->setFont(menu_font);
+
     setMenuBar(main_menu_bar);
 
     // .: File :.

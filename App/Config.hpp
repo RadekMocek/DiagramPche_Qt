@@ -2,6 +2,9 @@
 
 #include <QColor>
 
+constexpr auto FONT_SIZE_DEFAULT = 20;
+constexpr auto FONT_SIZE_MAIN_MENU_BAR = 16;
+
 //constexpr auto SCENE_SIZE = 5000;
 //constexpr auto SCENE_MID = SCENE_SIZE / 2;
 
