@@ -6,10 +6,10 @@
 #include <QPlainTextEdit>
 
 #include "MainWindow.hpp"
+#include "../Config.hpp"
 #include "../Helper/Print.hpp"
 #include "Scene.hpp"
 #include "Viewer.hpp"
-#include "../Config.hpp"
 
 GUIMainWindow::GUIMainWindow()
 {
@@ -27,7 +27,15 @@ void GUIMainWindow::ParseAndUpdate()
     m_parser.Parse(m_source->toPlainText().toStdString());
     //Print(m_parser.m_result_nodes_pq.size());
     m_scene->Redraw(m_parser.m_result_nodes_pq, m_parser.m_result_paths);
-    m_error_label->setText((m_parser.m_is_error) ? QString::fromStdString(m_parser.m_error_description) : "");
+
+    if (m_parser.m_is_error) {
+        auto err_str = QString::fromStdString(m_parser.m_error_description);
+        err_str.replace("\n", " ");
+        m_error_label->setText(err_str);
+    }
+    else {
+        m_error_label->setText("");
+    }
 }
 
 void GUIMainWindow::InitMainMenuBar()

@@ -15,6 +15,8 @@ int main(int argc, char* argv[])
     default_font.setPixelSize(FONT_SIZE_DEFAULT);
     QApplication::setFont(default_font);
 
+    app.setWindowIcon(QIcon("./Resource/Icon/icon-256.png"));
+
     GUIMainWindow window;
     window.show();
 
