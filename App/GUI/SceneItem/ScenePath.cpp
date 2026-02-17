@@ -22,12 +22,13 @@ void ScenePath::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
     for (const auto& path : m_crate.paths) {
         painter->drawLines(path);
 
-        if (m_crate.do_end_arrow && path.length() >= 2) {
-            DrawArrowTip(painter, path[path.length() - 2], path[path.length() - 1]);
+        if (path.length() >= 2) {
+            if (m_crate.do_start_arrow) {
+                DrawArrowTip(painter, path[1], path[0]);
+            }
+            if (m_crate.do_end_arrow) {
+                DrawArrowTip(painter, path[path.length() - 2], path[path.length() - 1]);
+            }
         }
-    }
-
-    if (m_crate.do_start_arrow && !m_crate.paths.empty() && m_crate.paths[0].length() >= 2) {
-        DrawArrowTip(painter, m_crate.paths[0][1], m_crate.paths[0][0]);
     }
 }

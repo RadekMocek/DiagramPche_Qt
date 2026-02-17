@@ -75,7 +75,7 @@ pivot = "top"
 xy = ["Cache", "bottom", 0, 35]
 #size = ["w", "h"]
 z = 6
-color = "#006db6AF"
+color = "#006db680"
 
 [node."Řídící\njednotka"]
 pivot = "top"
@@ -120,5 +120,15 @@ points=[
   ["","",500,"","",500],
 ]
 tips="<>"
+
+[[path]]
+start=["Datové\nregistry","right",0,20]
+ends=[
+  ["Datové\nregistry","right",200,0],
+  ["Datové\nregistry","right",200,15],
+  ["Datové\nregistry","right",200,30],
+]
+points=[["","start",50,"","end",0]]
+tips="<-"
 )""";
 };
