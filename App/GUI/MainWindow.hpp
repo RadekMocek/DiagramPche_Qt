@@ -32,6 +32,8 @@ private:
     void ParseAndUpdate();
 
     void InitMainMenuBar();
+    static void ApplyFontMenu(const QMenu* menu, const QFont& font);
+
     void InitCentralWidget();
 
     void LoadSourceFromFile(const char* filename);
@@ -109,7 +111,7 @@ tips="<>"
 [[path]]
 start=["Cache","top-left",0,0]
 end=["Cache","bottom-right",0,0]
-color=[150,0,0,255]
+color=[150,0,0,80]
 tips="<>"
 
 [[path]]

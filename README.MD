@@ -2,10 +2,11 @@
 
 ## TODO
 
-* Error highlight
-* Endless scrolling
-* Resizable textedit
-* SVG export
+* [ ] Error highlight
+* [ ] Endless scrolling
+* [ ] Resizable textedit
+* [ ] SVG export ability (Nodes, Multiline text, Paths, Arrow tips)
+* [ ] SVG export proper dialog
 
 ## Problems
 

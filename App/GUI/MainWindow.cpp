@@ -42,14 +42,16 @@ void GUIMainWindow::InitMainMenuBar()
 {
     const QPointer main_menu_bar = new QMenuBar(this);
 
-    QFont menu_font = main_menu_bar->font();
-    menu_font.setPixelSize(FONT_SIZE_MAIN_MENU_BAR);
-    main_menu_bar->setFont(menu_font);
+    QFont main_menu_font = main_menu_bar->font();
+    main_menu_font.setPixelSize(FONT_SIZE_MAIN_MENU_BAR);
+    main_menu_bar->setFont(main_menu_font);
 
     setMenuBar(main_menu_bar);
 
     // .: File :.
     const QPointer file_menu = main_menu_bar->addMenu("File");
+    // . Export to SVG .
+    const QPointer export_svg_action = file_menu->addAction("Export to SVG (WIP)");
     // . Exit .
     const QPointer exit_action = file_menu->addAction("Exit");
     connect(exit_action, SIGNAL(triggered()), this, SLOT(close()));
@@ -91,6 +93,23 @@ void GUIMainWindow::InitMainMenuBar()
         );
         msgBox.exec();
     });
+
+    for (const QAction* action : main_menu_bar->actions()) {
+        if (QMenu* menu = action->menu()) {
+            menu->setFont(main_menu_font);
+            ApplyFontMenu(menu, main_menu_font);
+        }
+    }
+}
+
+void GUIMainWindow::ApplyFontMenu(const QMenu* menu, const QFont& font)
+{
+    for (const QAction* action : menu->actions()) {
+        if (QMenu* inner_menu = action->menu()) {
+            inner_menu->setFont(font);
+            ApplyFontMenu(inner_menu, font);
+        }
+    }
 }
 
 void GUIMainWindow::InitCentralWidget()
