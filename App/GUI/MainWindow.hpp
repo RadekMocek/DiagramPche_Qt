@@ -11,7 +11,7 @@ class QPlainTextEdit;
 QT_END_NAMESPACE
 
 // App imports
-#include "../Logic/Parser.hpp"
+#include "../Logic/TOML/Parser.hpp"
 #include "SceneItem/SceneNode.hpp"
 
 // App fwd declrs

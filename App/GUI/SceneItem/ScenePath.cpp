@@ -27,7 +27,7 @@ void ScenePath::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
         }
     }
 
-    if (m_crate.do_start_arrow && m_crate.paths.length() >= 1 && m_crate.paths[0].length() >= 2) {
+    if (m_crate.do_start_arrow && !m_crate.paths.empty() && m_crate.paths[0].length() >= 2) {
         DrawArrowTip(painter, m_crate.paths[0][1], m_crate.paths[0][0]);
     }
 }

@@ -9,6 +9,6 @@ struct ScenePathCrate
     QRectF aabr;
     QList<QList<QPointF>> paths;
     QColor color;
-    bool do_start_arrow;
-    bool do_end_arrow;
+    bool do_start_arrow{};
+    bool do_end_arrow{};
 };

@@ -4,8 +4,8 @@
 
 * Error highlight
 * Endless scrolling
-* All nodes disappear instead of showing last valid nodes when TOML parsing error occurs
 * Resizable textedit
+* SVG export
 
 ## Dependencies
 

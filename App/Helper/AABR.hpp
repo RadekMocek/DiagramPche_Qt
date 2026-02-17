@@ -33,6 +33,6 @@ struct AABRHelper
     // Get the AABR for given points
     [[nodiscard]] constexpr QRectF ToQRectF() const
     {
-        return QRectF(QPointF(x_min, y_min), QPointF(x_max, y_max));
+        return {QPointF(x_min, y_min), QPointF(x_max, y_max)};
     }
 };
