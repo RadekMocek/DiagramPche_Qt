@@ -40,23 +40,23 @@ QPointF SceneNode::GetOffsetFromPivot(const Pivot pivot) const
     switch (pivot) {
     default:
         // Unreachable (?), fallthrough
-    case TOPLEFT:
+    case PIVOT_TOPLEFT:
         return {0, 0};
-    case TOP:
+    case PIVOT_TOP:
         return {m_aabr.width() / 2, 0};
-    case TOPRIGHT:
+    case PIVOT_TOPRIGHT:
         return {m_aabr.width(), 0};
-    case RIGHT:
+    case PIVOT_RIGHT:
         return {m_aabr.width(), m_aabr.height() / 2};
-    case BOTTOMRIGHT:
+    case PIVOT_BOTTOMRIGHT:
         return {m_aabr.width(), m_aabr.height()};
-    case BOTTOM:
+    case PIVOT_BOTTOM:
         return {m_aabr.width() / 2, m_aabr.height()};
-    case BOTTOMLEFT:
+    case PIVOT_BOTTOMLEFT:
         return {0, m_aabr.height()};
-    case LEFT:
+    case PIVOT_LEFT:
         return {0, m_aabr.height() / 2};
-    case CENTER:
+    case PIVOT_CENTER:
         return {m_aabr.width() / 2, m_aabr.height() / 2};
     }
 }

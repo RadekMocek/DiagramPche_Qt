@@ -32,33 +32,33 @@ void GUIScene::GUIScenePrepareNode(const Node& node)
 
     // Move node according to its `pivot`, if the user had set some
     switch (node.pivot) {
-    case TOPLEFT:
+    case PIVOT_TOPLEFT:
         break;
-    case TOP:
+    case PIVOT_TOP:
         position.rx() -= size.width() / 2;
         break;
-    case TOPRIGHT:
+    case PIVOT_TOPRIGHT:
         position.rx() -= size.width();
         break;
-    case RIGHT:
+    case PIVOT_RIGHT:
         position.rx() -= size.width();
         position.ry() -= size.height() / 2;
         break;
-    case BOTTOMRIGHT:
+    case PIVOT_BOTTOMRIGHT:
         position.rx() -= size.width();
         position.ry() -= size.height();
         break;
-    case BOTTOM:
+    case PIVOT_BOTTOM:
         position.rx() -= size.width() / 2;
         position.ry() -= size.height();
         break;
-    case BOTTOMLEFT:
+    case PIVOT_BOTTOMLEFT:
         position.ry() -= size.height();
         break;
-    case LEFT:
+    case PIVOT_LEFT:
         position.ry() -= size.height() / 2;
         break;
-    case CENTER:
+    case PIVOT_CENTER:
         position.rx() -= size.width() / 2;
         position.ry() -= size.height() / 2;
         break;
@@ -74,51 +74,51 @@ void GUIScene::GUIScenePrepareNode(const Node& node)
     if (node.width > 0 || node.height > 0) {
         // Custom width/height => `label_pos` makes sense
         switch (node.label_position) {
-        case TOPLEFT:
+        case PIVOT_TOPLEFT:
             break;
-        case TOP:
+        case PIVOT_TOP:
             label_position = {
                 rect.center().x() - label_rect.width() / 2.0,
                 label_position.y()
             };
             break;
-        case TOPRIGHT:
+        case PIVOT_TOPRIGHT:
             label_position = {
                 rect.bottomRight().x() - label_rect.width() - NODE_PADDING,
                 label_position.y()
             };
             break;
-        case RIGHT:
+        case PIVOT_RIGHT:
             label_position = {
                 rect.bottomRight().x() - label_rect.width() - NODE_PADDING,
                 rect.center().y() - label_rect.height() / 2.0
             };
             break;
-        case BOTTOMRIGHT:
+        case PIVOT_BOTTOMRIGHT:
             label_position = {
                 rect.bottomRight().x() - label_rect.width() - NODE_PADDING,
                 rect.bottomRight().y() - label_rect.height() - NODE_PADDING
             };
             break;
-        case BOTTOM:
+        case PIVOT_BOTTOM:
             label_position = {
                 rect.center().x() - label_rect.width() / 2.0,
                 rect.bottomRight().y() - label_rect.height() - NODE_PADDING
             };
             break;
-        case BOTTOMLEFT:
+        case PIVOT_BOTTOMLEFT:
             label_position = {
                 label_position.x(),
                 rect.bottomRight().y() - label_rect.height() - NODE_PADDING
             };
             break;
-        case LEFT:
+        case PIVOT_LEFT:
             label_position = {
                 label_position.x(),
                 rect.center().y() - label_rect.height() / 2.0
             };
             break;
-        case CENTER:
+        case PIVOT_CENTER:
             label_position = {
                 rect.center().x() - label_rect.width() / 2.0,
                 rect.center().y() - label_rect.height() / 2.0

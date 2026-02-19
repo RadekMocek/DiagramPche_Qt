@@ -33,12 +33,13 @@ void GUIScene::GUIScenePreparePath(const Path& path)
     QList<QList<QPointF>> result_paths;
 
     // Each inner vector starts with the start point; or, if shift != 0 && start point is relative, with OG start point followed by a shifted start point
+    const auto n_ends = static_cast<qsizetype>(path.ends.size());
     if (!do_start_shift) {
-        result_paths = QList<QList<QPointF>>(path.ends.size(), QList<QPointF>());
+        result_paths = QList<QList<QPointF>>(n_ends, QList<QPointF>());
     }
     else {
         const auto shifted_start = start + path.GetShiftVector(path.start.parent_pivot);
-        result_paths = QList<QList<QPointF>>(path.ends.size(), QList({start, shifted_start}));
+        result_paths = QList<QList<QPointF>>(n_ends, QList({start, shifted_start}));
         start = shifted_start; // Do this so Pathpoints relative to start are relative to this
         aabr.Update(start);
     }
@@ -77,39 +78,39 @@ void GUIScene::GUIScenePreparePath(const Path& path)
             // Apply the Pathpoint type for both coordinates
             // X
             switch (pathpoint.x_type) {
-            case ABSOLUTE:
+            case PPTYPE_ABSOLUTE:
                 break;
-            case REFERENCE:
+            case PPTYPE_REFERENCE:
                 if (const auto it = m_scene_nodes.find(pathpoint.x_parent_id); it != m_scene_nodes.end()) {
                     curr.rx() += it->second->GetExactPointFromPivot(pathpoint.x_parent_pivot).x();
                 }
                 break;
-            case START:
+            case PPTYPE_START:
                 curr.rx() += start.x();
                 break;
-            case END:
+            case PPTYPE_END:
                 curr.rx() += shifted_end.x();
                 break;
-            case PREVIOUS:
+            case PPTYPE_PREVIOUS:
                 curr.rx() += prev.x();
                 break;
             }
             // Y
             switch (pathpoint.y_type) {
-            case ABSOLUTE:
+            case PPTYPE_ABSOLUTE:
                 break;
-            case REFERENCE:
+            case PPTYPE_REFERENCE:
                 if (const auto it = m_scene_nodes.find(pathpoint.y_parent_id); it != m_scene_nodes.end()) {
                     curr.ry() += it->second->GetExactPointFromPivot(pathpoint.y_parent_pivot).y();
                 }
                 break;
-            case START:
+            case PPTYPE_START:
                 curr.ry() += start.y();
                 break;
-            case END:
+            case PPTYPE_END:
                 curr.ry() += shifted_end.y();
                 break;
-            case PREVIOUS:
+            case PPTYPE_PREVIOUS:
                 curr.ry() += prev.y();
                 break;
             }
