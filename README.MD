@@ -17,3 +17,38 @@
 * [Qt](https://www.qt.io/development/qt-framework) ([LGPL](https://doc.qt.io/qt-6/lgpl.html))
 * [toml++](https://github.com/marzer/tomlplusplus) ([MIT](https://github.com/marzer/tomlplusplus/blob/master/LICENSE))
 * [Inconsolata](https://levien.com/type/myfonts/inconsolata.html) ([SIL Open Font](https://github.com/google/fonts/blob/main/ofl/inconsolata/OFL.txt))
+
+## Building locally
+
+### Debian based distros
+
+* Download Qt from <https://www.qt.io/> and install it, then:
+
+```bash
+sudo apt install cmake ninja-build libxcb-cursor0 libxcb-cursor-dev
+
+export QTDIR=<path_to_qt_installation>/6.10.0/gcc_64/  # Add this line to ~/.bashrc for auto export
+
+# Navigate to the root directory of this repository
+
+cmake -S . -B build
+
+cmake --build build
+```
+
+* To make it work in CLion on Linux:
+  1. Open the project in CLion
+  2. Click on the CMake icon at the bottom left corner
+  3. Click on the cogwheel icon → _CMake settings_
+  4. In the _Cache variables_ section of the settings, change _Value_ of _Name_ `Qt6_DIR` to `<path_to_qt_installation>/6.10.0/gcc_64/lib/cmake/Qt6`
+
+### Windows with Visual Studio
+
+* Download Qt from <https://www.qt.io/> and install it, the only component needed is _Qt_ → _Qt 6.10.0_ → _MSVC 2022 64-bit_
+* Create a new system environment variable called `QTDIR` with value: `<path_to_qt_installation>\6.10.0\msvc2022_64`
+* Add two new values to system environment variable PATH:
+  * `%QTDIR%\bin`
+  * `%QTDIR%\dir`
+* In Visual Studio's launcher, click on the _Open a local folder_ button and select root directory of this repository
+
+To run this working VS project in CLion, a _Visual Studio toolchain_ must be set up. See [Tutorial: Configure CLion on Windows](https://www.jetbrains.com/help/clion/quick-tutorial-on-configuring-clion-on-windows.html).

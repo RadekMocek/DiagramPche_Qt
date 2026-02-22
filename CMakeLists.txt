@@ -43,14 +43,3 @@ endif ()
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/Resource
         DESTINATION ${CMAKE_CURRENT_BINARY_DIR}
 )
-# Embedded resources
-set(resfiles
-        "Resource/Font/Inconsolata-Medium.ttf"
-)
-
-qt_add_resources("${BINARY_NAME}" "resfiles"
-        PREFIX
-        "/"
-        FILES
-        ${resfiles}
-)

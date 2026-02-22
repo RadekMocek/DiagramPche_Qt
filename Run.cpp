@@ -8,7 +8,7 @@ int main(int argc, char* argv[])
 {
     QApplication app(argc, argv);
 
-    QFontDatabase::addApplicationFont(":Resource/Font/Inconsolata-Medium.ttf");
+    QFontDatabase::addApplicationFont("./Resource/Font/Inconsolata-Medium.ttf");
 
     QFont default_font;
     default_font.setFamily("Inconsolata Medium");
