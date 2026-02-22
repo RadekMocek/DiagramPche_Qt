@@ -1,8 +1,8 @@
 #include "Scene.hpp"
-#include "SceneItem/SceneNode.hpp"
-#include "../Config.hpp"
-#include "../Helper/Color.hpp"
-#include "../Model/Node.hpp"
+#include "../../Config.hpp"
+#include "../../Helper/Color.hpp"
+#include "../../Model/Node.hpp"
+#include "../SceneItem/SceneNode.hpp"
 
 void GUIScene::GUIScenePrepareNode(const Node& node)
 {

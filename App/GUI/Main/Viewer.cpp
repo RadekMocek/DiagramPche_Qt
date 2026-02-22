@@ -1,7 +1,7 @@
 #include <QMouseEvent>
 
 #include "Viewer.hpp"
-#include "../Config.hpp"
+#include "../../Config.hpp"
 
 GUISceneViewer::GUISceneViewer(QGraphicsScene* scene, QWidget* parent) : QGraphicsView(scene, parent)
 {
@@ -62,9 +62,8 @@ void GUISceneViewer::wheelEvent(QWheelEvent* event)
         factor = 1.0 - ZOOM_STEP;
     }
 
-    const qreal current_scale = transform().m11();
-    if ((factor > 1.0 && current_scale < MAX_ZOOM) ||
-        (factor < 1.0 && current_scale > MIN_ZOOM)) {
+    if (const qreal current_scale = transform().m11();
+        (factor > 1.0 && current_scale < MAX_ZOOM) || (factor < 1.0 && current_scale > MIN_ZOOM)) {
         scale(factor, factor);
     }
 

@@ -11,8 +11,8 @@ class QPlainTextEdit;
 QT_END_NAMESPACE
 
 // App imports
-#include "../Logic/TOML/Parser.hpp"
-#include "SceneItem/SceneNode.hpp"
+#include "../../Logic/TOML/Parser.hpp"
+#include "../SceneItem/SceneNode.hpp"
 
 // App fwd declrs
 class GUIScene;
@@ -30,10 +30,10 @@ public:
 private:
     // = Methods =
     void ParseAndRedraw();
-    void ExportToSvg();
+    void ExportToSvg() const;
 
     // AppFile
-    void LoadSourceFromFile(const char* filename);
+    void LoadSourceFromFile(const char* filename) const;
 
     // Init GUI
     void InitMainMenuBar();

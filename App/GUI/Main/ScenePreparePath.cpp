@@ -1,9 +1,9 @@
 #include "Scene.hpp"
-#include "../Helper/AABR.hpp"
-#include "../Helper/Color.hpp"
-#include "../Model/Path.hpp"
-#include "SceneItem/SceneNode.hpp"
-#include "SceneItem/ScenePath.hpp"
+#include "../../Helper/AABR.hpp"
+#include "../../Helper/Color.hpp"
+#include "../../Model/Path.hpp"
+#include "../SceneItem/SceneNode.hpp"
+#include "../SceneItem/ScenePath.hpp"
 
 void GUIScene::GUIScenePreparePath(const Path& path)
 {

@@ -2,7 +2,7 @@
 #include <QFontDatabase>
 
 #include "App/Config.hpp"
-#include "App/GUI/MainWindow.hpp"
+#include "App/GUI/Main/MainWindow.hpp"
 
 int main(int argc, char* argv[])
 {

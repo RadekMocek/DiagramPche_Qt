@@ -3,7 +3,6 @@
 ## TODO
 
 * [ ] Error highlight
-* [ ] Endless scrolling
 * [ ] Resizable textedit
 * [x] SVG export ability
 * [ ] SVG export proper dialog
@@ -11,6 +10,10 @@
 ## Problems
 
 * Paths "aliasing"
+
+### Differences to IMGUI
+
+* Canvas: no endless scrolling, automatic boundaries and scrollbars
 
 ## Dependencies
 
@@ -51,4 +54,8 @@ cmake --build build
   * `%QTDIR%\dir`
 * In Visual Studio's launcher, click on the _Open a local folder_ button and select root directory of this repository
 
-To run this working VS project in CLion, a _Visual Studio toolchain_ must be set up. See [Tutorial: Configure CLion on Windows](https://www.jetbrains.com/help/clion/quick-tutorial-on-configuring-clion-on-windows.html).
+### Windows with CLion
+
+To run working Visual Studio project from the previous section in CLion, a _Visual Studio toolchain_ must be set up. See [Tutorial: Configure CLion on Windows](https://www.jetbrains.com/help/clion/quick-tutorial-on-configuring-clion-on-windows.html).
+
+An alternative approach would be to choose the _MinGW_ component instead of _MSVC_ during the Qt installation, set environment variables accordingly, and then run the project directly in CLion. I haven't tested that, though.

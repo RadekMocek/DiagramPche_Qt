@@ -1,6 +1,6 @@
 #include "Scene.hpp"
-#include "../Model/Node.hpp"
-#include "../Model/Path.hpp"
+#include "../../Model/Node.hpp"
+#include "../../Model/Path.hpp"
 
 GUIScene::GUIScene(const QFont& font, QObject* parent) :
     QGraphicsScene(parent),

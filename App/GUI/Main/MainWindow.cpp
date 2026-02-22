@@ -7,7 +7,7 @@
 #include <QSvgGenerator>
 
 #include "MainWindow.hpp"
-#include "../Config.hpp"
+#include "../../Config.hpp"
 #include "Scene.hpp"
 #include "Viewer.hpp"
 
@@ -39,7 +39,7 @@ void GUIMainWindow::ParseAndRedraw()
     }
 }
 
-void GUIMainWindow::ExportToSvg()
+void GUIMainWindow::ExportToSvg() const
 {
     constexpr auto SVG_PADDING = 25.0f;
     QSvgGenerator svg_generator;

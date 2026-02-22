@@ -3,7 +3,7 @@
 #include <QGraphicsView>
 #include <QScrollBar>
 
-#include "../Config.hpp"
+#include "../../Config.hpp"
 
 class GUISceneViewer : public QGraphicsView
 {

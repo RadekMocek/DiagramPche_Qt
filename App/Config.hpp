@@ -5,9 +5,6 @@
 constexpr auto FONT_SIZE_DEFAULT = 20;
 constexpr auto FONT_SIZE_MAIN_MENU_BAR = 16;
 
-//constexpr auto SCENE_SIZE = 5000;
-//constexpr auto SCENE_MID = SCENE_SIZE / 2;
-
 inline QColor COLOR_CANVAS_BACKGROUND = QColor::fromRgb(240, 240, 240);
 
 constexpr bool DO_SHOW_GRID_INIT = true;
