@@ -8,10 +8,7 @@
 * [ ] SVG export dialog
   * [x] _Browse..._ button
   * [ ] _Overwrite guard_ – label, auto checkbox/export_btn enable/disable
-  * [ ] _Action after export_
-    * [ ] Nothing
-    * [ ] Show in explorer
-    * [ ] Open
+  * [x] _Action after export_
 
 ## Problems
 

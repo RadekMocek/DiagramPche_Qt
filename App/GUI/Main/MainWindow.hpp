@@ -4,7 +4,6 @@
 #include <QMainWindow>
 #include <QPointer>
 
-
 // Qt fwd declrs
 QT_BEGIN_NAMESPACE
 class QLabel;

@@ -62,6 +62,9 @@ ExportSVGDialog::ExportSVGDialog(QWidget* parent, ExportSVGDialogState& state) :
     const QPointer group3_radio_nothing = new QRadioButton("Nothing");
     const QPointer group3_radio_explorer = new QRadioButton("Show in explorer");
     const QPointer group3_radio_open = new QRadioButton("Open");
+    group3_radio_nothing->setChecked(m_state.action == ActionAfterExport_DoNothing);
+    group3_radio_explorer->setChecked(m_state.action == ActionAfterExport_OpenFolder);
+    group3_radio_open->setChecked(m_state.action == ActionAfterExport_OpenFile);
     group3_layout->addWidget(group3_radio_nothing);
     group3_layout->addWidget(group3_radio_explorer);
     group3_layout->addWidget(group3_radio_open);
@@ -73,8 +76,14 @@ ExportSVGDialog::ExportSVGDialog(QWidget* parent, ExportSVGDialogState& state) :
     // .:===============:.
     const QPointer button_export = new QPushButton("Export");
     layout->addWidget(button_export);
-    connect(button_export, &QPushButton::clicked, [this, group1_input]() {
+    connect(button_export, &QPushButton::clicked, [this, group1_input, group3_radio_nothing, group3_radio_explorer]() {
         m_state.path = group1_input->text();
+        m_state.action = (group3_radio_nothing->isChecked())
+                             ? ActionAfterExport_DoNothing
+                             : (group3_radio_explorer->isChecked())
+                             ? ActionAfterExport_OpenFolder
+                             : ActionAfterExport_OpenFile;
+        emit ButtonExportClicked();
         close();
     });
 

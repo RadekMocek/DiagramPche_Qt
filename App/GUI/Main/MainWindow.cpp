@@ -1,6 +1,7 @@
 #include <filesystem>
 
-#include <QGraphicsView>
+#include <QDesktopServices>
+#include <QFileInfo>
 #include <QGridLayout>
 #include <QLabel>
 #include <QMenuBar>
@@ -59,11 +60,20 @@ void GUIMainWindow::ExportToSvg() const
     svg_generator.setSize(scene_aabr_size);
     svg_generator.setViewBox(viewbox);
 
-    svg_generator.setFileName("D:\\Download Floorp\\diagramQT.svg");
+    svg_generator.setFileName(m_state_dialog_export.path);
     QPainter painter(&svg_generator);
     m_scene->render(&painter, QRectF(viewbox), QRectF(viewbox), Qt::IgnoreAspectRatio);
     painter.end();
-    qDebug() << "SVG done";
+
+    if (m_state_dialog_export.action == ActionAfterExport_OpenFolder) {
+        const QFileInfo file_info(m_state_dialog_export.path);
+        QDesktopServices::openUrl(QUrl::fromLocalFile(file_info.absolutePath()));
+    }
+    else if (m_state_dialog_export.action == ActionAfterExport_OpenFile) {
+        QDesktopServices::openUrl(QUrl("file:///" + m_state_dialog_export.path, QUrl::TolerantMode));
+    }
+
+    qDebug() << "SVG saved to" << m_state_dialog_export.path;
 }
 
 // == GUI init ==
@@ -84,6 +94,7 @@ void GUIMainWindow::InitMainMenuBar()
     const QPointer export_svg_action = file_menu->addAction("Export to SVG (WIP)");
     connect(export_svg_action, &QAction::triggered, [this]() {
         ExportSVGDialog dialog(this, m_state_dialog_export);
+        connect(&dialog, &ExportSVGDialog::ButtonExportClicked, this, &GUIMainWindow::ExportToSvg);
         dialog.exec();
     });
     // . Exit .
@@ -185,4 +196,5 @@ void GUIMainWindow::InitCentralWidget()
 void GUIMainWindow::InitState()
 {
     m_state_dialog_export.path = QString((std::filesystem::current_path() / "diagram.svg").u16string());
+    m_state_dialog_export.action = ActionAfterExport_DoNothing;
 }

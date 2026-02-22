@@ -2,9 +2,15 @@
 
 #include <QDialog>
 
+enum ActionAfterExport
+{
+    ActionAfterExport_DoNothing, ActionAfterExport_OpenFolder, ActionAfterExport_OpenFile
+};
+
 struct ExportSVGDialogState
 {
     QString path;
+    ActionAfterExport action;
 };
 
 class ExportSVGDialog : public QDialog
@@ -16,4 +22,7 @@ public:
 
 private:
     ExportSVGDialogState& m_state;
+
+signals:
+    void ButtonExportClicked();
 };
