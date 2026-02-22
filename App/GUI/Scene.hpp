@@ -7,6 +7,9 @@
 #include <QFontMetrics>
 #include <QGraphicsScene>
 
+// App imports
+#include "App/Helper/AABR.hpp"
+
 // App fwd declrs
 struct Node;
 struct Path;
@@ -24,9 +27,14 @@ public:
     void GUIScenePrepareNode(const Node& node);
     void GUIScenePreparePath(const Path& path);
 
+    QRectF GetSceneAABR() const { return m_scene_aabr.ToQRectF(); }
+
 private:
     QFont m_font;
     QFontMetrics m_font_metrics;
 
     std::unordered_map<std::string, SceneNode*> m_scene_nodes;
+
+    // For svg export
+    AABRHelper m_scene_aabr;
 };

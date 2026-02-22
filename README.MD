@@ -5,7 +5,7 @@
 * [ ] Error highlight
 * [ ] Endless scrolling
 * [ ] Resizable textedit
-* [ ] SVG export ability (Nodes, Multiline text, Paths, Arrow tips, Transparency, +-canvas)
+* [x] SVG export ability
 * [ ] SVG export proper dialog
 
 ## Problems

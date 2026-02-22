@@ -41,12 +41,24 @@ void GUIMainWindow::ParseAndRedraw()
 
 void GUIMainWindow::ExportToSvg()
 {
+    constexpr auto SVG_PADDING = 25.0f;
     QSvgGenerator svg_generator;
+
+    const auto scene_aabr = m_scene->GetSceneAABR().toRect();
+    const auto scene_aabr_size = scene_aabr.size();
+
+    const QRect viewbox(scene_aabr.left() - SVG_PADDING,
+                        scene_aabr.top() - SVG_PADDING,
+                        scene_aabr_size.width() + 2 * SVG_PADDING,
+                        scene_aabr.height() + 2 * SVG_PADDING);
+
+    svg_generator.setSize(scene_aabr_size);
+    svg_generator.setViewBox(viewbox);
+
     svg_generator.setFileName("D:\\Download Floorp\\diagramQT.svg");
-    svg_generator.setSize(QSize(200, 200));
-    svg_generator.setViewBox(QRect(0, 0, 200, 200));
     QPainter painter(&svg_generator);
-    m_scene->render(&painter);
+    m_scene->render(&painter, QRectF(viewbox), QRectF(viewbox), Qt::IgnoreAspectRatio);
+    painter.end();
     qDebug() << "SVG done";
 }
 
@@ -144,7 +156,7 @@ void GUIMainWindow::InitCentralWidget()
     connect(m_source, &QPlainTextEdit::textChanged, this, &GUIMainWindow::ParseAndRedraw);
 
     QFont scene_font;
-    scene_font.setFamily("Inconsolata Medium");
+    scene_font.setFamily("Inconsolata");
     scene_font.setPixelSize(SCENE_FONT_SIZE_BASE);
     m_scene = new GUIScene(scene_font, this);
     //m_scene->setSceneRect(0, 0, SCENE_SIZE, SCENE_SIZE);

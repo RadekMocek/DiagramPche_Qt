@@ -141,4 +141,7 @@ void GUIScene::GUIScenePreparePath(const Path& path)
     });
     item->setZValue(DLUserChannelToRealChannel(path.z, false));
     addItem(item);
+
+    //
+    m_scene_aabr.UpdateWithQRectF(aabr.ToQRectF());
 }

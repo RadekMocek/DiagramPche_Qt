@@ -132,4 +132,7 @@ void GUIScene::GUIScenePrepareNode(const Node& node)
     item->setZValue(DLUserChannelToRealChannel(node.z, true));
     addItem(item);
     m_scene_nodes.insert({node.id, item});
+
+    //
+    m_scene_aabr.UpdateWithQRectF(rect);
 }

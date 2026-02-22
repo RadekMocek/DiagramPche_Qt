@@ -1,5 +1,6 @@
 #pragma once
 
+#include <QDebug>
 #include <QRectF>
 
 // You feed it points and it gives smallest Axis Aligned Bounding Rectangle for them
@@ -34,5 +35,43 @@ struct AABRHelper
     [[nodiscard]] constexpr QRectF ToQRectF() const
     {
         return {QPointF(x_min, y_min), QPointF(x_max, y_max)};
+    }
+
+    // --- --- --- --- --- --- --- --- --- ---
+
+    // Functionality for SVG export (determining document size)
+
+    AABRHelper()
+    {
+        Reset();
+    }
+
+    void Reset()
+    {
+        x_min = std::numeric_limits<qreal>::max();
+        y_min = std::numeric_limits<qreal>::max();
+        x_max = std::numeric_limits<qreal>::min();
+        y_max = std::numeric_limits<qreal>::min();
+    }
+
+    void UpdateWithQRectF(const QRectF& rect)
+    {
+        if (rect.left() < x_min) {
+            x_min = rect.left();
+        }
+        if (rect.right() > x_max) {
+            x_max = rect.right();
+        }
+        if (rect.top() < y_min) {
+            y_min = rect.top();
+        }
+        if (rect.bottom() > y_max) {
+            y_max = rect.bottom();
+        }
+    }
+
+    void DebugPrint() const
+    {
+        qDebug() << "x_min" << x_min << ", x_max" << x_max << ", y_min" << y_min << ", y_max" << y_max;
     }
 };

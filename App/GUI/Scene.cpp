@@ -15,6 +15,8 @@ void GUIScene::Redraw(std::priority_queue<Node>& nodes_pq, const std::vector<Pat
     m_scene_nodes.clear();
     clear();
 
+    m_scene_aabr.Reset();
+
     for (; !nodes_pq.empty(); nodes_pq.pop()) {
         GUIScenePrepareNode(nodes_pq.top());
     }
@@ -22,4 +24,6 @@ void GUIScene::Redraw(std::priority_queue<Node>& nodes_pq, const std::vector<Pat
     for (const auto& path : paths_vec) {
         GUIScenePreparePath(path);
     }
+
+    //m_scene_aabr.DebugPrint();
 }
