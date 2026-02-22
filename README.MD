@@ -5,10 +5,7 @@
 * [ ] Error highlight
 * [ ] Resizable textedit
 * [x] SVG export ability
-* [ ] SVG export dialog
-  * [x] _Browse..._ button
-  * [ ] _Overwrite guard_ – label, auto checkbox/export_btn enable/disable
-  * [x] _Action after export_
+* [x] SVG export dialog
 
 ## Problems
 
