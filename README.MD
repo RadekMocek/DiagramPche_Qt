@@ -5,7 +5,13 @@
 * [ ] Error highlight
 * [ ] Resizable textedit
 * [x] SVG export ability
-* [ ] SVG export proper dialog
+* [ ] SVG export dialog
+  * [x] _Browse..._ button
+  * [ ] _Overwrite guard_ – label, auto checkbox/export_btn enable/disable
+  * [ ] _Action after export_
+    * [ ] Nothing
+    * [ ] Show in explorer
+    * [ ] Open
 
 ## Problems
 

@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QPointer>
 
+
 // Qt fwd declrs
 QT_BEGIN_NAMESPACE
 class QLabel;
@@ -12,6 +13,7 @@ QT_END_NAMESPACE
 
 // App imports
 #include "../../Logic/TOML/Parser.hpp"
+#include "../Dialog/ExportSVGDialog.hpp"
 #include "../SceneItem/SceneNode.hpp"
 
 // App fwd declrs
@@ -39,6 +41,7 @@ private:
     void InitMainMenuBar();
     static void ApplyFontMenu(const QMenu* menu, const QFont& font);
     void InitCentralWidget();
+    void InitState();
 
     // = Members=
     // Text editor with the TOML describing the diagram
@@ -54,6 +57,9 @@ private:
     Parser m_parser;
 
     QPointer<QLabel> m_error_label;
+
+    // State
+    ExportSVGDialogState m_state_dialog_export;
 
     // Temporary
     static constexpr auto SOURCE_INIT = R"""([variables]

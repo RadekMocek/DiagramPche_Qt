@@ -1,3 +1,5 @@
+#include <filesystem>
+
 #include <QGraphicsView>
 #include <QGridLayout>
 #include <QLabel>
@@ -8,6 +10,7 @@
 
 #include "MainWindow.hpp"
 #include "../../Config.hpp"
+#include "../Dialog/ExportSVGDialog.hpp"
 #include "Scene.hpp"
 #include "Viewer.hpp"
 
@@ -18,6 +21,7 @@ GUIMainWindow::GUIMainWindow()
 
     InitMainMenuBar();
     InitCentralWidget();
+    InitState();
 
     ParseAndRedraw();
 }
@@ -78,7 +82,10 @@ void GUIMainWindow::InitMainMenuBar()
     const QPointer file_menu = main_menu_bar->addMenu("File");
     // . Export to SVG .
     const QPointer export_svg_action = file_menu->addAction("Export to SVG (WIP)");
-    connect(export_svg_action, &QAction::triggered, this, &GUIMainWindow::ExportToSvg);
+    connect(export_svg_action, &QAction::triggered, [this]() {
+        ExportSVGDialog dialog(this, m_state_dialog_export);
+        dialog.exec();
+    });
     // . Exit .
     const QPointer exit_action = file_menu->addAction("Exit");
     connect(exit_action, SIGNAL(triggered()), this, SLOT(close()));
@@ -156,10 +163,9 @@ void GUIMainWindow::InitCentralWidget()
     connect(m_source, &QPlainTextEdit::textChanged, this, &GUIMainWindow::ParseAndRedraw);
 
     QFont scene_font;
-    scene_font.setFamily("Inconsolata");
+    scene_font.setFamily(FONT_FAMILY_DEFAULT);
     scene_font.setPixelSize(SCENE_FONT_SIZE_BASE);
     m_scene = new GUIScene(scene_font, this);
-    //m_scene->setSceneRect(0, 0, SCENE_SIZE, SCENE_SIZE);
 
     m_viewer = new GUISceneViewer(m_scene);
     main_layout->addWidget(m_viewer, 0, 1);
@@ -174,4 +180,9 @@ void GUIMainWindow::InitCentralWidget()
     // Same width for both columns
     main_layout->setColumnStretch(0, 1);
     main_layout->setColumnStretch(1, 1);
+}
+
+void GUIMainWindow::InitState()
+{
+    m_state_dialog_export.path = QString((std::filesystem::current_path() / "diagram.svg").u16string());
 }
