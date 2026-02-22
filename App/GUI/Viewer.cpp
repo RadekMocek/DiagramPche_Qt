@@ -1,6 +1,5 @@
 #include <QMouseEvent>
 
-#include "../Helper/Print.hpp"
 #include "Viewer.hpp"
 #include "../Config.hpp"
 

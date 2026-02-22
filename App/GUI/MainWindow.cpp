@@ -4,10 +4,10 @@
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QPlainTextEdit>
+#include <QSvgGenerator>
 
 #include "MainWindow.hpp"
 #include "../Config.hpp"
-#include "../Helper/Print.hpp"
 #include "Scene.hpp"
 #include "Viewer.hpp"
 
@@ -19,13 +19,14 @@ GUIMainWindow::GUIMainWindow()
     InitMainMenuBar();
     InitCentralWidget();
 
-    ParseAndUpdate();
+    ParseAndRedraw();
 }
 
-void GUIMainWindow::ParseAndUpdate()
+// == Logic ==
+
+void GUIMainWindow::ParseAndRedraw()
 {
     m_parser.Parse(m_source->toPlainText().toStdString());
-    //Print(m_parser.m_result_nodes_pq.size());
     m_scene->Redraw(m_parser.m_result_nodes_pq, m_parser.m_result_paths);
 
     if (m_parser.m_is_error) {
@@ -37,6 +38,19 @@ void GUIMainWindow::ParseAndUpdate()
         m_error_label->setText("");
     }
 }
+
+void GUIMainWindow::ExportToSvg()
+{
+    QSvgGenerator svg_generator;
+    svg_generator.setFileName("D:\\Download Floorp\\diagramQT.svg");
+    svg_generator.setSize(QSize(200, 200));
+    svg_generator.setViewBox(QRect(0, 0, 200, 200));
+    QPainter painter(&svg_generator);
+    m_scene->render(&painter);
+    qDebug() << "SVG done";
+}
+
+// == GUI init ==
 
 void GUIMainWindow::InitMainMenuBar()
 {
@@ -52,6 +66,7 @@ void GUIMainWindow::InitMainMenuBar()
     const QPointer file_menu = main_menu_bar->addMenu("File");
     // . Export to SVG .
     const QPointer export_svg_action = file_menu->addAction("Export to SVG (WIP)");
+    connect(export_svg_action, &QAction::triggered, this, &GUIMainWindow::ExportToSvg);
     // . Exit .
     const QPointer exit_action = file_menu->addAction("Exit");
     connect(exit_action, SIGNAL(triggered()), this, SLOT(close()));
@@ -94,6 +109,7 @@ void GUIMainWindow::InitMainMenuBar()
         msgBox.exec();
     });
 
+    // Recursively decrease font size on menu (sub)items
     for (const QAction* action : main_menu_bar->actions()) {
         if (QMenu* menu = action->menu()) {
             menu->setFont(main_menu_font);
@@ -102,6 +118,7 @@ void GUIMainWindow::InitMainMenuBar()
     }
 }
 
+// Helper function to recursively decrease font size on menu (sub)items
 void GUIMainWindow::ApplyFontMenu(const QMenu* menu, const QFont& font)
 {
     for (const QAction* action : menu->actions()) {
@@ -124,7 +141,7 @@ void GUIMainWindow::InitCentralWidget()
     m_source->setPlainText(SOURCE_INIT);
     main_layout->addWidget(m_source, 0, 0);
 
-    connect(m_source, &QPlainTextEdit::textChanged, this, &GUIMainWindow::ParseAndUpdate);
+    connect(m_source, &QPlainTextEdit::textChanged, this, &GUIMainWindow::ParseAndRedraw);
 
     QFont scene_font;
     scene_font.setFamily("Inconsolata Medium");

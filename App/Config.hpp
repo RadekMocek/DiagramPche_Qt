@@ -20,3 +20,6 @@ inline QColor COLOR_ERROR = QColor::fromRgb(211, 1, 2);
 constexpr auto SCENE_FONT_SIZE_BASE = 18;
 
 constexpr auto NODE_PADDING = 18;
+
+constexpr int TIP_ARROW_LENGTH = 12;
+constexpr int TIP_ARROW_SPAN = 4;

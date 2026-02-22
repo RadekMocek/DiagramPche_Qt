@@ -29,14 +29,16 @@ public:
 
 private:
     // = Methods =
-    void ParseAndUpdate();
+    void ParseAndRedraw();
+    void ExportToSvg();
 
+    // AppFile
+    void LoadSourceFromFile(const char* filename);
+
+    // Init GUI
     void InitMainMenuBar();
     static void ApplyFontMenu(const QMenu* menu, const QFont& font);
-
     void InitCentralWidget();
-
-    void LoadSourceFromFile(const char* filename);
 
     // = Members=
     // Text editor with the TOML describing the diagram

@@ -22,9 +22,5 @@ private:
 
     //
 
-    QRectF m_aabr;
-    QColor m_color;
-    QFont m_font;
-    QPointF m_label_position;
-    QString m_label_value;
+    SceneNodeCrate m_crate;
 };
