@@ -3,7 +3,6 @@
 ## TODO
 
 * [ ] Error highlight
-* [ ] Resizable textedit
 * [x] SVG export ability
 * [x] SVG export dialog
 

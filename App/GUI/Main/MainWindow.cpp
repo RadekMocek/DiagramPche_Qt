@@ -7,6 +7,7 @@
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QPlainTextEdit>
+#include <QSplitter>
 #include <QSvgGenerator>
 
 #include "MainWindow.hpp"
@@ -172,34 +173,41 @@ void GUIMainWindow::InitCentralWidget()
 {
     const QPointer central_widget = new QWidget();
     setCentralWidget(central_widget);
-
-    const QPointer main_layout = new QGridLayout();
+    const QPointer main_layout = new QVBoxLayout();
     central_widget->setLayout(main_layout);
 
+    // Splitter between Text editor & Canvas
+    const QPointer splitter = new QSplitter();
+    splitter->setChildrenCollapsible(false);
+
+    // Text editor
     m_source = new QPlainTextEdit();
     m_source->setPlainText(WELCOME_TOML);
-    main_layout->addWidget(m_source, 0, 0);
+    m_source->setLineWrapMode(QPlainTextEdit::NoWrap);
+    splitter->addWidget(m_source);
 
     connect(m_source, &QPlainTextEdit::textChanged, this, &GUIMainWindow::ParseAndRedraw);
 
+    // Canvas
     QFont scene_font;
     scene_font.setFamily(FONT_FAMILY_DEFAULT);
     scene_font.setPixelSize(SCENE_FONT_SIZE_BASE);
     m_scene = new GUIScene(scene_font, this);
 
     m_viewer = new GUISceneViewer(m_scene);
-    main_layout->addWidget(m_viewer, 0, 1);
+    splitter->addWidget(m_viewer);
 
+    // Splitter ratio starts at 50/50
+    splitter->setSizes({1, 1});
+    main_layout->addWidget(splitter, 1);
+
+    // Error label
     QPalette error_text_palette;
     error_text_palette.setColor(QPalette::WindowText, COLOR_ERROR);
 
     m_error_label = new QLabel();
     m_error_label->setPalette(error_text_palette);
-    main_layout->addWidget(m_error_label, 1, 0, 1, 2);
-
-    // Same width for both columns
-    main_layout->setColumnStretch(0, 1);
-    main_layout->setColumnStretch(1, 1);
+    main_layout->addWidget(m_error_label, 0);
 }
 
 void GUIMainWindow::InitState()
