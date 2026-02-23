@@ -39,9 +39,11 @@ void GUIMainWindow::ParseAndRedraw()
         auto err_str = QString::fromStdString(m_parser.m_error_description);
         err_str.replace("\n", " ");
         m_error_label->setText(err_str);
+        ErrorHighlight(m_parser.m_error_source_region);
     }
     else {
         m_error_label->setText("");
+        m_source->setExtraSelections(QList<QTextEdit::ExtraSelection>()); // Disable error highlight if any
     }
 }
 
@@ -84,6 +86,27 @@ void GUIMainWindow::ExportToSvg() const
     else if (m_state_dialog_export.action == ActionAfterExport_OpenFile) {
         QDesktopServices::openUrl(QUrl("file:///" + m_state_dialog_export.path, QUrl::TolerantMode));
     }
+}
+
+void GUIMainWindow::ErrorHighlight(const toml::source_region& EH_region) const
+{
+    const auto error_y = EH_region.begin.line - 1;
+    const auto error_x_start = EH_region.begin.column - 1;
+    const auto error_x_length = EH_region.end.column - error_x_start - 1;
+
+    QTextCursor cursor = m_source->textCursor();
+    cursor.movePosition(QTextCursor::Start);
+    cursor.movePosition(QTextCursor::Down, QTextCursor::MoveAnchor, error_y);
+    cursor.movePosition(QTextCursor::Right, QTextCursor::MoveAnchor, error_x_start);
+    cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, error_x_length);
+
+    QTextEdit::ExtraSelection selection;
+    selection.format.setBackground(COLOR_ERROR_HIGHLIGHT);
+    // With this, error length of 0 will highlight whole line
+    selection.format.setProperty(QTextFormat::FullWidthSelection, true);
+    selection.cursor = cursor;
+
+    m_source->setExtraSelections(QList({selection}));
 }
 
 // == GUI init ==

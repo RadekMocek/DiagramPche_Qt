@@ -31,6 +31,7 @@ private:
     // = Methods =
     void ParseAndRedraw();
     void ExportToSvg() const;
+    void ErrorHighlight(const toml::source_region& EH_region) const;
 
     // AppFile
     void LoadSourceFromFile(const char* filename) const;

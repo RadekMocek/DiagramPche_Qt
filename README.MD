@@ -2,7 +2,6 @@
 
 ## TODO
 
-* [ ] Error highlight
 * [x] SVG export ability
 * [x] SVG export dialog
 

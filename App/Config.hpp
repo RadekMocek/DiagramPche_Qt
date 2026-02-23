@@ -14,7 +14,9 @@ constexpr qreal GRID_STEP_BASE = 100.0;
 inline QColor COLOR_GRID_LINE = QColor::fromRgb(200, 200, 200, 40);
 
 inline QColor COLOR_BLACK = QColor::fromRgb(0, 0, 0);
+
 inline QColor COLOR_ERROR = QColor::fromRgb(211, 1, 2);
+inline QColor COLOR_ERROR_HIGHLIGHT = QColor::fromRgb(211, 1, 2, 80);
 
 constexpr auto SCENE_FONT_SIZE_BASE = 18;
 
