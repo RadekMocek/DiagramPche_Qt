@@ -133,7 +133,7 @@ void GUIScene::GUIScenePrepareNode(const Node& node)
     if (node.label_shift_y != 0) {
         label_position.ry() += static_cast<float>(node.label_shift_y);
     }
-    
+
     // Create new `QGraphicsItem` of type `SceneNode` by passing `SceneNodeCrate` to ctor
     auto* item = new SceneNode({
         rect,

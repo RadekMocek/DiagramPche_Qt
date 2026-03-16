@@ -33,4 +33,17 @@ void ScenePath::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
             }
         }
     }
+
+    if (m_crate.do_path_label) {
+        painter->setBrush(m_crate.path_label_bg_color);
+        for (const auto& path_label : m_crate.path_label_top_lefts) {
+            const QRectF rect(path_label, m_crate.path_label_rect.size());
+
+            painter->fillRect(rect, m_crate.path_label_bg_color);
+
+            painter->drawText(QRectF(path_label.x(), path_label.y(), 0, 0),
+                              Qt::TextExpandTabs | Qt::TextDontClip,
+                              m_crate.path_label_value);
+        }
+    }
 }

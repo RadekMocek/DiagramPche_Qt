@@ -1,12 +1,24 @@
 #include "Scene.hpp"
 #include "../../Helper/AABR.hpp"
 #include "../../Helper/Color.hpp"
+#include "../../Helper/Draw.hpp"
 #include "../../Model/Path.hpp"
 #include "../SceneItem/SceneNode.hpp"
 #include "../SceneItem/ScenePath.hpp"
 
 void GUIScene::GUIScenePreparePath(const Path& path)
 {
+    // ---- Prepare for possible path label(s) --- --- --- --- --- --- --- --- --- --- --- --- --- ---
+    // (There may be multiple path labels on the same path,if it has multiple ends,
+    // but their text and background color is always the same)
+    const bool do_path_label = !path.label_value.empty();
+    QList<QPointF> result_path_labels;
+    const auto path_label_value = QString::fromStdString(path.label_value);
+    const auto path_label_rect = m_font_metrics.boundingRect(QRect(0, 0, 0, 0),
+                                                             Qt::TextExpandTabs | Qt::TextDontClip,
+                                                             path_label_value);
+    // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
+
     // Prepare the start point
     QPointF start(path.start.x, path.start.y);
     bool do_start_shift = false;
@@ -130,11 +142,67 @@ void GUIScene::GUIScenePreparePath(const Path& path)
             result_pathpoints.append(end);
             aabr.Update(end);
         }
+
+        // Path label (`label=` && `label_bg=`)
+        if (do_path_label) {
+            // Qt needs pairs of points to draw a line, so there are duplicate points in the collection, except for the first and last one.
+            // In TOML diagram definition you specify point index as if there are no pairs, just unique points.
+            // These magic functions are used to transform "TOML index" into "Qt index".
+            const auto GetQtIndex = [](const int idx) {
+                return (idx <= 1) ? idx : 2 * idx - 1;
+            };
+            const auto GetQtSize = [](const int size) {
+                return (size <= 2) ? size : size / 2 + 1;
+            };
+
+            // Path label is set in TOML as [string(1), int(2), int(3), int(4)]
+            // (1) is the label's text
+            // (2) is the point of the path on which the label is placed, use modulo to not get out of bounds
+            const auto size = GetQtSize(result_pathpoints.size());
+            const auto label_point_curr_idx = GetQtIndex(path.label_point % size);
+            // (3) is the shift of the label position to the next point on the path, get next point using modulo as well
+            const auto label_point_next_idx = GetQtIndex((path.label_point + 1) % size);
+            const auto label_shift = static_cast<float>(path.label_shift);
+            // (4) is shift in a direction orthogonal to (3), so user can fine-tune the placement of the label on the path
+            const auto label_shift_orth = static_cast<float>(path.label_shift_orthogonal);
+
+            // Get chosen point ("curr") and next point ("next"), and get the direction vector from curr to next
+            const auto label_point_curr = result_pathpoints[label_point_curr_idx];
+            const auto label_point_next = result_pathpoints[label_point_next_idx];
+            const auto direction = QPointFNormalized(label_point_next - label_point_curr);
+
+            // Using the direction vector, we can apply the shifts
+            auto label_position = label_point_curr;
+
+            if (label_shift != 0) {
+                label_position += direction * label_shift;
+            }
+            if (label_shift_orth != 0) {
+                label_position += QPointFOrthogonalized(direction) * label_shift_orth;
+            }
+
+            // Final shift to make it that when (3)==0, label center sits on the path
+            label_position.rx() -= path_label_rect.width() / 2.0f;
+            label_position.ry() -= path_label_rect.height() / 2.0f;
+
+            // Done
+            result_path_labels.append(label_position);
+        }
     }
 
-    //
+    // Create new `QGraphicsItem` of type `ScenePath` by passing `ScenePathCrate` to ctor
     auto* item = new ScenePath({
-        aabr.ToQRectF(), result_paths, GetQColorFromTuple(path.color), path.do_start_arrow, path.do_end_arrow
+        aabr.ToQRectF(),
+        std::move(result_paths),
+        GetQColorFromTuple(path.color),
+        path.do_start_arrow,
+        path.do_end_arrow,
+        // Path label
+        do_path_label,
+        path_label_value,
+        GetQColorFromTuple(path.label_bg_color),
+        std::move(result_path_labels),
+        path_label_rect
     });
     item->setZValue(DLUserChannelToRealChannel(path.z, false));
     addItem(item);

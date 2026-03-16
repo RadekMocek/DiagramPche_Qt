@@ -8,6 +8,7 @@
 inline QPointF QPointFNormalized(const QPointF p)
 {
     const auto magnitude = sqrtf((p.x() * p.x()) + (p.y() * p.y()));
+    //qDebug() << "In:" << p << ", Out:" << QPointF(p.x() / magnitude, p.y() / magnitude);
     return {p.x() / magnitude, p.y() / magnitude};
 }
 

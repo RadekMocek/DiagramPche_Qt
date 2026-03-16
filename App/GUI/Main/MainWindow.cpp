@@ -20,7 +20,7 @@
 GUIMainWindow::GUIMainWindow()
 {
     setWindowTitle("Untitled – DiagramPche :: Qt");
-    resize(1366, 768);
+    resize(1280, 800);
 
     InitMainMenuBar();
     InitCentralWidget();

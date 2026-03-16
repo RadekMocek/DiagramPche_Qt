@@ -11,4 +11,10 @@ struct ScenePathCrate
     QColor color;
     bool do_start_arrow{};
     bool do_end_arrow{};
+    // Path label
+    bool do_path_label;
+    QString path_label_value;
+    QColor path_label_bg_color;
+    QList<QPointF> path_label_top_lefts;
+    QRect path_label_rect;
 };
