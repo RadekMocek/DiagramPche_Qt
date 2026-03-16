@@ -12,6 +12,7 @@
 
 #include "MainWindow.hpp"
 #include "../../Config.hpp"
+#include "../../Welcome.hpp"
 #include "../Dialog/ExportSVGDialog.hpp"
 #include "Scene.hpp"
 #include "Viewer.hpp"
@@ -158,8 +159,10 @@ void GUIMainWindow::InitMainMenuBar()
     const QPointer help_menu = main_menu_bar->addMenu("Help");
     // .: Examples :.
     const QPointer examples_menu = help_menu->addMenu("Examples");
-    const QPointer example_1_action = examples_menu->addAction("Example 1");
+    const QPointer example_1_action = examples_menu->addAction("Example 1: CPU block diagram");
     connect(example_1_action, &QAction::triggered, [this] { LoadSourceFromFile("./Resource/Example/Example1.toml"); });
+    const QPointer example_2_action = examples_menu->addAction("Example 2: BPMN");
+    connect(example_2_action, &QAction::triggered, [this] { LoadSourceFromFile("./Resource/Example/Example2.toml"); });
     // . About .
     const QPointer about_action = help_menu->addAction("About");
     connect(about_action, &QAction::triggered, [this] {

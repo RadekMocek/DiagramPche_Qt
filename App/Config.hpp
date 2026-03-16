@@ -24,24 +24,3 @@ constexpr auto NODE_PADDING = 18;
 
 constexpr int TIP_ARROW_LENGTH = 12;
 constexpr int TIP_ARROW_SPAN = 4;
-
-constexpr auto WELCOME_TOML = R"([variables]
-offset = 14
-
-[node.hello]
-value = "Hello,"
-color = "#ff99b880"
-
-[node.world]
-value = "world!"
-color = "#ffcfb380"
-pivot = "top-left"
-xy = ["hello", "bottom-right", "offset", "offset"]
-
-[[path]]
-start = ["hello", "bottom", 0, 0]
-end = ["world", "bottom", 0, 0]
-shift = 40
-points = [["", "start", 0, "", "end", 0]]
-color = [40, 40, 40, 255]
-)";

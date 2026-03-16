@@ -14,10 +14,10 @@ This is part of a IMGUI paradigm research, [go back to main repo](https://github
   * [ ] View → Toolbar
     * [ ] Source: Allow changing font size of the text editor
     * [ ] Source: Show cursor position in the text editor
-    * [ ] Canvas: Change color node with color picker
-    * [ ] Canvas: Change node's type via Drop-down list
+    * [ ] Canvas: Change color node with color picker (add the parameter if it's missing in source; be aware that color def can be multiple lines if array)
+    * [ ] Canvas: Change node's type via Drop-down list (add the parameter if it's missing in source)
   * [ ] View → Secondary canvas toolbar
-    * [ ] Drag'n'Drop new node, button for each node type
+    * [ ] Drag'n'Drop new node, button for each node type (beware the canvas scroll and zoom)
     * [ ] Zoom slider, right aligned
   * Saving/loading:
     * [ ] New, Open, Save, Save as
@@ -25,6 +25,7 @@ This is part of a IMGUI paradigm research, [go back to main repo](https://github
     * [ ] Confirm unsaved new
     * [ ] Confirm unsaved open, including loading a debug diagram or an example
     * [ ] Change window name according to opened document (incl. star for unsaved)
+    * [ ] _Save → Cancel_ should behave the same as unsavedwarn's _Cancel_
   * [ ] Code editor syntax highlight
 * Pipeline: TOML parse → Draw to canvas / Render to SVG:
   * [ ] Remove `(expecting [X, Y])` from error message (does not make sense in wider context)
@@ -52,6 +53,7 @@ This is part of a IMGUI paradigm research, [go back to main repo](https://github
   * [ ] Main menu bar → File items
   * [ ] Toolbar → Drop-down list with node types
   * [ ] Secondary canvas toolbar → Drag'n'Drop buttons
+  * [ ] UnsavedWarn modal
 * TOML Parser:
   * [ ] Refactor TOML parsing: do not std::move into priority queue, use pq just for determining draw order and nothing more
 
@@ -98,6 +100,9 @@ An alternative approach would be to choose the _MinGW_ component instead of _MSV
 
 * [Qt](https://www.qt.io/development/qt-framework) ([LGPL](https://doc.qt.io/qt-6/lgpl.html))
 * [toml++](https://github.com/marzer/tomlplusplus) ([MIT](https://github.com/marzer/tomlplusplus/blob/master/LICENSE))
+
+<br>
+
 * [Inconsolata](https://levien.com/type/myfonts/inconsolata.html) ([SIL Open Font](https://github.com/google/fonts/blob/main/ofl/inconsolata/OFL.txt))
 
 ## Problems
