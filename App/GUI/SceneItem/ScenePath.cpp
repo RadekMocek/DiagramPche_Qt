@@ -35,7 +35,6 @@ void ScenePath::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
     }
 
     if (m_crate.do_path_label) {
-        painter->setBrush(m_crate.path_label_bg_color);
         for (const auto& path_label : m_crate.path_label_top_lefts) {
             const QRectF rect(path_label, m_crate.path_label_rect.size());
 
