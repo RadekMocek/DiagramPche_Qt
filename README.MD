@@ -29,10 +29,10 @@ This is part of a IMGUI paradigm research, [go back to main repo](https://github
   * [ ] Code editor syntax highlight
 * Pipeline: TOML parse → Draw to canvas / Render to SVG:
   * [ ] Remove `(expecting [X, Y])` from error message (does not make sense in wider context)
-  * [ ] `[node].type = "text"`
-  * [ ] `[node].type = "rectangle"`
-  * [ ] `[node].type = "ellipse"`
-  * [ ] `[node].type = "diamond"`
+  * [x] `[node].type = "text"`
+  * [x] `[node].type = "rectangle"`
+  * [x] `[node].type = "ellipse"`
+  * [x] `[node].type = "diamond"`
   * [ ] `[node].color_border`, don't forget to generalize the error message
   * [ ] `[node].label_shift`, allow for variables, don't forget about zoom level
   * [ ] Allow setting individual start/end path shift, keep backwards compatible
@@ -106,5 +106,3 @@ An alternative approach would be to choose the _MinGW_ component instead of _MSV
 * [Inconsolata](https://levien.com/type/myfonts/inconsolata.html) ([SIL Open Font](https://github.com/google/fonts/blob/main/ofl/inconsolata/OFL.txt))
 
 ## Problems
-
-* Paths "aliasing"

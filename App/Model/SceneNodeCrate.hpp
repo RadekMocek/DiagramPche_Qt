@@ -4,6 +4,8 @@
 #include <QFont>
 #include <QRect>
 
+#include "NodeType.hpp"
+
 struct SceneNodeCrate
 {
     QRectF aabr;
@@ -11,4 +13,5 @@ struct SceneNodeCrate
     QFont font;
     QPointF label_position;
     QString label_value;
+    NodeType type;
 };

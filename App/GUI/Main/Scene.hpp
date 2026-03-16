@@ -31,12 +31,13 @@ public:
     void GUIScenePrepareNode(const Node& node);
     void GUIScenePreparePath(const Path& path);
 
-    QRectF GetSceneAABR() const { return m_scene_aabr.ToQRectF(); }
+    [[nodiscard]] QRectF GetSceneAABR() const { return m_scene_aabr.ToQRectF(); }
 
 private:
     QFont m_font;
     QFontMetrics m_font_metrics;
 
+    // Store already prepared nodes, we need their data to prepare dependant nodes
     std::unordered_map<std::string, SceneNode*> m_scene_nodes;
 
     // For svg export

@@ -15,15 +15,38 @@ QRectF SceneNode::boundingRect() const
 
 void SceneNode::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
 {
-    painter->setFont(m_crate.font);
+    painter->setRenderHint(QPainter::Antialiasing, true);
 
-    painter->fillRect(m_crate.aabr, m_crate.color);
+    const auto& [aabr, color, font, label_position, label_value, type] = m_crate;
 
-    painter->drawText(QRectF(m_crate.label_position.x(), m_crate.label_position.y(), 0, 0),
+    painter->setFont(font);
+    painter->setBrush(color); // Fill color
+
+    switch (type) {
+    case NTYPE_RECTANGLE:
+        painter->drawRect(aabr);
+        break;
+    case NTYPE_ELLIPSE:
+        painter->drawEllipse(aabr);
+        break;
+    case NTYPE_DIAMOND:
+        {
+            QPolygon polygon;
+            polygon << GetExactPointFromPivot(PIVOT_TOP).toPoint()
+                << GetExactPointFromPivot(PIVOT_RIGHT).toPoint()
+                << GetExactPointFromPivot(PIVOT_BOTTOM).toPoint()
+                << GetExactPointFromPivot(PIVOT_LEFT).toPoint();
+            painter->drawConvexPolygon(polygon);
+        }
+        break;
+    case NTYPE_TEXT:
+        // Do nothing
+        break;
+    }
+
+    painter->drawText(QRectF(label_position.x(), label_position.y(), 0, 0),
                       Qt::TextExpandTabs | Qt::TextDontClip,
-                      m_crate.label_value);
-
-    painter->drawRect(m_crate.aabr);
+                      label_value);
 }
 
 QPointF SceneNode::GetExactPointFromPivot(const Pivot pivot) const
