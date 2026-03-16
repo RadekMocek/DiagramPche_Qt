@@ -18,7 +18,7 @@ void ScenePath::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
 {
     painter->setRenderHint(QPainter::Antialiasing, true);
 
-    painter->setPen(QPen(m_crate.color, 1.1)); // Line color
+    painter->setPen(QPen(m_crate.color)); // Line color
     painter->setBrush(m_crate.color); // Fill color (for the arrow tips)
 
     for (const auto& path : m_crate.paths) {

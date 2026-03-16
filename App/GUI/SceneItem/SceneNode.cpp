@@ -1,6 +1,7 @@
 #include <QPainter>
 
 #include "SceneNode.hpp"
+#include "App/Config.hpp"
 
 SceneNode::SceneNode(const SceneNodeCrate& crate) :
     m_crate(crate)
@@ -17,10 +18,11 @@ void SceneNode::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
 {
     painter->setRenderHint(QPainter::Antialiasing, true);
 
-    const auto& [aabr, color, font, label_position, label_value, type] = m_crate;
+    const auto& [aabr, color_fill, color_edge, font, label_position, label_value, type] = m_crate;
 
     painter->setFont(font);
-    painter->setBrush(color); // Fill color
+    painter->setPen(QPen(color_edge));
+    painter->setBrush(color_fill);
 
     switch (type) {
     case NTYPE_RECTANGLE:
@@ -44,6 +46,8 @@ void SceneNode::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
         break;
     }
 
+    // Switch back to black text
+    painter->setPen(QPen(COLOR_BLACK));
     painter->drawText(QRectF(label_position.x(), label_position.y(), 0, 0),
                       Qt::TextExpandTabs | Qt::TextDontClip,
                       label_value);

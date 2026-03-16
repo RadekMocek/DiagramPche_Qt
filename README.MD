@@ -10,7 +10,6 @@ This is part of a IMGUI paradigm research, [go back to main repo](https://github
 ## TODO
 
 * General:
-  * [ ] View → Jump to canvas origin
   * [ ] View → Toolbar
     * [ ] Source: Allow changing font size of the text editor
     * [ ] Source: Show cursor position in the text editor
@@ -28,19 +27,19 @@ This is part of a IMGUI paradigm research, [go back to main repo](https://github
     * [ ] _Save → Cancel_ should behave the same as unsavedwarn's _Cancel_
   * [ ] Code editor syntax highlight
 * Pipeline: TOML parse → Draw to canvas / Render to SVG:
-  * [ ] Remove `(expecting [X, Y])` from error message (does not make sense in wider context)
+  * [x] Remove `(expecting [X, Y])` from error message (does not make sense in wider context)
   * [x] `[node].type = "text"`
   * [x] `[node].type = "rectangle"`
   * [x] `[node].type = "ellipse"`
   * [x] `[node].type = "diamond"`
-  * [ ] `[node].color_border`, don't forget to generalize the error message
-  * [ ] `[node].label_shift`, allow for variables, don't forget about zoom level
-  * [ ] Allow setting individual start/end path shift, keep backwards compatible
+  * [x] `[node].color_border`, don't forget to generalize the error message
+  * [x] `[node].label_shift`, allow for variables, don't forget about zoom level
+  * [x] Allow setting individual start/end path shift, keep backwards compatible
   * [ ] `[[path]].label`
   * [ ] `[[path]].label_bg`
 * Canvas features:
-  * [ ] Canvas zooming: anchor under mouse
-  * [ ] Change the cursor type while dragging the canvas
+  * [x] Canvas zooming: anchor under mouse
+  * [x] Change the cursor type while dragging the canvas
   * [ ] Ctrl+Click to jump to node definition in text editor
 * Settings window:
   * [ ] Switch between vanilla and 3rd party text editor
@@ -55,7 +54,7 @@ This is part of a IMGUI paradigm research, [go back to main repo](https://github
   * [ ] Secondary canvas toolbar → Drag'n'Drop buttons
   * [ ] UnsavedWarn modal
 * TOML Parser:
-  * [ ] Refactor TOML parsing: do not std::move into priority queue, use pq just for determining draw order and nothing more
+  * [x] Refactor TOML parsing: do not std::move into priority queue, use pq just for determining draw order and nothing more
 
 ## Building locally
 

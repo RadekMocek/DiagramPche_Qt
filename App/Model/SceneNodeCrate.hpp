@@ -9,7 +9,8 @@
 struct SceneNodeCrate
 {
     QRectF aabr;
-    QColor color;
+    QColor color_fill;
+    QColor color_edge;
     QFont font;
     QPointF label_position;
     QString label_value;
