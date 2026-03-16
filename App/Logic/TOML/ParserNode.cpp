@@ -28,7 +28,8 @@ void Parser::ParseNode(const toml::table* node_table, Node& curr_node)
         }
         // == color ==> array of four u8s (rgba) or RGBA hex string ("#xxxxxxxx")
         else if (key_str == "color") {
-            SetColorFromArray(value, curr_node.color);
+            SetColorFromArrayOrString(value, curr_node.color);
+            curr_node.color_source = value.source();
         }
         // == size ==> array of two items [width, height], where each is specified either by integer or a string with variable name
         else if (key_str == "size") {
@@ -51,6 +52,33 @@ void Parser::ParseNode(const toml::table* node_table, Node& curr_node)
         // == z ==> integer
         else if (key_str == "z") {
             curr_node.z = GetZFromInt(value, true);
+        }
+        // == type ==> node type string
+        else if (key_str == "type") {
+            if (const auto* value_str_ptr = value.as_string()) {
+                if (const auto nodetype_opt = GetNodeTypeFromString(value_str_ptr->value_or(""));
+                    nodetype_opt.has_value()) {
+                    curr_node.type = nodetype_opt.value();
+                    curr_node.type_source = value.source();
+                }
+                else ReportError(value_str_ptr->source(), NODETYPE_ERROR_MESSAGE);
+            }
+            else ReportError(value.source(), "A string must follow after 'type='");
+        }
+        // == color_border ==> same as color
+        else if (key_str == "color_border") {
+            SetColorFromArrayOrString(value, curr_node.color_border);
+        }
+        // == label_shift ==> array [X, Y], same as size
+        else if (key_str == "label_shift") {
+            if (const auto* value_arr_ptr = value.as_array(); value_arr_ptr && value_arr_ptr->size() == 2) {
+                SetIntFromIntOrVariable(value_arr_ptr->at(0), curr_node.label_shift_x);
+                SetIntFromIntOrVariable(value_arr_ptr->at(1), curr_node.label_shift_y);
+            }
+            else {
+                ReportError(value.source(),
+                            "An array of two integers and/or variable names must follow after 'label_shift='");
+            }
         }
         // == Unknown key ==> report error
         else ReportError(key.source(), std::format("Unknown key '{}'", key_str));

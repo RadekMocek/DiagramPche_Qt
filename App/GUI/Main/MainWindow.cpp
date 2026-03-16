@@ -34,7 +34,7 @@ GUIMainWindow::GUIMainWindow()
 void GUIMainWindow::ParseAndRedraw()
 {
     m_parser.Parse(m_source->toPlainText().toStdString());
-    m_scene->Redraw(m_parser.m_result_nodes_pq, m_parser.m_result_paths);
+    m_scene->Redraw(m_parser.m_result_nodes_pq, m_parser.m_result_nodes, m_parser.m_result_paths);
 
     if (m_parser.m_is_error) {
         auto err_str = QString::fromStdString(m_parser.m_error_description);
@@ -50,7 +50,7 @@ void GUIMainWindow::ParseAndRedraw()
 
 void GUIMainWindow::ExportToSvg() const
 {
-    constexpr auto SVG_PADDING = 25.0f;
+    constexpr auto SVG_PADDING = 25;
     // Qt has the ability to save content of QGraphicsScene into a SVG file
     QSvgGenerator svg_generator;
 
@@ -91,9 +91,9 @@ void GUIMainWindow::ExportToSvg() const
 
 void GUIMainWindow::ErrorHighlight(const toml::source_region& EH_region) const
 {
-    const auto error_y = EH_region.begin.line - 1;
-    const auto error_x_start = EH_region.begin.column - 1;
-    const auto error_x_length = EH_region.end.column - error_x_start - 1;
+    const auto error_y = static_cast<int>(EH_region.begin.line - 1);
+    const auto error_x_start = static_cast<int>(EH_region.begin.column - 1);
+    const auto error_x_length = static_cast<int>(EH_region.end.column - error_x_start - 1);
 
     QTextCursor cursor = m_source->textCursor();
     cursor.movePosition(QTextCursor::Start);

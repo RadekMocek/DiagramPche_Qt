@@ -12,6 +12,7 @@
 
 // App fwd declrs
 struct Node;
+struct NodePriority;
 struct Path;
 class SceneNode;
 
@@ -23,7 +24,10 @@ class GUIScene : public QGraphicsScene
 public:
     explicit GUIScene(const QFont& font, QObject* parent = nullptr);
 
-    void Redraw(std::priority_queue<Node>& nodes_pq, const std::vector<Path>& paths_vec);
+    void Redraw(std::priority_queue<NodePriority>& nodes_pq,
+                const std::unordered_map<std::string, Node>& nodes_map,
+                const std::vector<Path>& paths_vec);
+
     void GUIScenePrepareNode(const Node& node);
     void GUIScenePreparePath(const Path& path);
 

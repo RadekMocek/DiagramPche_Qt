@@ -1,12 +1,15 @@
 #pragma once
 
+#include <string>
 #include <vector>
 
 #include <QPointF>
 
 #include "Pathpoint.hpp"
 #include "Point.hpp"
-#include "App/Helper/DrawLayer.hpp"
+#include "../Helper/DrawLayer.hpp"
+
+using ColorTuple = std::tuple<unsigned char, unsigned char, unsigned char, unsigned char>;
 
 struct Path
 {
@@ -14,19 +17,26 @@ struct Path
     std::vector<Point> ends{};
     std::vector<Pathpoint> pathpoints{};
 
-    int shift{};
+    int shift_start{};
+    int shift_end{};
 
-    std::tuple<unsigned char, unsigned char, unsigned char, unsigned char> color = {0, 0, 0, 255};
+    ColorTuple color = {0, 0, 0, 255};
 
     bool do_start_arrow = false;
     bool do_end_arrow = true;
 
     int z = DL_USER_CHANNEL_DEFAULT_PATH;
 
+    std::string label_value{};
+    int label_point{};
+    int label_shift{};
+    int label_shift_orthogonal{};
+    ColorTuple label_bg_color = {0, 0, 0, 0};
+
     //
-    [[nodiscard]] constexpr QPointF GetShiftVector(const Pivot pivot) const
+    [[nodiscard]] constexpr QPointF GetShiftVector(const Pivot pivot, const bool is_start) const
     {
-        const auto sf = static_cast<qreal>(shift);
+        const auto sf = static_cast<qreal>((is_start) ? shift_start : shift_end);
         switch (pivot) {
         default:
             // Unreachable (?), fallthrough

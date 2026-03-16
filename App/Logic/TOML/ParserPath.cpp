@@ -38,7 +38,7 @@ void Parser::ParsePath(const toml::table* path_table, Path& curr_path)
                     // "",   "end",   23  :: relative to path end
                     // "",   "prev",  23  :: relative to previous pathpoint
                     // Instead of integer (23), string with variable name can be used
-                    if (const auto* pathpoint_arr_ptr = pathpoint.as_array(); !!pathpoint_arr_ptr
+                    if (const auto* pathpoint_arr_ptr = pathpoint.as_array(); pathpoint_arr_ptr
                         && pathpoint_arr_ptr->size() == 6
                         && pathpoint_arr_ptr->at(0).is_string()
                         && pathpoint_arr_ptr->at(1).is_string()
@@ -61,13 +61,20 @@ void Parser::ParsePath(const toml::table* path_table, Path& curr_path)
             }
             else ReportError(value.source(), "An array of arrays must follow after 'points='");
         }
-        // == shift ==> int or var
+        // == shift ==> int or [int, int]
         else if (key_str == "shift") {
-            SetIntFromIntOrVariable(value, curr_path.shift);
+            if (const auto* value_arr_ptr = value.as_array(); value_arr_ptr && value_arr_ptr->size() == 2) {
+                SetIntFromIntOrVariable(value_arr_ptr->at(0), curr_path.shift_start);
+                SetIntFromIntOrVariable(value_arr_ptr->at(1), curr_path.shift_end);
+            }
+            else {
+                SetIntFromIntOrVariable(value, curr_path.shift_start);
+                SetIntFromIntOrVariable(value, curr_path.shift_end);
+            }
         }
         // == color ==> array of four u8s (rgba) or RGBA hex string ("#xxxxxxxx")
         else if (key_str == "color") {
-            SetColorFromArray(value, curr_path.color);
+            SetColorFromArrayOrString(value, curr_path.color);
         }
         // == tips ==> 2 char string for now?
         else if (key_str == "tips") {
@@ -96,6 +103,25 @@ void Parser::ParsePath(const toml::table* path_table, Path& curr_path)
         else if (key_str == "z") {
             curr_path.z = GetZFromInt(value, false);
         }
+        // == label ==> array [string, int, int]
+        else if (key_str == "label") {
+            if (const auto* value_arr_ptr = value.as_array(); value_arr_ptr
+                && value_arr_ptr->size() == 4
+                && value_arr_ptr->at(0).is_string()
+                && value_arr_ptr->at(1).is_integer()
+                && value_arr_ptr->at(2).is_integer()
+                && value_arr_ptr->at(3).is_integer()) {
+                curr_path.label_value = value_arr_ptr->at(0).as_string()->value_or("");
+                curr_path.label_point = value_arr_ptr->at(1).as_integer()->value_or(0);
+                curr_path.label_shift = value_arr_ptr->at(2).as_integer()->value_or(0);
+                curr_path.label_shift_orthogonal = value_arr_ptr->at(3).as_integer()->value_or(0);
+            }
+            else ReportError(value.source(), "An array [string, int, int, int] must follow after 'label='");
+        }
+        // == label_bg ==> same as color
+        else if (key_str == "label_bg") {
+            SetColorFromArrayOrString(value, curr_path.label_bg_color);
+        }
         // == Unknown key ==> report error
         else ReportError(key.source(), std::format("Unknown key '{}'", key_str));
     }
@@ -106,7 +132,7 @@ void Parser::ParsePathStartOrEnd(const toml::node& value, Point& to_set)
     SetPositionPointFromArray(value, to_set);
     // Check if the parent id exist, `SetPositionPointFromArray` does not do that because all nodes might not parsed yet when we call it (now they are)
     if (const auto& parent_id = to_set.parent_id;
-        !parent_id.empty() && !m_nodes_map.contains(parent_id)) {
+        !parent_id.empty() && !m_result_nodes.contains(parent_id)) {
         ReportError(to_set.parent_id_source_region,
                     std::format("Path's start/end is referencing non existant id: '{}'", parent_id));
     }
@@ -133,7 +159,7 @@ void Parser::ParsePathpointXOrY(const toml::array* pathpoint_arr_ptr, const bool
         }
     }
     else { // Some ID => pathpoint type is REFERENCE => check if ID is valid and get parent's pivot
-        if (!m_nodes_map.contains(id_str)) {
+        if (!m_result_nodes.contains(id_str)) {
             ReportError(pathpoint_arr_ptr->at(0 + arr_offset).source(),
                         std::format("Pathpoint's x is referencing non existant id: '{}'", id_str));
         }

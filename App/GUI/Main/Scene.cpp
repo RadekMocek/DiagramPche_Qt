@@ -1,6 +1,7 @@
 #include "Scene.hpp"
 #include "../../Model/Node.hpp"
 #include "../../Model/Path.hpp"
+#include "../../Logic/TOML/NodePriority.hpp"
 
 GUIScene::GUIScene(const QFont& font, QObject* parent) :
     QGraphicsScene(parent),
@@ -10,7 +11,9 @@ GUIScene::GUIScene(const QFont& font, QObject* parent) :
     //
 }
 
-void GUIScene::Redraw(std::priority_queue<Node>& nodes_pq, const std::vector<Path>& paths_vec)
+void GUIScene::Redraw(std::priority_queue<NodePriority>& nodes_pq,
+                      const std::unordered_map<std::string, Node>& nodes_map,
+                      const std::vector<Path>& paths_vec)
 {
     m_scene_nodes.clear();
     clear();
@@ -18,7 +21,8 @@ void GUIScene::Redraw(std::priority_queue<Node>& nodes_pq, const std::vector<Pat
     m_scene_aabr.Reset();
 
     for (; !nodes_pq.empty(); nodes_pq.pop()) {
-        GUIScenePrepareNode(nodes_pq.top());
+        const auto& [node_draw_batch_number, node_id] = nodes_pq.top();
+        GUIScenePrepareNode(nodes_map.at(node_id));
     }
 
     for (const auto& path : paths_vec) {

@@ -4,13 +4,14 @@
 
 #include <QColor>
 
-inline QColor GetColorFromTuple(const std::tuple<unsigned char, unsigned char, unsigned char, unsigned char>& tup)
+using ColorTuple = std::tuple<unsigned char, unsigned char, unsigned char, unsigned char>;
+
+inline QColor GetQColorFromTuple(const ColorTuple& tup)
 {
     return QColor::fromRgb(std::get<0>(tup), std::get<1>(tup), std::get<2>(tup), std::get<3>(tup));
 }
 
-inline std::tuple<unsigned char, unsigned char, unsigned char, unsigned char>
-GetTupleFromString(const std::string& color_str)
+inline ColorTuple GetColorTupleFromString(const std::string& color_str)
 {
     if (color_str.length() == 9 && color_str[0] == '#') {
         unsigned int r = 0, g = 0, b = 0, a = 0;

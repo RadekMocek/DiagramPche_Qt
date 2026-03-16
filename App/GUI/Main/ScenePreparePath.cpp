@@ -7,9 +7,6 @@
 
 void GUIScene::GUIScenePreparePath(const Path& path)
 {
-    // Get the "simple" values from path
-    const auto shift = path.shift;
-
     // Prepare the start point
     QPointF start(path.start.x, path.start.y);
     bool do_start_shift = false;
@@ -18,7 +15,7 @@ void GUIScene::GUIScenePreparePath(const Path& path)
             // Move start point so it's relative to parent's pivot
             start += it->second->GetExactPointFromPivot(path.start.parent_pivot);
             // Path shift makes sense only when the start/end point is relative to some node
-            if (shift != 0) {
+            if (path.shift_start != 0) {
                 do_start_shift = true;
             }
         }
@@ -38,7 +35,7 @@ void GUIScene::GUIScenePreparePath(const Path& path)
         result_paths = QList<QList<QPointF>>(n_ends, QList<QPointF>());
     }
     else {
-        const auto shifted_start = start + path.GetShiftVector(path.start.parent_pivot);
+        const auto shifted_start = start + path.GetShiftVector(path.start.parent_pivot, true);
         result_paths = QList<QList<QPointF>>(n_ends, QList({start, shifted_start}));
         start = shifted_start; // Do this so Pathpoints relative to start are relative to this
         aabr.Update(start);
@@ -55,7 +52,7 @@ void GUIScene::GUIScenePreparePath(const Path& path)
         if (!path_end.parent_id.empty()) {
             if (const auto it = m_scene_nodes.find(path_end.parent_id); it != m_scene_nodes.end()) {
                 end += it->second->GetExactPointFromPivot(path_end.parent_pivot);
-                if (shift != 0) {
+                if (path.shift_end != 0) {
                     do_end_shift = true;
                 }
             }
@@ -64,7 +61,7 @@ void GUIScene::GUIScenePreparePath(const Path& path)
         // `shifted_end` is the end point, that all the Pathpoints relate to.
         // If there is no a shift, it is just the original end.
         // If there is a shift, we apply it; we still remember the original end and in this case it will be the last point added to current collection.
-        const auto shifted_end = (!do_end_shift) ? end : end + path.GetShiftVector(path_end.parent_pivot);
+        const auto shifted_end = (!do_end_shift) ? end : end + path.GetShiftVector(path_end.parent_pivot, false);
 
         // Pathpoints (defined as a collection [[path]].points) are points between start and end.
         // They are not mandatory: if no Pathpoints are specified, then path is just a single line from start to end.
@@ -137,7 +134,7 @@ void GUIScene::GUIScenePreparePath(const Path& path)
 
     //
     auto* item = new ScenePath({
-        aabr.ToQRectF(), result_paths, GetColorFromTuple(path.color), path.do_start_arrow, path.do_end_arrow
+        aabr.ToQRectF(), result_paths, GetQColorFromTuple(path.color), path.do_start_arrow, path.do_end_arrow
     });
     item->setZValue(DLUserChannelToRealChannel(path.z, false));
     addItem(item);
