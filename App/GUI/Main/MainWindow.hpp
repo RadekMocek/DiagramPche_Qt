@@ -15,6 +15,7 @@ QT_END_NAMESPACE
 #include "../Dialog/ExportSVGDialog.hpp"
 #include "../Dialog/PreferencesDialog.hpp"
 #include "../SceneItem/SceneNode.hpp"
+#include "../Support/Highlighter.hpp"
 
 // App fwd declrs
 class GUIScene;
@@ -48,6 +49,7 @@ private:
     // = Members=
     // Text editor with the TOML describing the diagram
     QPointer<QPlainTextEdit> m_source;
+    QPointer<Highlighter> m_highlighter; // Syntax highlight
 
     // This is where diagram will be rendered
     QPointer<GUIScene> m_scene;
@@ -57,8 +59,7 @@ private:
 
     // TOML parser
     Parser m_parser;
-
-    QPointer<QLabel> m_error_label;
+    QPointer<QLabel> m_error_label; // Widget showing TOML parsing error, if there is some
 
     // Modeless windows
     QPointer<BenchmarkDialog> m_benchmark_dialog;

@@ -25,7 +25,7 @@ This is part of a IMGUI paradigm research, [go back to main repo](https://github
     * [ ] Confirm unsaved open, including loading a debug diagram or an example
     * [ ] Change window name according to opened document (incl. star for unsaved)
     * [ ] _Save → Cancel_ should behave the same as unsavedwarn's _Cancel_
-  * [ ] Code editor syntax highlight
+  * [x] Code editor syntax highlight
 * Pipeline: TOML parse → Draw to canvas / Render to SVG:
   * [x] Remove `(expecting [X, Y])` from error message (does not make sense in wider context)
   * [x] `[node].type = "text"`

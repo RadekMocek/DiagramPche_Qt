@@ -261,6 +261,9 @@ void GUIMainWindow::InitCentralWidget()
     m_source = new QPlainTextEdit();
     m_source->setPlainText(WELCOME_TOML);
     m_source->setLineWrapMode(QPlainTextEdit::NoWrap);
+
+    m_highlighter = new Highlighter(m_source->document());
+
     splitter->addWidget(m_source);
 
     connect(m_source, &QPlainTextEdit::textChanged, this, &GUIMainWindow::ParseAndRedraw);
