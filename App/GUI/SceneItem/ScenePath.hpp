@@ -4,7 +4,8 @@
 
 #include "../../Model/ScenePathCrate.hpp"
 
-// ===================================
+// === === === === === === === === ===
+
 class ScenePath : public QGraphicsItem
 {
 public:

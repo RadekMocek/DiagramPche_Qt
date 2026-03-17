@@ -11,7 +11,9 @@ QT_END_NAMESPACE
 
 // App imports
 #include "../../Logic/TOML/Parser.hpp"
+#include "../Dialog/BenchmarkDialog.hpp"
 #include "../Dialog/ExportSVGDialog.hpp"
+#include "../Dialog/PreferencesDialog.hpp"
 #include "../SceneItem/SceneNode.hpp"
 
 // App fwd declrs
@@ -40,6 +42,7 @@ private:
     void InitMainMenuBar();
     static void ApplyFontMenu(const QMenu* menu, const QFont& font);
     void InitCentralWidget();
+    void InitToolbar();
     void InitState();
 
     // = Members=
@@ -56,6 +59,10 @@ private:
     Parser m_parser;
 
     QPointer<QLabel> m_error_label;
+
+    // Modeless windows
+    QPointer<BenchmarkDialog> m_benchmark_dialog;
+    QPointer<PreferencesDialog> m_preferences_dialog;
 
     // State
     ExportSVGDialogState m_state_dialog_export;

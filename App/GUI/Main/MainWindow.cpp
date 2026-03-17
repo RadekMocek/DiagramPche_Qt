@@ -1,14 +1,18 @@
 #include <filesystem>
 
 #include <QDesktopServices>
+#include <QComboBox>
 #include <QDir>
 #include <QGridLayout>
 #include <QLabel>
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QPlainTextEdit>
+#include <QPushButton>
+#include <QSpinBox>
 #include <QSplitter>
 #include <QSvgGenerator>
+#include <QToolBar>
 
 #include "MainWindow.hpp"
 #include "../../Config.hpp"
@@ -24,6 +28,7 @@ GUIMainWindow::GUIMainWindow()
 
     InitMainMenuBar();
     InitCentralWidget();
+    InitToolbar();
     InitState();
 
     ParseAndRedraw();
@@ -124,35 +129,81 @@ void GUIMainWindow::InitMainMenuBar()
 
     // .: File :.
     const QPointer file_menu = main_menu_bar->addMenu("File");
+    // . New .
+    const QPointer file_new_action = file_menu->addAction("New");
+    //todo
+    // . Open .
+    const QPointer file_open_action = file_menu->addAction("Open");
+    //todo
+    // . Save .
+    const QPointer file_save_action = file_menu->addAction("Save");
+    //todo
+    // . Save as .
+    const QPointer file_saveas_action = file_menu->addAction("Save as");
+    //todo
     // . Export to SVG .
-    const QPointer export_svg_action = file_menu->addAction("Export to SVG");
-    connect(export_svg_action, &QAction::triggered, [this]() {
+    const QPointer file_export_svg_action = file_menu->addAction("Export to SVG");
+    connect(file_export_svg_action, &QAction::triggered, [this] {
         ExportSVGDialog dialog(this, m_state_dialog_export);
         connect(&dialog, &ExportSVGDialog::ButtonExportClicked, this, &GUIMainWindow::ExportToSvg);
         dialog.exec();
     });
+    file_menu->addSeparator();
+
+    // . Preferences .
+    const QPointer file_preferences_action = file_menu->addAction("Preferences");
+    connect(file_preferences_action, &QAction::triggered, [this] {
+        if (m_preferences_dialog) {
+            m_preferences_dialog->raise();
+            m_preferences_dialog->activateWindow();
+            return;
+        }
+        m_preferences_dialog = new PreferencesDialog(this);
+        m_preferences_dialog->setAttribute(Qt::WA_DeleteOnClose);
+        m_preferences_dialog->show();
+    });
+    file_menu->addSeparator();
     // . Exit .
-    const QPointer exit_action = file_menu->addAction("Exit");
-    connect(exit_action, SIGNAL(triggered()), this, SLOT(close()));
+    const QPointer file_exit_action = file_menu->addAction("Exit");
+    connect(file_exit_action, SIGNAL(triggered()), this, SLOT(close()));
 
     // .: View :.
     const QPointer view_menu = main_menu_bar->addMenu("View");
-    // . Grid .
-    const QPointer view_grid_action = view_menu->addAction("Grid");
-    view_grid_action->setCheckable(true);
-    view_grid_action->setChecked(DO_SHOW_GRID_INIT);
-    connect(view_grid_action, &QAction::toggled, [this](const bool is_checked) {
+    // . Toolbar .
+    const QPointer view_canvas_toolbar_action = view_menu->addAction("Toolbar");
+    //todo
+    view_menu->addSeparator();
+    // . Canvas grid .
+    const QPointer view_canvas_grid_action = view_menu->addAction("Canvas grid");
+    view_canvas_grid_action->setCheckable(true);
+    view_canvas_grid_action->setChecked(DO_SHOW_GRID_INIT);
+    connect(view_canvas_grid_action, &QAction::toggled, [this](const bool is_checked) {
         m_viewer->m_do_show_grid = is_checked;
         m_scene->update();
     });
+    // . Secondary canvas toolbar .
+    const QPointer view_secondary_toolbar_action = view_menu->addAction("Secondary canvas toolbar");
+    //todo
 
     // .: Debug :.
     const QPointer debug_menu = main_menu_bar->addMenu("Debug");
     // .: Render tests :.
-    const QPointer render_tests_menu = debug_menu->addMenu("Render tests");
-    const QPointer render_test_1_action = render_tests_menu->addAction("Z-axis, out-of-order");
-    connect(render_test_1_action, &QAction::triggered, [this] {
+    const QPointer debug_render_tests_menu = debug_menu->addMenu("Render tests");
+    const QPointer debug_render_test_1_action = debug_render_tests_menu->addAction("Z-axis, out-of-order");
+    connect(debug_render_test_1_action, &QAction::triggered, [this] {
         LoadSourceFromFile("./Resource/Example/Debug/Z-axis.toml");
+    });
+    // . Benchmark .
+    const QPointer debug_benchmark_action = debug_menu->addAction("Benchmark");
+    connect(debug_benchmark_action, &QAction::triggered, [this] {
+        if (m_benchmark_dialog) {
+            m_benchmark_dialog->raise();
+            m_benchmark_dialog->activateWindow();
+            return;
+        }
+        m_benchmark_dialog = new BenchmarkDialog(this);
+        m_benchmark_dialog->setAttribute(Qt::WA_DeleteOnClose);
+        m_benchmark_dialog->show();
     });
 
     // .: Help :.
@@ -221,10 +272,47 @@ void GUIMainWindow::InitCentralWidget()
     m_scene = new GUIScene(scene_font, this);
 
     m_viewer = new GUISceneViewer(m_scene);
-    splitter->addWidget(m_viewer);
+
+    // Canvas + secondary canvas toolbar container?
+    const QPointer canvas_container_wrapper = new QWidget();
+    const QPointer canvas_container = new QVBoxLayout(canvas_container_wrapper);
+    canvas_container->setContentsMargins(0, 0, 0, 0);
+    canvas_container->addWidget(m_viewer);
+
+    const QPointer secondary_canvas_toolbar = new QHBoxLayout(); // secondary_canvas_toolbar == "sct"
+
+    //TODO loop me and add logic, maybe move this init to a separate function
+    const QPointer sct_dnd_btn_rectangle = new QPushButton("A");
+    //sct_dnd_btn_rectangle->setMaximumWidth(50);
+    secondary_canvas_toolbar->addWidget(sct_dnd_btn_rectangle);
+
+    const QPointer sct_dnd_btn_ellipse = new QPushButton("B");
+    //sct_dnd_btn_ellipse->setMaximumWidth(50);
+    secondary_canvas_toolbar->addWidget(sct_dnd_btn_ellipse);
+
+    const QPointer sct_dnd_btn_diamond = new QPushButton("C");
+    //sct_dnd_btn_diamond->setMaximumWidth(50);
+    secondary_canvas_toolbar->addWidget(sct_dnd_btn_diamond);
+
+    const QPointer sct_dnd_btn_text = new QPushButton("D");
+    //sct_dnd_btn_text->setMaximumWidth(50);
+    secondary_canvas_toolbar->addWidget(sct_dnd_btn_text);
+
+    secondary_canvas_toolbar->addStretch(1); // Buttons on left, slider on right
+
+    const QPointer sct_slider = new QSlider(Qt::Horizontal);
+    //sct_slider->setMaximumWidth(50);
+    secondary_canvas_toolbar->addWidget(sct_slider);
+
+    canvas_container->addLayout(secondary_canvas_toolbar);
+    splitter->addWidget(canvas_container_wrapper);
 
     // Splitter ratio starts at 50/50
-    splitter->setSizes({1, 1});
+    //splitter->setStretchFactor(0, 1); // Index, factor
+    //splitter->setStretchFactor(1, 1); // Index, factor
+    const int half = width() / 2;
+    splitter->setSizes({half, half});
+
     main_layout->addWidget(splitter, 1);
 
     // Error label
@@ -234,6 +322,58 @@ void GUIMainWindow::InitCentralWidget()
     m_error_label = new QLabel();
     m_error_label->setPalette(error_text_palette);
     main_layout->addWidget(m_error_label, 0);
+}
+
+void GUIMainWindow::InitToolbar()
+{
+    // Gives a right-padding to the toolbars.
+    // These numbers don't really work as expected, otherwise I would give it a bigger padding/margin. This works for now.
+    constexpr QMargins TOOLBAR_MARGINS(0, 0, 2, 0);
+
+    // .: Toolbar :: Text edit font size :.
+    const QPointer toolbar_font_size = addToolBar("Text edit font size");
+    toolbar_font_size->setContentsMargins(TOOLBAR_MARGINS);
+    const QPointer label_font_size = new QLabel("Font size: ");
+    toolbar_font_size->addWidget(label_font_size);
+
+    const QPointer widget_font_size = new QSpinBox();
+    toolbar_font_size->addWidget(widget_font_size);
+
+    // .: Toolbar :: Text edit cursor position :.
+    const QPointer toolbar_cursor_pos = addToolBar("Text edit cursor position");
+    toolbar_cursor_pos->setContentsMargins(TOOLBAR_MARGINS);
+    const QPointer label_cursor_pos = new QLabel("Cursor pos: ");
+    toolbar_cursor_pos->addWidget(label_cursor_pos);
+
+    const QPointer widget_cursor_pos = new QLabel("0,0");
+    toolbar_cursor_pos->addWidget(widget_cursor_pos);
+
+    // .: Toolbar :: Selected node color :.
+    const QPointer toolbar_node_color = addToolBar("Selected node color");
+    toolbar_node_color->setContentsMargins(TOOLBAR_MARGINS);
+    const QPointer label_node_color = new QLabel("Node color: ");
+    toolbar_node_color->addWidget(label_node_color);
+
+    const QPointer widget_node_color = new QPushButton("Change color");
+    toolbar_node_color->addWidget(widget_node_color);
+
+    // .: Toolbar :: Selected node type :.
+    const QPointer toolbar_node_type = addToolBar("Selected node type");
+    toolbar_node_type->setContentsMargins(TOOLBAR_MARGINS);
+    const QPointer label_node_type = new QLabel("Node type: ");
+    toolbar_node_type->addWidget(label_node_type);
+
+    const QPointer widget_node_type = new QComboBox();
+    toolbar_node_type->addWidget(widget_node_type);
+
+    // .: Toolbar :: Selected node ID :.
+    const QPointer toolbar_node_id = addToolBar("Selected node ID");
+    toolbar_node_id->setContentsMargins(TOOLBAR_MARGINS);
+    const QPointer label_node_id = new QLabel("Node ID: ");
+    toolbar_node_id->addWidget(label_node_id);
+
+    const QPointer widget_node_id = new QLabel("(no node hovered)");
+    toolbar_node_id->addWidget(widget_node_id);
 }
 
 void GUIMainWindow::InitState()

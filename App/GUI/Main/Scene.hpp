@@ -16,7 +16,8 @@ struct NodePriority;
 struct Path;
 class SceneNode;
 
-// ===================================
+// === === === === === === === === ===
+
 class GUIScene : public QGraphicsScene
 {
     Q_OBJECT

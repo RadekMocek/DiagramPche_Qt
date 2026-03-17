@@ -5,7 +5,8 @@
 #include "../../Model/Pivot.hpp"
 #include "../../Model/SceneNodeCrate.hpp"
 
-// ===================================
+// === === === === === === === === ===
+
 class SceneNode : public QGraphicsItem
 {
 public:

@@ -5,6 +5,8 @@
 
 #include "../../Config.hpp"
 
+// === === === === === === === === === === ===
+
 class GUISceneViewer : public QGraphicsView
 {
 public:
