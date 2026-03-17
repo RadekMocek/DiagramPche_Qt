@@ -57,8 +57,11 @@ void GUIMainWindow::OnNodeCtrlClick(const std::string& id) const
 {
     const auto& nodes = m_parser.m_result_nodes;
     if (const auto it = nodes.find(id); it != nodes.end()) {
-        const QTextCursor cursor(m_source->document()->findBlockByLineNumber(it->second.node_source.begin.line - 1));
-        m_source->moveCursor(QTextCursor::End); // Move to end first so when we jump the [node.id] is at top of the text edit
+        const QTextCursor cursor(m_source->document()->findBlockByLineNumber(
+            static_cast<int>(it->second.node_source.begin.line - 1)
+        ));
+        m_source->moveCursor(QTextCursor::End);
+        // Move to end first so when we jump the [node.id] is at top of the text edit
         m_source->setTextCursor(cursor);
         m_source->setFocus();
     }
@@ -124,6 +127,18 @@ void GUIMainWindow::ErrorHighlight(const toml::source_region& EH_region) const
     selection.cursor = cursor;
 
     m_source->setExtraSelections(QList({selection}));
+}
+
+int GUIMainWindow::GetSourceFontSize() const
+{
+    return m_source->font().pixelSize();
+}
+
+void GUIMainWindow::SetSourceFontSize(const int new_size) const
+{
+    auto font = m_source->font();
+    font.setPixelSize(new_size);
+    m_source->setFont(font);
 }
 
 // == GUI init ==
@@ -346,54 +361,86 @@ void GUIMainWindow::InitCentralWidget()
 
 void GUIMainWindow::InitToolbar()
 {
-    // Gives a right-padding to the toolbars.
-    // These numbers don't really work as expected, otherwise I would give it a bigger padding/margin. This works for now.
-    constexpr QMargins TOOLBAR_MARGINS(0, 0, 2, 0);
+    constexpr auto FONT_SIZE_SOURCE_MIN = 8;
+    constexpr auto FONT_SIZE_SOURCE_MAX = 40;
+
+    // These numbers don't really work as expected, otherwise I would give it a proper padding/margin.
+    //constexpr QMargins TOOLBAR_MARGINS(0, 0, 2, 0);
+
+    // Currently it seems that the best way to add some right padding to the toolbar is by adding a literal space
+    const auto AddSpace = [](QToolBar* toolbar) {
+        toolbar->addWidget(new QLabel(" "));
+    };
 
     // .: Toolbar :: Text edit font size :.
     const QPointer toolbar_font_size = addToolBar("Text edit font size");
-    toolbar_font_size->setContentsMargins(TOOLBAR_MARGINS);
-    const QPointer label_font_size = new QLabel("Font size: ");
+    const QPointer label_font_size = new QLabel(" Font size: ");
     toolbar_font_size->addWidget(label_font_size);
 
     const QPointer widget_font_size = new QSpinBox();
+    widget_font_size->setValue(GetSourceFontSize());
+    widget_font_size->setMinimum(FONT_SIZE_SOURCE_MIN);
+    widget_font_size->setMaximum(FONT_SIZE_SOURCE_MAX);
     toolbar_font_size->addWidget(widget_font_size);
+    connect(widget_font_size, &QSpinBox::valueChanged, [this](const int value) {
+        SetSourceFontSize(value);
+    });
+
+    AddSpace(toolbar_font_size);
+    toolbar_font_size->setMovable(false);
+    toolbar_font_size->toggleViewAction()->setEnabled(false);
 
     // .: Toolbar :: Text edit cursor position :.
     const QPointer toolbar_cursor_pos = addToolBar("Text edit cursor position");
-    toolbar_cursor_pos->setContentsMargins(TOOLBAR_MARGINS);
-    const QPointer label_cursor_pos = new QLabel("Cursor pos: ");
+    const QPointer label_cursor_pos = new QLabel(" Cursor pos: ");
     toolbar_cursor_pos->addWidget(label_cursor_pos);
 
     const QPointer widget_cursor_pos = new QLabel("0,0");
     toolbar_cursor_pos->addWidget(widget_cursor_pos);
 
+    AddSpace(toolbar_cursor_pos);
+    toolbar_cursor_pos->setMovable(false);
+    toolbar_cursor_pos->toggleViewAction()->setEnabled(false);
+
     // .: Toolbar :: Selected node color :.
     const QPointer toolbar_node_color = addToolBar("Selected node color");
-    toolbar_node_color->setContentsMargins(TOOLBAR_MARGINS);
-    const QPointer label_node_color = new QLabel("Node color: ");
+    const QPointer label_node_color = new QLabel(" Node color: ");
     toolbar_node_color->addWidget(label_node_color);
 
     const QPointer widget_node_color = new QPushButton("Change color");
     toolbar_node_color->addWidget(widget_node_color);
 
+    connect(widget_node_color, &QPushButton::clicked, [] {
+        //
+    });
+
+    AddSpace(toolbar_node_color);
+    toolbar_node_color->setMovable(false);
+    toolbar_node_color->toggleViewAction()->setEnabled(false);
+
     // .: Toolbar :: Selected node type :.
     const QPointer toolbar_node_type = addToolBar("Selected node type");
-    toolbar_node_type->setContentsMargins(TOOLBAR_MARGINS);
-    const QPointer label_node_type = new QLabel("Node type: ");
+    const QPointer label_node_type = new QLabel(" Node type: ");
     toolbar_node_type->addWidget(label_node_type);
 
     const QPointer widget_node_type = new QComboBox();
     toolbar_node_type->addWidget(widget_node_type);
 
+    AddSpace(toolbar_node_type);
+    toolbar_node_type->setMovable(false);
+    toolbar_node_type->toggleViewAction()->setEnabled(false);
+
     // .: Toolbar :: Selected node ID :.
     const QPointer toolbar_node_id = addToolBar("Selected node ID");
-    toolbar_node_id->setContentsMargins(TOOLBAR_MARGINS);
-    const QPointer label_node_id = new QLabel("Node ID: ");
+    const QPointer label_node_id = new QLabel(" Node ID: ");
     toolbar_node_id->addWidget(label_node_id);
 
     const QPointer widget_node_id = new QLabel("(no node hovered)");
     toolbar_node_id->addWidget(widget_node_id);
+
+    AddSpace(toolbar_node_id);
+    toolbar_node_id->setMovable(false);
+    toolbar_node_id->toggleViewAction()->setEnabled(false);
 }
 
 void GUIMainWindow::InitState()

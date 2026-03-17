@@ -11,7 +11,7 @@ This is part of a IMGUI paradigm research, [go back to main repo](https://github
 
 * General:
   * [ ] View → Toolbar
-    * [ ] Source: Allow changing font size of the text editor
+    * [x] Source: Allow changing font size of the text editor
     * [ ] Source: Show cursor position in the text editor
     * [ ] Canvas: Change color node with color picker (add the parameter if it's missing in source; be aware that color def can be multiple lines if array)
     * [ ] Canvas: Change node's type via Drop-down list (add the parameter if it's missing in source)
@@ -42,7 +42,7 @@ This is part of a IMGUI paradigm research, [go back to main repo](https://github
   * [x] Change the cursor type while dragging the canvas
   * [x] Ctrl+Click to jump to node definition in text editor
 * Settings window:
-  * [ ] Switch between vanilla and 3rd party text editor
+  * [ ] Turn syntax highlight on/off
   * [ ] Appearance: color theme
   * [ ] Option for forcing light canvas regardless of color theme
   * [ ] Duplicate settings from app: view→grid/toolbar/toolbar2, text editor font size (so all things that can be set and saved are at one place)

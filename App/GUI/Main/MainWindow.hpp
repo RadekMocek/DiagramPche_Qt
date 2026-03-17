@@ -40,6 +40,9 @@ private:
     void ExportToSvg() const;
     void ErrorHighlight(const toml::source_region& EH_region) const;
 
+    [[nodiscard]] int GetSourceFontSize() const;
+    void SetSourceFontSize(int new_size) const;
+
     // AppFile
     void LoadSourceFromFile(const char* filename) const;
 
