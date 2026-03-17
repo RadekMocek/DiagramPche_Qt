@@ -3,7 +3,7 @@
 #include "../../Model/Node.hpp"
 #include "../SceneItem/SceneNode.hpp"
 
-void GUIScene::GUIScenePrepareNode(const Node& node)
+void GUIScene::GUIScenePrepareNode(const std::string& node_id, const Node& node)
 {
     // Qt friendly label
     const auto label_value = QString::fromStdString(node.value);
@@ -135,6 +135,8 @@ void GUIScene::GUIScenePrepareNode(const Node& node)
 
     // Create new `QGraphicsItem` of type `SceneNode` by passing `SceneNodeCrate` to ctor
     auto* item = new SceneNode({
+        node_id,
+        //
         rect,
         GetQColorFromTuple(node.color),
         GetQColorFromTuple(node.color_border),

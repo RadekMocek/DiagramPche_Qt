@@ -18,8 +18,14 @@ public:
 
     [[nodiscard]] QPointF GetExactPointFromPivot(Pivot pivot) const;
 
+    //
+
+    std::string GetID() { return m_crate.id; }
+
 private:
     [[nodiscard]] QPointF GetOffsetFromPivot(Pivot pivot) const;
+
+    //void mousePressEvent(QGraphicsSceneMouseEvent* mouse_event) override;
 
     //
 

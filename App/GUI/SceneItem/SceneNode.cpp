@@ -18,11 +18,14 @@ void SceneNode::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
 {
     painter->setRenderHint(QPainter::Antialiasing, true);
 
-    const auto& [aabr, color_fill, color_edge, font, label_position, label_value, type] = m_crate;
+    const auto& [id, aabr, color_fill, color_edge, font, label_position, label_value, type] = m_crate;
 
     painter->setFont(font);
     painter->setPen(QPen(color_edge));
     painter->setBrush(color_fill);
+
+    // Debug purposes
+    //painter->drawRect(aabr);
 
     switch (type) {
     case NTYPE_RECTANGLE:
@@ -83,3 +86,14 @@ QPointF SceneNode::GetOffsetFromPivot(const Pivot pivot) const
         return {m_crate.aabr.width() / 2, m_crate.aabr.height() / 2};
     }
 }
+
+/*
+#include <QGraphicsSceneMouseEvent>
+void SceneNode::mousePressEvent(QGraphicsSceneMouseEvent* mouse_event)
+{
+    if (mouse_event->button() == Qt::LeftButton) {
+        qDebug() << m_crate.label_value;
+    }
+    QGraphicsItem::mousePressEvent(mouse_event);
+}
+//*/

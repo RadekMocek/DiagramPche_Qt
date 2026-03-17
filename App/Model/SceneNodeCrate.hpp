@@ -8,6 +8,8 @@
 
 struct SceneNodeCrate
 {
+    std::string id;
+    //
     QRectF aabr;
     QColor color_fill;
     QColor color_edge;

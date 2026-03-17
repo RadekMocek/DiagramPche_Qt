@@ -40,7 +40,7 @@ This is part of a IMGUI paradigm research, [go back to main repo](https://github
 * Canvas features:
   * [x] Canvas zooming: anchor under mouse
   * [x] Change the cursor type while dragging the canvas
-  * [ ] Ctrl+Click to jump to node definition in text editor
+  * [x] Ctrl+Click to jump to node definition in text editor
 * Settings window:
   * [ ] Switch between vanilla and 3rd party text editor
   * [ ] Appearance: color theme

@@ -53,6 +53,17 @@ void GUIMainWindow::ParseAndRedraw()
     }
 }
 
+void GUIMainWindow::OnNodeCtrlClick(const std::string& id) const
+{
+    const auto& nodes = m_parser.m_result_nodes;
+    if (const auto it = nodes.find(id); it != nodes.end()) {
+        const QTextCursor cursor(m_source->document()->findBlockByLineNumber(it->second.node_source.begin.line - 1));
+        m_source->moveCursor(QTextCursor::End); // Move to end first so when we jump the [node.id] is at top of the text edit
+        m_source->setTextCursor(cursor);
+        m_source->setFocus();
+    }
+}
+
 void GUIMainWindow::ExportToSvg() const
 {
     constexpr auto SVG_PADDING = 25;
@@ -277,6 +288,8 @@ void GUIMainWindow::InitCentralWidget()
     scene_font.setFamily(FONT_FAMILY_DEFAULT);
     scene_font.setPixelSize(SCENE_FONT_SIZE_BASE);
     m_scene = new GUIScene(scene_font, this);
+
+    connect(m_scene, &GUIScene::NodeCtrlClicked, this, &GUIMainWindow::OnNodeCtrlClick);
 
     m_viewer = new GUISceneViewer(m_scene);
 

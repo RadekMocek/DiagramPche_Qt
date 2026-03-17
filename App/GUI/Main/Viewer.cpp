@@ -17,7 +17,8 @@ void GUISceneViewer::mousePressEvent(QMouseEvent* event)
         event->accept();
         return;
     }
-    event->ignore();
+
+    QGraphicsView::mousePressEvent(event); // Pass further for LMB to select nodes to work
 }
 
 void GUISceneViewer::mouseReleaseEvent(QMouseEvent* event)

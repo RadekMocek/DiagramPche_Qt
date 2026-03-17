@@ -36,6 +36,7 @@ public:
 private:
     // = Methods =
     void ParseAndRedraw();
+    void OnNodeCtrlClick(const std::string& id) const;
     void ExportToSvg() const;
     void ErrorHighlight(const toml::source_region& EH_region) const;
 

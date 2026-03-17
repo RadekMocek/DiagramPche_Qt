@@ -32,12 +32,14 @@ public:
                 const std::unordered_map<std::string, Node>& nodes_map,
                 const std::vector<Path>& paths_vec);
 
-    void GUIScenePrepareNode(const Node& node);
+    void GUIScenePrepareNode(const std::string& node_id, const Node& node);
     void GUIScenePreparePath(const Path& path);
 
     [[nodiscard]] QRectF GetSceneAABR() const { return m_scene_aabr.ToQRectF(); }
 
 private:
+    void mousePressEvent(QGraphicsSceneMouseEvent* mouse_event) override;
+
     QFont m_font;
     QFontMetrics m_font_metrics;
 
@@ -46,4 +48,7 @@ private:
 
     // For svg export
     AABRHelper m_scene_aabr;
+
+signals:
+    void NodeCtrlClicked(const std::string& id);
 };
