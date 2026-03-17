@@ -4,6 +4,12 @@
 
 #include <QColor>
 
+// Common colors
+inline QColor COLOR_BLACK = QColor::fromRgb(0, 0, 0);
+inline QColor COLOR_ERROR = QColor::fromRgb(211, 1, 2);
+inline QColor COLOR_ERROR_HIGHLIGHT = QColor::fromRgb(211, 1, 2, 80);
+
+// Color functions
 using ColorTuple = std::tuple<unsigned char, unsigned char, unsigned char, unsigned char>;
 
 inline QColor GetQColorFromTuple(const ColorTuple& tup)

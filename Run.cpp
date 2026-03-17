@@ -1,11 +1,13 @@
 #include <QApplication>
-#include <QFontDatabase>
 
-#include "App/Config.hpp"
 #include "App/GUI/Main/MainWindow.hpp"
 
 int main(int argc, char* argv[])
 {
+    // --- App config  --- --- --- --- --- ---
+    constexpr auto FONT_SIZE_DEFAULT = 20;
+    // --- --- --- --- --- --- --- --- --- ---
+
     QApplication app(argc, argv);
 
     QFontDatabase::addApplicationFont("./Resource/Font/Inconsolata-Medium.ttf");

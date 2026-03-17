@@ -16,7 +16,10 @@ struct NodePriority;
 struct Path;
 class SceneNode;
 
-// === === === === === === === === ===
+// === Scene config == === === === === ===
+constexpr auto SCENE_FONT_SIZE_BASE = 18;
+constexpr auto NODE_PADDING = 18;
+// === === === === === === === === === ===
 
 class GUIScene : public QGraphicsScene
 {

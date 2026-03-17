@@ -1,7 +1,7 @@
 #include <QPainter>
 
 #include "SceneNode.hpp"
-#include "App/Config.hpp"
+#include "../../Helper/Color.hpp"
 
 SceneNode::SceneNode(const SceneNodeCrate& crate) :
     m_crate(crate)

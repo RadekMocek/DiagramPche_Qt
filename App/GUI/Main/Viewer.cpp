@@ -1,7 +1,6 @@
 #include <QMouseEvent>
 
 #include "Viewer.hpp"
-#include "../../Config.hpp"
 
 GUISceneViewer::GUISceneViewer(QGraphicsScene* scene, QWidget* parent) : QGraphicsView(scene, parent)
 {

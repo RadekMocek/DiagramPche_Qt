@@ -3,9 +3,12 @@
 #include <QGraphicsView>
 #include <QScrollBar>
 
-#include "../../Config.hpp"
-
-// === === === === === === === === === === ===
+// ===  GUISceneViewer config  === === === === === === === === === === ===
+inline QColor COLOR_CANVAS_BACKGROUND = QColor::fromRgb(240, 240, 240);
+constexpr qreal GRID_STEP_BASE = 100.0;
+constexpr bool DO_SHOW_GRID_INIT = true;
+inline QColor COLOR_GRID_LINE = QColor::fromRgb(200, 200, 200, 40);
+// === === === === === === === === === === === === === === === === === ===
 
 class GUISceneViewer : public QGraphicsView
 {

@@ -8,7 +8,7 @@
 #include <QVBoxLayout>
 
 #include "ExportSVGDialog.hpp"
-#include "../../Config.hpp"
+#include "../../Helper/Color.hpp"
 
 ExportSVGDialog::ExportSVGDialog(QWidget* parent, ExportSVGDialogState& state) : QDialog(parent), m_state(state)
 {

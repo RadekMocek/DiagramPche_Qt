@@ -15,7 +15,7 @@
 #include <QToolBar>
 
 #include "MainWindow.hpp"
-#include "../../Config.hpp"
+#include "../../Helper/Color.hpp"
 #include "../../Welcome.hpp"
 #include "../Dialog/ExportSVGDialog.hpp"
 #include "Scene.hpp"
@@ -119,6 +119,10 @@ void GUIMainWindow::ErrorHighlight(const toml::source_region& EH_region) const
 
 void GUIMainWindow::InitMainMenuBar()
 {
+    // --- Main menu bar config -- --- --- --- ---
+    constexpr auto FONT_SIZE_MAIN_MENU_BAR = 18;
+    // --- --- --- --- --- --- --- --- --- --- ---
+
     const QPointer main_menu_bar = new QMenuBar(this);
 
     QFont main_menu_font = main_menu_bar->font();

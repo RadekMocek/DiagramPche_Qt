@@ -21,7 +21,10 @@ QT_END_NAMESPACE
 class GUIScene;
 class GUISceneViewer;
 
-// =====================================
+// === App config  === === === === === === === === ===
+constexpr auto FONT_FAMILY_DEFAULT = "Inconsolata";
+// === === === === === === === === === === === === ===
+
 class GUIMainWindow : public QMainWindow
 {
     Q_OBJECT

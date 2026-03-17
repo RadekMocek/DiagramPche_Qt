@@ -1,5 +1,4 @@
 #include "Scene.hpp"
-#include "../../Config.hpp"
 #include "../../Helper/Color.hpp"
 #include "../../Model/Node.hpp"
 #include "../SceneItem/SceneNode.hpp"

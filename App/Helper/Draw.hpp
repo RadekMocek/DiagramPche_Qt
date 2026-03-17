@@ -3,8 +3,6 @@
 #include <QPainter>
 #include <QPointF>
 
-#include "App/Config.hpp"
-
 inline QPointF QPointFNormalized(const QPointF p)
 {
     const auto magnitude = sqrtf((p.x() * p.x()) + (p.y() * p.y()));
@@ -23,6 +21,9 @@ inline void DrawArrowTip(
     const QPointF p2
 )
 {
+    constexpr int TIP_ARROW_LENGTH = 12;
+    constexpr int TIP_ARROW_SPAN = 4;
+
     const auto p2_to_p1 = QPointFNormalized(p1 - p2);
     const auto point_slightly_before_p2 = p2 + p2_to_p1 * TIP_ARROW_LENGTH;
     const auto p2_orthogonal_addition = QPointFOrthogonalized(p2_to_p1) * TIP_ARROW_SPAN;
