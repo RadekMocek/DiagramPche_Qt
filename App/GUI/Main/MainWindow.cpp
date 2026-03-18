@@ -66,6 +66,7 @@ void GUIMainWindow::OnEmptySpaceClick()
 {
     m_is_some_node_selected = false;
     SetNodeToolbarsEnabled(false);
+    ToolbarInfoReset();
 }
 
 void GUIMainWindow::OnNodeClick(const std::string& id)
@@ -73,7 +74,7 @@ void GUIMainWindow::OnNodeClick(const std::string& id)
     if (const auto* node = GetNodePtrFromId(id); node != nullptr) {
         m_is_some_node_selected = true;
         SetNodeToolbarsEnabled(true);
-        m_color_picker->SetColor(GetQColorFromTuple(node->color));
+        ToolbarInfoSet(node);
     }
 }
 
@@ -96,7 +97,7 @@ void GUIMainWindow::OnNodeHoverEnter(const std::string& id) const
         return;
     }
     if (const auto* node = GetNodePtrFromId(id); node != nullptr) {
-        m_color_picker->SetColor(GetQColorFromTuple(node->color));
+        ToolbarInfoSet(node);
     }
 }
 
@@ -105,7 +106,21 @@ void GUIMainWindow::OnNodeHoverLeave() const
     if (m_is_some_node_selected) {
         return;
     }
-    m_color_picker->SetColor(QColor::fromRgb(240, 240, 240));
+    ToolbarInfoReset();
+}
+
+void GUIMainWindow::ToolbarInfoSet(const Node* node) const
+{
+    m_tbd_color_picker->SetColor(GetQColorFromTuple(node->color));
+    m_tbd_id_label->setText(QString::fromStdString(node->id));
+    m_tbd_type_combo->setCurrentIndex(node->type); // Implicit enum to int
+}
+
+void GUIMainWindow::ToolbarInfoReset() const
+{
+    m_tbd_color_picker->SetColor(QColor::fromRgb(240, 240, 240));
+    m_tbd_id_label->setText("(No node hovered)");
+    m_tbd_type_combo->setCurrentIndex(0);
 }
 
 void GUIMainWindow::ExportToSvg() const
@@ -192,7 +207,7 @@ void GUIMainWindow::SetNodeToolbarsEnabled(const bool value) const
 void GUIMainWindow::UpdateCursorPositionInfo() const
 {
     const auto& cursor = m_source->textCursor();
-    m_cursor_position_label->setText(QString("%1,%2")
+    m_tbd_cursor_position_label->setText(QString("%1,%2")
                                      .arg(cursor.blockNumber())
                                      .arg(cursor.columnNumber()));
 }
@@ -460,8 +475,8 @@ void GUIMainWindow::InitToolbar()
     const QPointer label_cursor_pos = new QLabel(" Cursor pos: ");
     toolbar_cursor_pos->addWidget(label_cursor_pos);
 
-    m_cursor_position_label = new QLabel("0,0");
-    toolbar_cursor_pos->addWidget(m_cursor_position_label);
+    m_tbd_cursor_position_label = new QLabel("0,0");
+    toolbar_cursor_pos->addWidget(m_tbd_cursor_position_label);
 
     AddSpace(toolbar_cursor_pos);
     toolbar_cursor_pos->setMovable(false);
@@ -472,8 +487,8 @@ void GUIMainWindow::InitToolbar()
     const QPointer label_node_color = new QLabel(" Node color: ");
     m_toolbar_node_color->addWidget(label_node_color);
 
-    m_color_picker = new ColorPicker(this);
-    m_toolbar_node_color->addWidget(m_color_picker);
+    m_tbd_color_picker = new ColorPicker(this);
+    m_toolbar_node_color->addWidget(m_tbd_color_picker);
 
     AddSpace(m_toolbar_node_color);
     m_toolbar_node_color->setMovable(false);
@@ -484,8 +499,9 @@ void GUIMainWindow::InitToolbar()
     const QPointer label_node_type = new QLabel(" Node type: ");
     m_toolbar_node_type->addWidget(label_node_type);
 
-    const QPointer widget_node_type = new QComboBox();
-    m_toolbar_node_type->addWidget(widget_node_type);
+    m_tbd_type_combo = new QComboBox();
+    m_tbd_type_combo->addItems(NODE_TYPE_NAMES);
+    m_toolbar_node_type->addWidget(m_tbd_type_combo);
 
     AddSpace(m_toolbar_node_type);
     m_toolbar_node_type->setMovable(false);
@@ -496,8 +512,8 @@ void GUIMainWindow::InitToolbar()
     const QPointer label_node_id = new QLabel(" Node ID: ");
     m_toolbar_node_id->addWidget(label_node_id);
 
-    const QPointer widget_node_id = new QLabel("(no node hovered)");
-    m_toolbar_node_id->addWidget(widget_node_id);
+    m_tbd_id_label = new QLabel("(No node hovered)");
+    m_toolbar_node_id->addWidget(m_tbd_id_label);
 
     AddSpace(m_toolbar_node_id);
     m_toolbar_node_id->setMovable(false);

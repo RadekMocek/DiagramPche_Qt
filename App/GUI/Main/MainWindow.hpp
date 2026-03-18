@@ -5,6 +5,7 @@
 
 // Qt fwd declrs
 QT_BEGIN_NAMESPACE
+class QComboBox;
 class QLabel;
 class QPlainTextEdit;
 QT_END_NAMESPACE
@@ -38,13 +39,16 @@ private:
     // = Methods =
     void ParseAndRedraw();
 
-    const Node* GetNodePtrFromId(const std::string& id) const;
+    [[nodiscard]] const Node* GetNodePtrFromId(const std::string& id) const;
 
     void OnEmptySpaceClick();
     void OnNodeClick(const std::string& id);
     void OnNodeCtrlClick(const std::string& id) const;
     void OnNodeHoverEnter(const std::string& id) const;
     void OnNodeHoverLeave() const;
+
+    void ToolbarInfoSet(const Node* node) const;
+    void ToolbarInfoReset() const;
 
     void ExportToSvg() const;
     void ErrorHighlight(const toml::source_region& EH_region) const;
@@ -85,10 +89,12 @@ private:
     QPointer<QToolBar> m_toolbar_node_color;
     QPointer<QToolBar> m_toolbar_node_type;
     QPointer<QToolBar> m_toolbar_node_id;
-    // - toolbar dynamics
+    // - toolbar dynamics == "tdb"
     bool m_is_some_node_selected = false;
-    QPointer<QLabel> m_cursor_position_label;
-    QPointer<ColorPicker> m_color_picker;
+    QPointer<QLabel> m_tbd_cursor_position_label;
+    QPointer<ColorPicker> m_tbd_color_picker;
+    QPointer<QComboBox> m_tbd_type_combo;
+    QPointer<QLabel> m_tbd_id_label;
 
     // Modeless windows
     QPointer<BenchmarkDialog> m_benchmark_dialog;
