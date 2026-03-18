@@ -8,7 +8,6 @@
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QPlainTextEdit>
-#include <QPushButton>
 #include <QSpinBox>
 #include <QSplitter>
 #include <QSvgGenerator>
@@ -18,6 +17,7 @@
 #include "../../Helper/Color.hpp"
 #include "../../Welcome.hpp"
 #include "../Dialog/ExportSVGDialog.hpp"
+#include "../Support/ColorPicker.hpp"
 #include "Scene.hpp"
 #include "Viewer.hpp"
 
@@ -53,18 +53,59 @@ void GUIMainWindow::ParseAndRedraw()
     }
 }
 
-void GUIMainWindow::OnNodeCtrlClick(const std::string& id) const
+const Node* GUIMainWindow::GetNodePtrFromId(const std::string& id) const
 {
     const auto& nodes = m_parser.m_result_nodes;
     if (const auto it = nodes.find(id); it != nodes.end()) {
+        return &(it->second);
+    }
+    return nullptr;
+}
+
+void GUIMainWindow::OnEmptySpaceClick()
+{
+    m_is_some_node_selected = false;
+    SetNodeToolbarsEnabled(false);
+}
+
+void GUIMainWindow::OnNodeClick(const std::string& id)
+{
+    if (const auto* node = GetNodePtrFromId(id); node != nullptr) {
+        m_is_some_node_selected = true;
+        SetNodeToolbarsEnabled(true);
+        m_color_picker->SetColor(GetQColorFromTuple(node->color));
+    }
+}
+
+void GUIMainWindow::OnNodeCtrlClick(const std::string& id) const
+{
+    if (const auto* node = GetNodePtrFromId(id); node != nullptr) {
         const QTextCursor cursor(m_source->document()->findBlockByLineNumber(
-            static_cast<int>(it->second.node_source.begin.line - 1)
+            static_cast<int>(node->node_source.begin.line - 1)
         ));
         m_source->moveCursor(QTextCursor::End);
         // Move to end first so when we jump the [node.id] is at top of the text edit
         m_source->setTextCursor(cursor);
         m_source->setFocus();
     }
+}
+
+void GUIMainWindow::OnNodeHoverEnter(const std::string& id) const
+{
+    if (m_is_some_node_selected) {
+        return;
+    }
+    if (const auto* node = GetNodePtrFromId(id); node != nullptr) {
+        m_color_picker->SetColor(GetQColorFromTuple(node->color));
+    }
+}
+
+void GUIMainWindow::OnNodeHoverLeave() const
+{
+    if (m_is_some_node_selected) {
+        return;
+    }
+    m_color_picker->SetColor(QColor::fromRgb(240, 240, 240));
 }
 
 void GUIMainWindow::ExportToSvg() const
@@ -139,6 +180,21 @@ void GUIMainWindow::SetSourceFontSize(const int new_size) const
     auto font = m_source->font();
     font.setPixelSize(new_size);
     m_source->setFont(font);
+}
+
+void GUIMainWindow::SetNodeToolbarsEnabled(const bool value) const
+{
+    m_toolbar_node_color->setEnabled(value);
+    m_toolbar_node_type->setEnabled(value);
+    m_toolbar_node_id->setEnabled(value);
+}
+
+void GUIMainWindow::UpdateCursorPositionInfo() const
+{
+    const auto& cursor = m_source->textCursor();
+    m_cursor_position_label->setText(QString("%1,%2")
+                                     .arg(cursor.blockNumber())
+                                     .arg(cursor.columnNumber()));
 }
 
 // == GUI init ==
@@ -297,6 +353,7 @@ void GUIMainWindow::InitCentralWidget()
     splitter->addWidget(m_source);
 
     connect(m_source, &QPlainTextEdit::textChanged, this, &GUIMainWindow::ParseAndRedraw);
+    connect(m_source, &QPlainTextEdit::cursorPositionChanged, this, &GUIMainWindow::UpdateCursorPositionInfo);
 
     // Canvas
     QFont scene_font;
@@ -304,7 +361,11 @@ void GUIMainWindow::InitCentralWidget()
     scene_font.setPixelSize(SCENE_FONT_SIZE_BASE);
     m_scene = new GUIScene(scene_font, this);
 
+    connect(m_scene, &GUIScene::EmptySpaceClicked, this, &GUIMainWindow::OnEmptySpaceClick);
+    connect(m_scene, &GUIScene::NodeClicked, this, &GUIMainWindow::OnNodeClick);
     connect(m_scene, &GUIScene::NodeCtrlClicked, this, &GUIMainWindow::OnNodeCtrlClick);
+    connect(m_scene, &GUIScene::NodeHoverEntered, this, &GUIMainWindow::OnNodeHoverEnter);
+    connect(m_scene, &GUIScene::NodeHoverLeft, this, &GUIMainWindow::OnNodeHoverLeave);
 
     m_viewer = new GUISceneViewer(m_scene);
 
@@ -395,52 +456,51 @@ void GUIMainWindow::InitToolbar()
     const QPointer label_cursor_pos = new QLabel(" Cursor pos: ");
     toolbar_cursor_pos->addWidget(label_cursor_pos);
 
-    const QPointer widget_cursor_pos = new QLabel("0,0");
-    toolbar_cursor_pos->addWidget(widget_cursor_pos);
+    m_cursor_position_label = new QLabel("0,0");
+    toolbar_cursor_pos->addWidget(m_cursor_position_label);
 
     AddSpace(toolbar_cursor_pos);
     toolbar_cursor_pos->setMovable(false);
     toolbar_cursor_pos->toggleViewAction()->setEnabled(false);
 
     // .: Toolbar :: Selected node color :.
-    const QPointer toolbar_node_color = addToolBar("Selected node color");
+    m_toolbar_node_color = addToolBar("Selected node color");
     const QPointer label_node_color = new QLabel(" Node color: ");
-    toolbar_node_color->addWidget(label_node_color);
+    m_toolbar_node_color->addWidget(label_node_color);
 
-    const QPointer widget_node_color = new QPushButton("Change color");
-    toolbar_node_color->addWidget(widget_node_color);
+    m_color_picker = new ColorPicker(this);
+    m_toolbar_node_color->addWidget(m_color_picker);
 
-    connect(widget_node_color, &QPushButton::clicked, [] {
-        //
-    });
-
-    AddSpace(toolbar_node_color);
-    toolbar_node_color->setMovable(false);
-    toolbar_node_color->toggleViewAction()->setEnabled(false);
+    AddSpace(m_toolbar_node_color);
+    m_toolbar_node_color->setMovable(false);
+    m_toolbar_node_color->toggleViewAction()->setEnabled(false);
 
     // .: Toolbar :: Selected node type :.
-    const QPointer toolbar_node_type = addToolBar("Selected node type");
+    m_toolbar_node_type = addToolBar("Selected node type");
     const QPointer label_node_type = new QLabel(" Node type: ");
-    toolbar_node_type->addWidget(label_node_type);
+    m_toolbar_node_type->addWidget(label_node_type);
 
     const QPointer widget_node_type = new QComboBox();
-    toolbar_node_type->addWidget(widget_node_type);
+    m_toolbar_node_type->addWidget(widget_node_type);
 
-    AddSpace(toolbar_node_type);
-    toolbar_node_type->setMovable(false);
-    toolbar_node_type->toggleViewAction()->setEnabled(false);
+    AddSpace(m_toolbar_node_type);
+    m_toolbar_node_type->setMovable(false);
+    m_toolbar_node_type->toggleViewAction()->setEnabled(false);
 
     // .: Toolbar :: Selected node ID :.
-    const QPointer toolbar_node_id = addToolBar("Selected node ID");
+    m_toolbar_node_id = addToolBar("Selected node ID");
     const QPointer label_node_id = new QLabel(" Node ID: ");
-    toolbar_node_id->addWidget(label_node_id);
+    m_toolbar_node_id->addWidget(label_node_id);
 
     const QPointer widget_node_id = new QLabel("(no node hovered)");
-    toolbar_node_id->addWidget(widget_node_id);
+    m_toolbar_node_id->addWidget(widget_node_id);
 
-    AddSpace(toolbar_node_id);
-    toolbar_node_id->setMovable(false);
-    toolbar_node_id->toggleViewAction()->setEnabled(false);
+    AddSpace(m_toolbar_node_id);
+    m_toolbar_node_id->setMovable(false);
+    m_toolbar_node_id->toggleViewAction()->setEnabled(false);
+
+    // No node is selected at the start
+    SetNodeToolbarsEnabled(false);
 }
 
 void GUIMainWindow::InitState()

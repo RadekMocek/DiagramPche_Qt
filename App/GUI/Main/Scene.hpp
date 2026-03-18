@@ -50,5 +50,10 @@ private:
     AABRHelper m_scene_aabr;
 
 signals:
+    void EmptySpaceClicked();
+    void NodeClicked(const std::string& id);
     void NodeCtrlClicked(const std::string& id);
+
+    void NodeHoverEntered(const std::string& id);
+    void NodeHoverLeft();
 };

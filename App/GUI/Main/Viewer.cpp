@@ -18,7 +18,8 @@ void GUISceneViewer::mousePressEvent(QMouseEvent* event)
         return;
     }
 
-    QGraphicsView::mousePressEvent(event); // Pass further for LMB to select nodes to work
+    // Pass further for LMB to select nodes to work
+    QGraphicsView::mousePressEvent(event);
 }
 
 void GUISceneViewer::mouseReleaseEvent(QMouseEvent* event)
@@ -42,7 +43,9 @@ void GUISceneViewer::mouseMoveEvent(QMouseEvent* event)
         event->accept();
         return;
     }
-    event->ignore();
+
+    // Pass further for mouse hover on nodes to work
+    QGraphicsView::mouseMoveEvent(event);
 }
 
 void GUISceneViewer::wheelEvent(QWheelEvent* event)

@@ -20,6 +20,7 @@ QT_END_NAMESPACE
 // App fwd declrs
 class GUIScene;
 class GUISceneViewer;
+class ColorPicker;
 
 // === App config  === === === === === === === === ===
 constexpr auto FONT_FAMILY_DEFAULT = "Inconsolata";
@@ -36,12 +37,24 @@ public:
 private:
     // = Methods =
     void ParseAndRedraw();
+
+    const Node* GetNodePtrFromId(const std::string& id) const;
+
+    void OnEmptySpaceClick();
+    void OnNodeClick(const std::string& id);
     void OnNodeCtrlClick(const std::string& id) const;
+    void OnNodeHoverEnter(const std::string& id) const;
+    void OnNodeHoverLeave() const;
+
     void ExportToSvg() const;
     void ErrorHighlight(const toml::source_region& EH_region) const;
 
     [[nodiscard]] int GetSourceFontSize() const;
     void SetSourceFontSize(int new_size) const;
+
+    void SetNodeToolbarsEnabled(bool value) const;
+
+    void UpdateCursorPositionInfo() const;
 
     // AppFile
     void LoadSourceFromFile(const char* filename) const;
@@ -67,6 +80,15 @@ private:
     // TOML parser
     Parser m_parser;
     QPointer<QLabel> m_error_label; // Widget showing TOML parsing error, if there is some
+
+    // Toolbar
+    QPointer<QToolBar> m_toolbar_node_color;
+    QPointer<QToolBar> m_toolbar_node_type;
+    QPointer<QToolBar> m_toolbar_node_id;
+    // - toolbar dynamics
+    bool m_is_some_node_selected = false;
+    QPointer<QLabel> m_cursor_position_label;
+    QPointer<ColorPicker> m_color_picker;
 
     // Modeless windows
     QPointer<BenchmarkDialog> m_benchmark_dialog;

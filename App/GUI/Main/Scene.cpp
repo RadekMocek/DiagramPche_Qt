@@ -35,7 +35,6 @@ void GUIScene::Redraw(std::priority_queue<NodePriority>& nodes_pq,
     //m_scene_aabr.DebugPrint();
 }
 
-//*
 void GUIScene::mousePressEvent(QGraphicsSceneMouseEvent* mouse_event)
 {
     if (mouse_event->button() == Qt::LeftButton) {
@@ -49,15 +48,17 @@ void GUIScene::mousePressEvent(QGraphicsSceneMouseEvent* mouse_event)
                     emit NodeCtrlClicked(scene_node->GetID());
                 }
                 else {
-                    //TODO
+                    // LMB
+                    emit NodeClicked(scene_node->GetID());
                 }
 
                 // Stop at first (topmost) node found
-                break;
+                return;
             }
         }
+
+        // If we did not return, user clicked at empty space
+        emit EmptySpaceClicked();
     }
     QGraphicsScene::mousePressEvent(mouse_event);
 }
-
-/**/

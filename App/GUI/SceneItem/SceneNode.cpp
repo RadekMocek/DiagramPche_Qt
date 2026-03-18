@@ -2,11 +2,12 @@
 
 #include "SceneNode.hpp"
 #include "../../Helper/Color.hpp"
+#include "../Main/Scene.hpp"
 
 SceneNode::SceneNode(const SceneNodeCrate& crate) :
     m_crate(crate)
 {
-    //
+    setAcceptHoverEvents(true);
 }
 
 QRectF SceneNode::boundingRect() const
@@ -87,13 +88,14 @@ QPointF SceneNode::GetOffsetFromPivot(const Pivot pivot) const
     }
 }
 
-/*
-#include <QGraphicsSceneMouseEvent>
-void SceneNode::mousePressEvent(QGraphicsSceneMouseEvent* mouse_event)
+void SceneNode::hoverEnterEvent(QGraphicsSceneHoverEvent* event)
 {
-    if (mouse_event->button() == Qt::LeftButton) {
-        qDebug() << m_crate.label_value;
-    }
-    QGraphicsItem::mousePressEvent(mouse_event);
+    emit static_cast<GUIScene*>(scene())->NodeHoverEntered(m_crate.id);
+    QGraphicsItem::hoverEnterEvent(event);
 }
-//*/
+
+void SceneNode::hoverLeaveEvent(QGraphicsSceneHoverEvent* event)
+{
+    emit static_cast<GUIScene*>(scene())->NodeHoverLeft();
+    QGraphicsItem::hoverLeaveEvent(event);
+}

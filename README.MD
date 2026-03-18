@@ -12,9 +12,10 @@ This is part of a IMGUI paradigm research, [go back to main repo](https://github
 * General:
   * [ ] View → Toolbar
     * [x] Source: Allow changing font size of the text editor
-    * [ ] Source: Show cursor position in the text editor
+    * [x] Source: Show cursor position in the text editor
     * [ ] Canvas: Change color node with color picker (add the parameter if it's missing in source; be aware that color def can be multiple lines if array)
     * [ ] Canvas: Change node's type via Drop-down list (add the parameter if it's missing in source)
+    * [ ] Check toolbar quirk: I have node selected and I delete it in the textedit 
   * [ ] View → Secondary canvas toolbar
     * [ ] Drag'n'Drop new node, button for each node type (beware the canvas scroll and zoom)
     * [ ] Zoom slider, right aligned
@@ -26,17 +27,6 @@ This is part of a IMGUI paradigm research, [go back to main repo](https://github
     * [ ] Change window name according to opened document (incl. star for unsaved)
     * [ ] _Save → Cancel_ should behave the same as unsavedwarn's _Cancel_
   * [x] Code editor syntax highlight
-* Pipeline: TOML parse → Draw to canvas / Render to SVG:
-  * [x] Remove `(expecting [X, Y])` from error message (does not make sense in wider context)
-  * [x] `[node].type = "text"`
-  * [x] `[node].type = "rectangle"`
-  * [x] `[node].type = "ellipse"`
-  * [x] `[node].type = "diamond"`
-  * [x] `[node].color_border`, don't forget to generalize the error message
-  * [x] `[node].label_shift`, allow for variables, don't forget about zoom level
-  * [x] Allow setting individual start/end path shift, keep backwards compatible
-  * [x] `[[path]].label`
-  * [x] `[[path]].label_bg`
 * Canvas features:
   * [x] Canvas zooming: anchor under mouse
   * [x] Change the cursor type while dragging the canvas
@@ -47,7 +37,7 @@ This is part of a IMGUI paradigm research, [go back to main repo](https://github
   * [ ] Option for forcing light canvas regardless of color theme
   * [ ] Duplicate settings from app: view→grid/toolbar/toolbar2, text editor font size (so all things that can be set and saved are at one place)
 * Benchmark window:
-  * [ ] Do?
+  * [ ] Do
 * Icons:
   * [ ] Main menu bar → File items
   * [ ] Toolbar → Drop-down list with node types
