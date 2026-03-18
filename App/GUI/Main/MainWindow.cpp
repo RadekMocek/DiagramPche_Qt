@@ -279,6 +279,10 @@ void GUIMainWindow::InitMainMenuBar()
     connect(debug_render_test_1_action, &QAction::triggered, [this] {
         LoadSourceFromFile("./Resource/Example/Debug/Z-axis.toml");
     });
+    const QPointer debug_render_test_2_action = debug_render_tests_menu->addAction("Path label background");
+    connect(debug_render_test_2_action, &QAction::triggered, [this] {
+        LoadSourceFromFile("./Resource/Example/Debug/PathLabel.toml");
+    });
     // . Benchmark .
     const QPointer debug_benchmark_action = debug_menu->addAction("Benchmark");
     connect(debug_benchmark_action, &QAction::triggered, [this] {

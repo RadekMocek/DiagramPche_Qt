@@ -46,6 +46,10 @@ Highlighter::Highlighter(QTextDocument* parent) : QSyntaxHighlighter(parent)
         m_highlighting_rules.append({QRegularExpression(pattern), m_format_identifier});
     }
 
+    // = Numbers =
+    m_format_number.setForeground(COLOR_NUMBER);
+    m_highlighting_rules.append({QRegularExpression(QStringLiteral("\\b[0-9]+\\b")), m_format_number});
+
     // = Comment =
     m_format_comment.setForeground(COLOR_COMMENT);
     m_highlighting_rules.append({QRegularExpression(QStringLiteral("#[^\n]*")), m_format_comment});
@@ -54,10 +58,7 @@ Highlighter::Highlighter(QTextDocument* parent) : QSyntaxHighlighter(parent)
     m_format_string.setForeground(COLOR_STRING);
     m_highlighting_rules.append({QRegularExpression(QStringLiteral("\".*\"")), m_format_string});
     // String must be set after comment otherwise '#' inside string would count as a comment
-
-    // = Numbers =
-    m_format_number.setForeground(COLOR_NUMBER);
-    m_highlighting_rules.append({QRegularExpression(QStringLiteral("\\b[0-9]+\\b")), m_format_number});
+    // But now when we have comment with a string, the string is still green instead fo gray
 }
 
 void Highlighter::highlightBlock(const QString& text)

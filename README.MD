@@ -96,4 +96,4 @@ An alternative approach would be to choose the _MinGW_ component instead of _MSV
 
 ## Problems
 
-* Path label background rect size
+* Syntax highlight highlights commented string as normal string

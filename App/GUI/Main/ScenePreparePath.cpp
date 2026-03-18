@@ -187,6 +187,7 @@ void GUIScene::GUIScenePreparePath(const Path& path)
 
             // Done
             result_path_labels.append(label_position);
+            aabr.UpdateWithQRectF(path_label_rect.toRectF().translated(label_position));
         }
     }
 
@@ -199,6 +200,7 @@ void GUIScene::GUIScenePreparePath(const Path& path)
         path.do_end_arrow,
         // Path label
         do_path_label,
+        m_font,
         path_label_value,
         GetQColorFromTuple(path.label_bg_color),
         std::move(result_path_labels),

@@ -25,7 +25,7 @@ private:
 
     QTextCharFormat m_format_keyword;
     QTextCharFormat m_format_identifier;
+    QTextCharFormat m_format_number;
     QTextCharFormat m_format_comment;
     QTextCharFormat m_format_string;
-    QTextCharFormat m_format_number;
 };
