@@ -15,7 +15,6 @@ color = "#ffcfb380"
 pivot = "top-left"
 xy = ["hello", "bottom-right", "node_offset", "node_offset"]
 type = "diamond"
-color_border="#800000ff"
 
 [[path]]
 start = ["hello", "bottom", 0, 0]

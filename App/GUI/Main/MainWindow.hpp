@@ -36,6 +36,24 @@ public:
     ~GUIMainWindow() override = default;
 
 private:
+    // = Helper structs =
+    // To store info about selected node, that might be used if user changes something via the toolbar
+    struct NodeInfo
+    {
+        std::string id{};
+        toml::source_region node_source{};
+        std::optional<toml::source_region> color_source = std::nullopt;
+        std::optional<toml::source_region> type_source = std::nullopt;
+
+        void Update(const Node* node)
+        {
+            id = node->id;
+            node_source = node->node_source;
+            color_source = node->color_source;
+            type_source = node->type_source;
+        }
+    };
+
     // = Methods =
     void ParseAndRedraw();
 
@@ -60,8 +78,12 @@ private:
 
     void UpdateCursorPositionInfo() const;
 
-    // AppFile
+    // AppFile.cpp
     void LoadSourceFromFile(const char* filename) const;
+
+    // AppSource.cpp
+    void ReplaceInMSource(const toml::source_region& source, const QString& new_str) const;
+    void InsertNodeParameterInMSource(const toml::source_position& end, const QString& new_str) const;
 
     // Init GUI
     void InitMainMenuBar();
@@ -91,6 +113,7 @@ private:
     QPointer<QToolBar> m_toolbar_node_id;
     // - toolbar dynamics == "tdb"
     bool m_is_some_node_selected = false;
+    NodeInfo m_selected_node_info{};
     QPointer<QLabel> m_tbd_cursor_position_label;
     QPointer<ColorPicker> m_tbd_color_picker;
     QPointer<QComboBox> m_tbd_type_combo;

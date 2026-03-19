@@ -51,6 +51,18 @@ void GUIMainWindow::ParseAndRedraw()
         m_error_label->setText("");
         m_source->setExtraSelections(QList<QTextEdit::ExtraSelection>()); // Disable error highlight if any
     }
+
+    if (m_is_some_node_selected) {
+        // If selected node is removed from the TOML source, unselect it
+        if (!m_parser.m_result_nodes.contains(m_selected_node_info.id)) {
+            // Clicking on empty space in canvas is basically unselecting the node
+            OnEmptySpaceClick();
+        }
+        // If selected node was not removed, it's data might have changed in some way
+        else {
+            m_selected_node_info.Update(&m_parser.m_result_nodes[m_selected_node_info.id]);
+        }
+    }
 }
 
 const Node* GUIMainWindow::GetNodePtrFromId(const std::string& id) const
@@ -73,6 +85,7 @@ void GUIMainWindow::OnNodeClick(const std::string& id)
 {
     if (const auto* node = GetNodePtrFromId(id); node != nullptr) {
         m_is_some_node_selected = true;
+        m_selected_node_info.Update(node);
         SetNodeToolbarsEnabled(true);
         ToolbarInfoSet(node);
     }
@@ -208,8 +221,8 @@ void GUIMainWindow::UpdateCursorPositionInfo() const
 {
     const auto& cursor = m_source->textCursor();
     m_tbd_cursor_position_label->setText(QString("%1,%2")
-                                     .arg(cursor.blockNumber())
-                                     .arg(cursor.columnNumber()));
+                                         .arg(cursor.blockNumber())
+                                         .arg(cursor.columnNumber()));
 }
 
 // == GUI init ==
@@ -501,6 +514,19 @@ void GUIMainWindow::InitToolbar()
 
     m_tbd_type_combo = new QComboBox();
     m_tbd_type_combo->addItems(NODE_TYPE_NAMES);
+    // using `activated` instead of `currentIndexChanged`, because it does not trigger when the index is changed from code
+    connect(m_tbd_type_combo, &QComboBox::activated, [this](const int new_idx) {
+        if (m_is_some_node_selected) {
+            const auto type_quoted_str = GetQuotedStringFromNodeType(static_cast<NodeType>(new_idx));
+            if (m_selected_node_info.type_source.has_value()) {
+                ReplaceInMSource(m_selected_node_info.type_source.value(), type_quoted_str);
+            }
+            else {
+                InsertNodeParameterInMSource(m_selected_node_info.node_source.end,
+                                             QString("\ntype = %1").arg(type_quoted_str));
+            }
+        }
+    });
     m_toolbar_node_type->addWidget(m_tbd_type_combo);
 
     AddSpace(m_toolbar_node_type);

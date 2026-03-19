@@ -28,3 +28,19 @@ constexpr std::optional<NodeType> GetNodeTypeFromString(const std::string& type_
 
 const std::string NODETYPE_ERROR_MESSAGE =
     "Allowed NodeType values are: 'text', 'rectangle', 'ellipse', 'diamond'";
+
+constexpr const char* GetQuotedStringFromNodeType(const NodeType type)
+{
+    switch (type) {
+    case NTYPE_RECTANGLE:
+        return "\"rectangle\"";
+    case NTYPE_ELLIPSE:
+        return "\"ellipse\"";
+    case NTYPE_DIAMOND:
+        return "\"diamond\"";
+    case NTYPE_TEXT:
+        return "\"text\"";
+    default:
+        return "\"\"";
+    }
+}
