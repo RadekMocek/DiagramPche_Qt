@@ -10,12 +10,6 @@ This is part of a IMGUI paradigm research, [go back to main repo](https://github
 ## TODO
 
 * General:
-  * [ ] View → Toolbar
-    * [x] Source: Allow changing font size of the text editor
-    * [x] Source: Show cursor position in the text editor
-    * [ ] Canvas: Change color node with color picker (add the parameter if it's missing in source; be aware that color def can be multiple lines if array)
-    * [x] Canvas: Change node's type via Drop-down list (add the parameter if it's missing in source)
-    * [ ] Check toolbar quirk: I have node selected and I delete it in the textedit 
   * [ ] View → Secondary canvas toolbar
     * [ ] Drag'n'Drop new node, button for each node type (beware the canvas scroll and zoom)
     * [ ] Zoom slider, right aligned
@@ -26,11 +20,6 @@ This is part of a IMGUI paradigm research, [go back to main repo](https://github
     * [ ] Confirm unsaved open, including loading a debug diagram or an example
     * [ ] Change window name according to opened document (incl. star for unsaved)
     * [ ] _Save → Cancel_ should behave the same as unsavedwarn's _Cancel_
-  * [x] Code editor syntax highlight
-* Canvas features:
-  * [x] Canvas zooming: anchor under mouse
-  * [x] Change the cursor type while dragging the canvas
-  * [x] Ctrl+Click to jump to node definition in text editor
 * Settings window:
   * [ ] Turn syntax highlight on/off
   * [ ] Appearance: color theme
@@ -43,8 +32,6 @@ This is part of a IMGUI paradigm research, [go back to main repo](https://github
   * [ ] Toolbar → Drop-down list with node types
   * [ ] Secondary canvas toolbar → Drag'n'Drop buttons
   * [ ] UnsavedWarn modal
-* TOML Parser:
-  * [x] Refactor TOML parsing: do not std::move into priority queue, use pq just for determining draw order and nothing more
 
 ## Building locally
 

@@ -31,3 +31,14 @@ inline ColorTuple GetColorTupleFromString(const std::string& color_str)
     }
     return {0, 0, 0, 0};
 }
+
+inline QString GetQuotedRGBAHexFromQColor(const QColor& color)
+{
+    char result[12];
+    std::sprintf(result, "\"#%02X%02X%02X%02X\"",
+                 static_cast<unsigned char>(color.red()),
+                 static_cast<unsigned char>(color.green()),
+                 static_cast<unsigned char>(color.blue()),
+                 static_cast<unsigned char>(color.alpha()));
+    return result;
+}

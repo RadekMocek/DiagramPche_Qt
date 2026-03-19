@@ -25,6 +25,8 @@ class ColorPicker;
 
 // === App config  === === === === === === === === ===
 constexpr auto FONT_FAMILY_DEFAULT = "Inconsolata";
+constexpr bool DO_SHOW_PRIMARY_TOOLBAR_INIT = true;
+constexpr bool DO_SHOW_SECONDARY_TOOLBAR_INIT = true;
 // === === === === === === === === === === === === ===
 
 class GUIMainWindow : public QMainWindow
@@ -74,6 +76,7 @@ private:
     [[nodiscard]] int GetSourceFontSize() const;
     void SetSourceFontSize(int new_size) const;
 
+    void SetAllToolbarsVisible(bool value) const;
     void SetNodeToolbarsEnabled(bool value) const;
 
     void UpdateCursorPositionInfo() const;
@@ -108,6 +111,8 @@ private:
     QPointer<QLabel> m_error_label; // Widget showing TOML parsing error, if there is some
 
     // Toolbar
+    QPointer<QToolBar> m_toolbar_source_font_size;
+    QPointer<QToolBar> m_toolbar_source_cursor_position;
     QPointer<QToolBar> m_toolbar_node_color;
     QPointer<QToolBar> m_toolbar_node_type;
     QPointer<QToolBar> m_toolbar_node_id;
@@ -118,6 +123,9 @@ private:
     QPointer<ColorPicker> m_tbd_color_picker;
     QPointer<QComboBox> m_tbd_type_combo;
     QPointer<QLabel> m_tbd_id_label;
+
+    // Secondary canvas toolbar
+    QPointer<QWidget> m_secondary_canvas_toolbar_wrapper;
 
     // Modeless windows
     QPointer<BenchmarkDialog> m_benchmark_dialog;

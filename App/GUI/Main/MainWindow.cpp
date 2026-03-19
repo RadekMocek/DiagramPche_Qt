@@ -60,7 +60,9 @@ void GUIMainWindow::ParseAndRedraw()
         }
         // If selected node was not removed, it's data might have changed in some way
         else {
-            m_selected_node_info.Update(m_parser.m_result_nodes[m_selected_node_info.id]);
+            const auto& node = m_parser.m_result_nodes[m_selected_node_info.id];
+            ToolbarInfoSet(node);
+            m_selected_node_info.Update(node);
         }
     }
 }
@@ -124,14 +126,14 @@ void GUIMainWindow::OnNodeHoverLeave() const
 
 void GUIMainWindow::ToolbarInfoSet(const Node& node) const
 {
-    m_tbd_color_picker->SetColor(GetQColorFromTuple(node.color));
+    m_tbd_color_picker->SetColor(GetQColorFromTuple(node.color), false);
     m_tbd_id_label->setText(QString::fromStdString(node.id));
     m_tbd_type_combo->setCurrentIndex(node.type); // Implicit enum to int
 }
 
 void GUIMainWindow::ToolbarInfoReset() const
 {
-    m_tbd_color_picker->SetColor(QColor::fromRgb(240, 240, 240));
+    m_tbd_color_picker->SetColor(QColor::fromRgb(240, 240, 240), false);
     m_tbd_id_label->setText("(No node hovered)");
     m_tbd_type_combo->setCurrentIndex(0);
 }
@@ -210,6 +212,15 @@ void GUIMainWindow::SetSourceFontSize(const int new_size) const
     m_source->setFont(font);
 }
 
+void GUIMainWindow::SetAllToolbarsVisible(const bool value) const
+{
+    m_toolbar_source_font_size->setVisible(value);
+    m_toolbar_source_cursor_position->setVisible(value);
+    m_toolbar_node_color->setVisible(value);
+    m_toolbar_node_type->setVisible(value);
+    m_toolbar_node_id->setVisible(value);
+}
+
 void GUIMainWindow::SetNodeToolbarsEnabled(const bool value) const
 {
     m_toolbar_node_color->setEnabled(value);
@@ -285,7 +296,11 @@ void GUIMainWindow::InitMainMenuBar()
     const QPointer view_menu = main_menu_bar->addMenu("View");
     // . Toolbar .
     const QPointer view_canvas_toolbar_action = view_menu->addAction("Toolbar");
-    //todo
+    view_canvas_toolbar_action->setCheckable(true);
+    view_canvas_toolbar_action->setChecked(DO_SHOW_PRIMARY_TOOLBAR_INIT);
+    connect(view_canvas_toolbar_action, &QAction::toggled, [this](const bool is_checked) {
+        SetAllToolbarsVisible(is_checked);
+    });
     view_menu->addSeparator();
     // . Canvas grid .
     const QPointer view_canvas_grid_action = view_menu->addAction("Canvas grid");
@@ -297,7 +312,11 @@ void GUIMainWindow::InitMainMenuBar()
     });
     // . Secondary canvas toolbar .
     const QPointer view_secondary_toolbar_action = view_menu->addAction("Secondary canvas toolbar");
-    //todo
+    view_secondary_toolbar_action->setCheckable(true);
+    view_secondary_toolbar_action->setChecked(DO_SHOW_SECONDARY_TOOLBAR_INIT);
+    connect(view_secondary_toolbar_action, &QAction::toggled, [this](const bool is_checked) {
+        m_secondary_canvas_toolbar_wrapper->setVisible(is_checked);
+    });
 
     // .: Debug :.
     const QPointer debug_menu = main_menu_bar->addMenu("Debug");
@@ -402,13 +421,17 @@ void GUIMainWindow::InitCentralWidget()
     m_viewer = new GUISceneViewer(m_scene);
 
     // Canvas + secondary canvas toolbar container?
-    const QPointer canvas_container_wrapper = new QWidget();
+    const QPointer canvas_container_wrapper = new QWidget(); // Wrapper so it can be added to the splitter
     const QPointer canvas_container = new QVBoxLayout(canvas_container_wrapper);
     canvas_container->setContentsMargins(0, 0, 0, 0);
     canvas_container->addWidget(m_viewer);
 
-    const QPointer secondary_canvas_toolbar = new QHBoxLayout(); // secondary_canvas_toolbar == "sct"
+    m_secondary_canvas_toolbar_wrapper = new QWidget(); // Wrapper so it can be hided with View→SecondaryCanvasToolbar
+    const QPointer secondary_canvas_toolbar = new QHBoxLayout(m_secondary_canvas_toolbar_wrapper);
+    secondary_canvas_toolbar->setContentsMargins(0, 0, 0, 0);
 
+    // secondary_canvas_toolbar == "sct"
+    // drag'n'drop = "dnd"
     //TODO loop me and add logic, maybe move this init to a separate function
     const QPointer sct_dnd_btn_rectangle = new QPushButton("A");
     //sct_dnd_btn_rectangle->setMaximumWidth(50);
@@ -432,7 +455,7 @@ void GUIMainWindow::InitCentralWidget()
     //sct_slider->setMaximumWidth(50);
     secondary_canvas_toolbar->addWidget(sct_slider);
 
-    canvas_container->addLayout(secondary_canvas_toolbar);
+    canvas_container->addWidget(m_secondary_canvas_toolbar_wrapper);
     splitter->addWidget(canvas_container_wrapper);
 
     // Splitter ratio starts at 50/50
@@ -466,34 +489,34 @@ void GUIMainWindow::InitToolbar()
     };
 
     // .: Toolbar :: Text edit font size :.
-    const QPointer toolbar_font_size = addToolBar("Text edit font size");
+    m_toolbar_source_font_size = addToolBar("Text edit font size");
     const QPointer label_font_size = new QLabel(" Font size: ");
-    toolbar_font_size->addWidget(label_font_size);
+    m_toolbar_source_font_size->addWidget(label_font_size);
 
     const QPointer widget_font_size = new QSpinBox();
     widget_font_size->setValue(GetSourceFontSize());
     widget_font_size->setMinimum(FONT_SIZE_SOURCE_MIN);
     widget_font_size->setMaximum(FONT_SIZE_SOURCE_MAX);
-    toolbar_font_size->addWidget(widget_font_size);
+    m_toolbar_source_font_size->addWidget(widget_font_size);
     connect(widget_font_size, &QSpinBox::valueChanged, [this](const int value) {
         SetSourceFontSize(value);
     });
 
-    AddSpace(toolbar_font_size);
-    toolbar_font_size->setMovable(false);
-    toolbar_font_size->toggleViewAction()->setEnabled(false);
+    AddSpace(m_toolbar_source_font_size);
+    m_toolbar_source_font_size->setMovable(false);
+    m_toolbar_source_font_size->toggleViewAction()->setEnabled(false);
 
     // .: Toolbar :: Text edit cursor position :.
-    const QPointer toolbar_cursor_pos = addToolBar("Text edit cursor position");
+    m_toolbar_source_cursor_position = addToolBar("Text edit cursor position");
     const QPointer label_cursor_pos = new QLabel(" Cursor pos: ");
-    toolbar_cursor_pos->addWidget(label_cursor_pos);
+    m_toolbar_source_cursor_position->addWidget(label_cursor_pos);
 
     m_tbd_cursor_position_label = new QLabel("0,0");
-    toolbar_cursor_pos->addWidget(m_tbd_cursor_position_label);
+    m_toolbar_source_cursor_position->addWidget(m_tbd_cursor_position_label);
 
-    AddSpace(toolbar_cursor_pos);
-    toolbar_cursor_pos->setMovable(false);
-    toolbar_cursor_pos->toggleViewAction()->setEnabled(false);
+    AddSpace(m_toolbar_source_cursor_position);
+    m_toolbar_source_cursor_position->setMovable(false);
+    m_toolbar_source_cursor_position->toggleViewAction()->setEnabled(false);
 
     // .: Toolbar :: Selected node color :.
     m_toolbar_node_color = addToolBar("Selected node color");
@@ -501,6 +524,17 @@ void GUIMainWindow::InitToolbar()
     m_toolbar_node_color->addWidget(label_node_color);
 
     m_tbd_color_picker = new ColorPicker(this);
+    connect(m_tbd_color_picker, &ColorPicker::ColorChanged, [this](const QColor& new_color) {
+        if (m_is_some_node_selected) {
+            const auto color_quoted_str = GetQuotedRGBAHexFromQColor(new_color);
+            if (m_selected_node_info.color_source.has_value()) {
+                ReplaceInMSource(m_selected_node_info.color_source.value(), color_quoted_str);
+            }
+            else {
+                InsertNodeParameterInMSource(m_selected_node_info.node_source.end, "\ncolor = " + color_quoted_str);
+            }
+        }
+    });
     m_toolbar_node_color->addWidget(m_tbd_color_picker);
 
     AddSpace(m_toolbar_node_color);
