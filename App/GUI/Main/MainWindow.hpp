@@ -45,19 +45,19 @@ private:
         std::optional<toml::source_region> color_source = std::nullopt;
         std::optional<toml::source_region> type_source = std::nullopt;
 
-        void Update(const Node* node)
+        void Update(const Node& node)
         {
-            id = node->id;
-            node_source = node->node_source;
-            color_source = node->color_source;
-            type_source = node->type_source;
+            id = node.id;
+            node_source = node.node_source;
+            color_source = node.color_source;
+            type_source = node.type_source;
         }
     };
 
     // = Methods =
     void ParseAndRedraw();
 
-    [[nodiscard]] const Node* GetNodePtrFromId(const std::string& id) const;
+    [[nodiscard]] std::optional<std::reference_wrapper<const Node>> GetNodeRefFromId(const std::string& id) const;
 
     void OnEmptySpaceClick();
     void OnNodeClick(const std::string& id);
@@ -65,7 +65,7 @@ private:
     void OnNodeHoverEnter(const std::string& id) const;
     void OnNodeHoverLeave() const;
 
-    void ToolbarInfoSet(const Node* node) const;
+    void ToolbarInfoSet(const Node& node) const;
     void ToolbarInfoReset() const;
 
     void ExportToSvg() const;

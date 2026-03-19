@@ -60,18 +60,18 @@ void GUIMainWindow::ParseAndRedraw()
         }
         // If selected node was not removed, it's data might have changed in some way
         else {
-            m_selected_node_info.Update(&m_parser.m_result_nodes[m_selected_node_info.id]);
+            m_selected_node_info.Update(m_parser.m_result_nodes[m_selected_node_info.id]);
         }
     }
 }
 
-const Node* GUIMainWindow::GetNodePtrFromId(const std::string& id) const
+std::optional<std::reference_wrapper<const Node>> GUIMainWindow::GetNodeRefFromId(const std::string& id) const
 {
     const auto& nodes = m_parser.m_result_nodes;
     if (const auto it = nodes.find(id); it != nodes.end()) {
-        return &(it->second);
+        return std::cref(it->second);
     }
-    return nullptr;
+    return std::nullopt;
 }
 
 void GUIMainWindow::OnEmptySpaceClick()
@@ -83,19 +83,19 @@ void GUIMainWindow::OnEmptySpaceClick()
 
 void GUIMainWindow::OnNodeClick(const std::string& id)
 {
-    if (const auto* node = GetNodePtrFromId(id); node != nullptr) {
+    if (const auto& node = GetNodeRefFromId(id); node.has_value()) {
         m_is_some_node_selected = true;
-        m_selected_node_info.Update(node);
+        m_selected_node_info.Update(node.value());
         SetNodeToolbarsEnabled(true);
-        ToolbarInfoSet(node);
+        ToolbarInfoSet(node.value());
     }
 }
 
 void GUIMainWindow::OnNodeCtrlClick(const std::string& id) const
 {
-    if (const auto* node = GetNodePtrFromId(id); node != nullptr) {
+    if (const auto& node = GetNodeRefFromId(id); node.has_value()) {
         const QTextCursor cursor(m_source->document()->findBlockByLineNumber(
-            static_cast<int>(node->node_source.begin.line - 1)
+            static_cast<int>(node.value().get().node_source.begin.line - 1)
         ));
         m_source->moveCursor(QTextCursor::End);
         // Move to end first so when we jump the [node.id] is at top of the text edit
@@ -109,8 +109,8 @@ void GUIMainWindow::OnNodeHoverEnter(const std::string& id) const
     if (m_is_some_node_selected) {
         return;
     }
-    if (const auto* node = GetNodePtrFromId(id); node != nullptr) {
-        ToolbarInfoSet(node);
+    if (const auto& node = GetNodeRefFromId(id); node.has_value()) {
+        ToolbarInfoSet(node.value());
     }
 }
 
@@ -122,11 +122,11 @@ void GUIMainWindow::OnNodeHoverLeave() const
     ToolbarInfoReset();
 }
 
-void GUIMainWindow::ToolbarInfoSet(const Node* node) const
+void GUIMainWindow::ToolbarInfoSet(const Node& node) const
 {
-    m_tbd_color_picker->SetColor(GetQColorFromTuple(node->color));
-    m_tbd_id_label->setText(QString::fromStdString(node->id));
-    m_tbd_type_combo->setCurrentIndex(node->type); // Implicit enum to int
+    m_tbd_color_picker->SetColor(GetQColorFromTuple(node.color));
+    m_tbd_id_label->setText(QString::fromStdString(node.id));
+    m_tbd_type_combo->setCurrentIndex(node.type); // Implicit enum to int
 }
 
 void GUIMainWindow::ToolbarInfoReset() const
