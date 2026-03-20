@@ -9,20 +9,14 @@ This is part of a IMGUI paradigm research, [go back to main repo](https://github
 
 ## TODO
 
-* General:
-  * [ ] View → Secondary canvas toolbar
-    * [x] Drag'n'Drop new node, button for each node type (beware the canvas scroll and zoom)
-      * [x] Tooltips
-      * [x] After adding node, make it selected and jump to its definition in textedit
-    * [ ] Zoom slider, right aligned
-  * Saving/loading:
-    * [ ] New, Open, Save, Save as
-    * [ ] Confirm unsaved exit (OS close button, alt+f4, mainmenubar option)
-    * [ ] Confirm unsaved new
-    * [ ] Confirm unsaved open, including loading a debug diagram or an example
-    * [ ] Change window name according to opened document (incl. star for unsaved)
-    * [ ] _Save → Cancel_ should behave the same as unsavedwarn's _Cancel_
-    * [ ] Don't forget to mark the file as dirty (text change, drag'n'drop, change color, change type)
+* Saving/loading:
+  * [ ] New, Open, Save, Save as
+  * [ ] Confirm unsaved exit (OS close button, alt+f4, mainmenubar option)
+  * [ ] Confirm unsaved new
+  * [ ] Confirm unsaved open, including loading a debug diagram or an example
+  * [ ] Change window name according to opened document (incl. star for unsaved)
+  * [ ] _Save → Cancel_ should behave the same as unsavedwarn's _Cancel_
+  * [ ] Don't forget to mark the file as dirty (text change, drag'n'drop, change color, change type)
 * Settings window:
   * [ ] Turn syntax highlight on/off
   * [ ] Appearance: color theme
@@ -86,4 +80,5 @@ An alternative approach would be to choose the _MinGW_ component instead of _MSV
 
 ## Problems
 
-* Syntax highlight highlights commented string as normal string
+* (minor) Syntax highlight highlights commented string as normal string
+* (minor) Canvas reset scrolling after app startup not working as expected

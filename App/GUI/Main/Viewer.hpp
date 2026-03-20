@@ -1,6 +1,5 @@
 #pragma once
 
-#include <QGraphicsView>
 #include <QPointer>
 #include <QScrollBar>
 
@@ -15,8 +14,12 @@ inline QColor COLOR_GRID_LINE = QColor::fromRgb(200, 200, 200, 40);
 
 class GUISceneViewer : public QGraphicsView
 {
+    Q_OBJECT
+
 public:
     explicit GUISceneViewer(GUIScene* scene, QWidget* parent = nullptr);
+
+    void ResetCanvasScrollingAndZoom();
 
     bool m_do_show_grid = DO_SHOW_GRID_INIT;
 
@@ -35,4 +38,7 @@ private:
     bool eventFilter(QObject* watched, QEvent* event) override;
 
     QPointer<GUIScene> m_scene;
+
+signals:
+    void ZoomChangeRequested(bool is_plus);
 };

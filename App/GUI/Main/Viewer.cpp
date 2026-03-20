@@ -11,6 +11,20 @@ GUISceneViewer::GUISceneViewer(GUIScene* scene, QWidget* parent) :
 
     // For getting mouse position when drag'n'dropping node
     qApp->installEventFilter(this);
+
+    // Set large scene and hide the scrollbars for the same canvas as its IMGUI counterparts
+    setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    scene->setSceneRect(-100000, -100000, 200000, 200000);
+}
+
+void GUISceneViewer::ResetCanvasScrollingAndZoom()
+{
+    constexpr auto SCROLLING_OFFSET_DEFAULT = 5;
+
+    resetTransform();
+    centerOn(size().width() / 2 - SCROLLING_OFFSET_DEFAULT,
+             size().height() / 2 - SCROLLING_OFFSET_DEFAULT);
 }
 
 void GUISceneViewer::mousePressEvent(QMouseEvent* event)
@@ -56,26 +70,9 @@ void GUISceneViewer::mouseMoveEvent(QMouseEvent* event)
 
 void GUISceneViewer::wheelEvent(QWheelEvent* event)
 {
-    constexpr qreal MIN_ZOOM = 0.333;
-    constexpr qreal MAX_ZOOM = 1.666;
-    constexpr qreal ZOOM_STEP = 0.222;
-
     const ViewportAnchor anchor = transformationAnchor();
     setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
-    const int angle = event->angleDelta().y();
-    qreal factor;
-    if (angle > 0) {
-        factor = 1.0 + ZOOM_STEP;
-    }
-    else {
-        factor = 1.0 - ZOOM_STEP;
-    }
-
-    if (const qreal current_scale = transform().m11();
-        (factor > 1.0 && current_scale < MAX_ZOOM) || (factor < 1.0 && current_scale > MIN_ZOOM)) {
-        scale(factor, factor);
-    }
-
+    emit ZoomChangeRequested(event->angleDelta().y() > 0);
     setTransformationAnchor(anchor);
 }
 

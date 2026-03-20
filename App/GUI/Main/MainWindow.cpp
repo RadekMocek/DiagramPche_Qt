@@ -33,6 +33,8 @@ GUIMainWindow::GUIMainWindow()
     InitState();
 
     ParseAndRedraw();
+
+    m_viewer->ResetCanvasScrollingAndZoom(); // It moves the canvas but not as expected when called here
 }
 
 // == Logic ==
@@ -146,6 +148,14 @@ void GUIMainWindow::OnGhostNodePlace(const NodeType type, const QPoint position)
 
     // Move cursor up
     OnNodeCtrlClick(new_node_id);
+}
+
+void GUIMainWindow::OnZoomChangeRequest(const bool is_plus) const
+{
+    const auto current_value = m_secondary_canvas_toolbar_slider->value();
+    const auto slider_step = m_secondary_canvas_toolbar_slider->singleStep();
+    const auto current_step = (is_plus) ? slider_step : -slider_step;
+    m_secondary_canvas_toolbar_slider->setValue(current_value + current_step);
 }
 
 void GUIMainWindow::ToolbarInfoSet(const Node& node) const
@@ -341,6 +351,10 @@ void GUIMainWindow::InitMainMenuBar()
     connect(view_secondary_toolbar_action, &QAction::toggled, [this](const bool is_checked) {
         m_secondary_canvas_toolbar_wrapper->setVisible(is_checked);
     });
+    view_menu->addSeparator();
+    // . Jump to canvas origin .
+    m_view_jump_to_origin_action = view_menu->addAction("Jump to canvas origin");
+    // ↑ Is connected later after initializing the viewer
 
     // .: Debug :.
     const QPointer debug_menu = main_menu_bar->addMenu("Debug");
@@ -445,18 +459,40 @@ void GUIMainWindow::InitCentralWidget()
 
     m_viewer = new GUISceneViewer(m_scene);
 
-    // Canvas + secondary canvas toolbar container?
+    connect(m_view_jump_to_origin_action, &QAction::triggered, m_viewer, &GUISceneViewer::ResetCanvasScrollingAndZoom);
+    connect(m_viewer, &GUISceneViewer::ZoomChangeRequested, this, &GUIMainWindow::OnZoomChangeRequest);
+
+    // Canvas + secondary canvas toolbar container
     const QPointer canvas_container_wrapper = new QWidget(); // Wrapper so it can be added to the splitter
     const QPointer canvas_container = new QVBoxLayout(canvas_container_wrapper);
     canvas_container->setContentsMargins(0, 0, 0, 0);
     canvas_container->addWidget(m_viewer);
+    InitSecondaryCanvasToolbar(canvas_container);
+    splitter->addWidget(canvas_container_wrapper);
 
+    // Splitter ratio starts at 50/50
+    const int half = width() / 2;
+    splitter->setSizes({half, half});
+
+    main_layout->addWidget(splitter, 1);
+
+    // Error label
+    QPalette error_text_palette;
+    error_text_palette.setColor(QPalette::WindowText, COLOR_ERROR);
+
+    m_error_label = new QLabel();
+    m_error_label->setPalette(error_text_palette);
+    main_layout->addWidget(m_error_label, 0);
+}
+
+void GUIMainWindow::InitSecondaryCanvasToolbar(const QPointer<QVBoxLayout>& canvas_container)
+{
     m_secondary_canvas_toolbar_wrapper = new QWidget(); // Wrapper so it can be hided with View→SecondaryCanvasToolbar
     const QPointer secondary_canvas_toolbar = new QHBoxLayout(m_secondary_canvas_toolbar_wrapper);
     secondary_canvas_toolbar->setContentsMargins(0, 0, 0, 0);
 
     // secondary_canvas_toolbar == "sct"
-    // drag'n'drop = "dnd"
+    // drag'n'drop == "dnd"
     for (int i = 0; i < N_NTYPES; i++) {
         const QPointer sct_dnd_button = new DragButton(static_cast<NodeType>(i));
         sct_dnd_button->setToolTip(
@@ -470,28 +506,31 @@ void GUIMainWindow::InitCentralWidget()
     // Buttons on left, slider on right
     secondary_canvas_toolbar->addStretch(1);
 
-    const QPointer sct_slider = new QSlider(Qt::Horizontal);
-    //sct_slider->setMaximumWidth(50);
-    secondary_canvas_toolbar->addWidget(sct_slider);
+    // Zoom level slider
+    m_secondary_canvas_toolbar_slider = new QSlider(Qt::Horizontal);
+    m_secondary_canvas_toolbar_slider->setFixedWidth(200);
+    secondary_canvas_toolbar->addWidget(m_secondary_canvas_toolbar_slider);
+
+    constexpr auto CANVAS_FONT_SIZE_BASE = 18;
+    constexpr auto CANVAS_FONT_SIZE_STEP = 4;
+    constexpr auto CANVAS_FONT_SIZE_MIN = 6;
+    constexpr auto CANVAS_FONT_SIZE_MAX = 30;
+    constexpr auto SLIDER_INIT = 3;
+    constexpr auto SLIDER_MIN = 0;
+    constexpr auto SLIDER_MAX = (CANVAS_FONT_SIZE_MAX - CANVAS_FONT_SIZE_MIN) / CANVAS_FONT_SIZE_STEP;
+
+    m_secondary_canvas_toolbar_slider->setRange(SLIDER_MIN, SLIDER_MAX);
+    m_secondary_canvas_toolbar_slider->setValue(SLIDER_INIT);
+    m_secondary_canvas_toolbar_slider->setSingleStep(1);
+    m_secondary_canvas_toolbar_slider->setPageStep(1);
+    connect(m_secondary_canvas_toolbar_slider, &QSlider::valueChanged, [this](const int slider_value) {
+        const auto new_scale = static_cast<float>(CANVAS_FONT_SIZE_MIN + CANVAS_FONT_SIZE_STEP * slider_value) /
+            static_cast<float>(CANVAS_FONT_SIZE_BASE);
+        m_viewer->resetTransform();
+        m_viewer->scale(new_scale, new_scale);
+    });
 
     canvas_container->addWidget(m_secondary_canvas_toolbar_wrapper);
-    splitter->addWidget(canvas_container_wrapper);
-
-    // Splitter ratio starts at 50/50
-    //splitter->setStretchFactor(0, 1); // Index, factor
-    //splitter->setStretchFactor(1, 1); // Index, factor
-    const int half = width() / 2;
-    splitter->setSizes({half, half});
-
-    main_layout->addWidget(splitter, 1);
-
-    // Error label
-    QPalette error_text_palette;
-    error_text_palette.setColor(QPalette::WindowText, COLOR_ERROR);
-
-    m_error_label = new QLabel();
-    m_error_label->setPalette(error_text_palette);
-    main_layout->addWidget(m_error_label, 0);
 }
 
 void GUIMainWindow::InitToolbar()

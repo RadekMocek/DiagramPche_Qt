@@ -8,6 +8,8 @@ QT_BEGIN_NAMESPACE
 class QComboBox;
 class QLabel;
 class QPlainTextEdit;
+class QSlider;
+class QVBoxLayout;
 QT_END_NAMESPACE
 
 // App imports
@@ -25,8 +27,8 @@ class ColorPicker;
 
 // === App config  === === === === === === === === ===
 constexpr auto FONT_FAMILY_DEFAULT = "Inconsolata";
-constexpr bool DO_SHOW_PRIMARY_TOOLBAR_INIT = true;
-constexpr bool DO_SHOW_SECONDARY_TOOLBAR_INIT = true;
+constexpr auto DO_SHOW_PRIMARY_TOOLBAR_INIT = true;
+constexpr auto DO_SHOW_SECONDARY_TOOLBAR_INIT = true;
 // === === === === === === === === === === === === ===
 
 class GUIMainWindow : public QMainWindow
@@ -68,6 +70,7 @@ private:
     void OnNodeHoverEnter(const std::string& id) const;
     void OnNodeHoverLeave() const;
     void OnGhostNodePlace(NodeType type, QPoint position);
+    void OnZoomChangeRequest(bool is_plus) const;
     // ---
 
     void ToolbarInfoSet(const Node& node) const;
@@ -95,6 +98,7 @@ private:
     void InitMainMenuBar();
     static void ApplyFontMenu(const QMenu* menu, const QFont& font);
     void InitCentralWidget();
+    void InitSecondaryCanvasToolbar(const QPointer<QVBoxLayout>& canvas_container);
     void InitToolbar();
     void InitState();
 
@@ -113,6 +117,9 @@ private:
     Parser m_parser;
     QPointer<QLabel> m_error_label; // Widget showing TOML parsing error, if there is some
 
+    // MainMenuBar
+    QPointer<QAction> m_view_jump_to_origin_action;
+
     // Toolbar
     QPointer<QToolBar> m_toolbar_source_font_size;
     QPointer<QToolBar> m_toolbar_source_cursor_position;
@@ -129,6 +136,7 @@ private:
 
     // Secondary canvas toolbar
     QPointer<QWidget> m_secondary_canvas_toolbar_wrapper;
+    QPointer<QSlider> m_secondary_canvas_toolbar_slider;
 
     // Modeless windows
     QPointer<BenchmarkDialog> m_benchmark_dialog;
