@@ -18,6 +18,7 @@
 #include "../../Welcome.hpp"
 #include "../Dialog/ExportSVGDialog.hpp"
 #include "../Support/ColorPicker.hpp"
+#include "../Support/DragButton.hpp"
 #include "Scene.hpp"
 #include "Viewer.hpp"
 
@@ -433,9 +434,10 @@ void GUIMainWindow::InitCentralWidget()
     // secondary_canvas_toolbar == "sct"
     // drag'n'drop = "dnd"
     //TODO loop me and add logic, maybe move this init to a separate function
-    const QPointer sct_dnd_btn_rectangle = new QPushButton("A");
+    const QPointer sct_dnd_btn_rectangle = new DragButton(NTYPE_RECTANGLE);
     //sct_dnd_btn_rectangle->setMaximumWidth(50);
     secondary_canvas_toolbar->addWidget(sct_dnd_btn_rectangle);
+    connect(sct_dnd_btn_rectangle, &DragButton::DragStateChanged, m_scene, &GUIScene::OnDragStateChange);
 
     const QPointer sct_dnd_btn_ellipse = new QPushButton("B");
     //sct_dnd_btn_ellipse->setMaximumWidth(50);

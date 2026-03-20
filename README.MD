@@ -12,6 +12,9 @@ This is part of a IMGUI paradigm research, [go back to main repo](https://github
 * General:
   * [ ] View → Secondary canvas toolbar
     * [ ] Drag'n'Drop new node, button for each node type (beware the canvas scroll and zoom)
+      * [ ] Tooltips
+      * [ ] After adding node, make it selected and jump to its definition in textedit
+      * [ ] Don't forget to mark the file as dirty (dragndrop, change color, change type)
     * [ ] Zoom slider, right aligned
   * Saving/loading:
     * [ ] New, Open, Save, Save as

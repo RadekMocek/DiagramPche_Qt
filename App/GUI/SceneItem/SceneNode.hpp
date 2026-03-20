@@ -13,7 +13,12 @@ public:
     explicit SceneNode(const SceneNodeCrate& crate);
     [[nodiscard]] QRectF boundingRect() const override;
     [[nodiscard]] QPointF GetExactPointFromPivot(Pivot pivot) const;
-    std::string GetID() { return m_crate.id; }
+    [[nodiscard]] std::string GetID() const { return m_crate.id; }
+
+    //void DebugPrint() const { m_crate.DebugPrint(); }
+
+    // Ghost node
+    void UpdateGhostNode(const QString& label_value, NodeType type);
 
 private:
     [[nodiscard]] QPointF GetOffsetFromPivot(Pivot pivot) const;

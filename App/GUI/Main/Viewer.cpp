@@ -2,9 +2,15 @@
 
 #include "Viewer.hpp"
 
-GUISceneViewer::GUISceneViewer(QGraphicsScene* scene, QWidget* parent) : QGraphicsView(scene, parent)
+GUISceneViewer::GUISceneViewer(GUIScene* scene, QWidget* parent) :
+    QGraphicsView(scene, parent),
+    m_scene(scene)
 {
-    setViewportUpdateMode(QGraphicsView::FullViewportUpdate); // For the grid to work
+    // For the grid to work
+    setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
+
+    // For getting mouse position when drag'n'dropping node
+    qApp->installEventFilter(this);
 }
 
 void GUISceneViewer::mousePressEvent(QMouseEvent* event)
@@ -100,4 +106,15 @@ void GUISceneViewer::drawBackground(QPainter* painter, const QRectF& rect)
         const auto y = i * GRID_STEP_BASE;
         painter->drawLine(x1, y, x2, y);
     }
+}
+
+bool GUISceneViewer::eventFilter(QObject* watched, QEvent* event)
+{
+    if (m_scene->IsDraggingNode() && event->type() == QEvent::MouseMove) {
+        m_scene->MoveGhostNode(mapToScene(mapFromGlobal(
+            dynamic_cast<QMouseEvent*>(event)->globalPosition().toPoint()
+        )));
+    }
+
+    return QGraphicsView::eventFilter(watched, event);
 }

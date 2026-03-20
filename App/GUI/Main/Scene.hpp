@@ -8,13 +8,13 @@
 #include <QGraphicsScene>
 
 // App imports
-#include "App/Helper/AABR.hpp"
+#include "../../Helper/AABR.hpp"
+#include "../SceneItem/SceneNode.hpp"
 
 // App fwd declrs
 struct Node;
 struct NodePriority;
 struct Path;
-class SceneNode;
 
 // === Scene config == === === === === ===
 constexpr auto SCENE_FONT_SIZE_BASE = 18;
@@ -37,6 +37,10 @@ public:
 
     [[nodiscard]] QRectF GetSceneAABR() const { return m_scene_aabr.ToQRectF(); }
 
+    // Ghost node
+    [[nodiscard]] bool IsDraggingNode() const { return m_drag_state.has_value(); }
+    void MoveGhostNode(const QPointF pos) { m_ghost_node.setPos(pos); };
+
 private:
     void mousePressEvent(QGraphicsSceneMouseEvent* mouse_event) override;
 
@@ -49,6 +53,10 @@ private:
     // For svg export
     AABRHelper m_scene_aabr;
 
+    // Drag'n'drop buttons to add nodes to scene functionality
+    std::optional<NodeType> m_drag_state;
+    SceneNode m_ghost_node;
+
 signals:
     void EmptySpaceClicked();
     void NodeClicked(const std::string& id);
@@ -56,4 +64,7 @@ signals:
 
     void NodeHoverEntered(const std::string& id);
     void NodeHoverLeft();
+
+public slots:
+    void OnDragStateChange(std::optional<NodeType> type);
 };

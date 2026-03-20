@@ -88,8 +88,15 @@ QPointF SceneNode::GetOffsetFromPivot(const Pivot pivot) const
     }
 }
 
+void SceneNode::UpdateGhostNode(const QString& label_value, const NodeType type)
+{
+    m_crate.label_value = label_value;
+    m_crate.type = type;
+}
+
 void SceneNode::hoverEnterEvent(QGraphicsSceneHoverEvent* event)
 {
+    //DebugPrint();
     emit static_cast<GUIScene*>(scene())->NodeHoverEntered(m_crate.id);
     QGraphicsItem::hoverEnterEvent(event);
 }

@@ -1,7 +1,10 @@
 #pragma once
 
 #include <QGraphicsView>
+#include <QPointer>
 #include <QScrollBar>
+
+#include "Scene.hpp"
 
 // ===  GUISceneViewer config  === === === === === === === === === === ===
 inline QColor COLOR_CANVAS_BACKGROUND = QColor::fromRgb(240, 240, 240);
@@ -13,7 +16,7 @@ inline QColor COLOR_GRID_LINE = QColor::fromRgb(200, 200, 200, 40);
 class GUISceneViewer : public QGraphicsView
 {
 public:
-    explicit GUISceneViewer(QGraphicsScene* scene, QWidget* parent = nullptr);
+    explicit GUISceneViewer(GUIScene* scene, QWidget* parent = nullptr);
 
     bool m_do_show_grid = DO_SHOW_GRID_INIT;
 
@@ -26,4 +29,10 @@ private:
 
     bool m_is_panning{};
     int m_pan_start_x{}, m_pan_start_y{};
+
+    //
+
+    bool eventFilter(QObject* watched, QEvent* event) override;
+
+    QPointer<GUIScene> m_scene;
 };

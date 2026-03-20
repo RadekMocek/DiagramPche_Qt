@@ -15,7 +15,7 @@ enum NodeType
     NTYPE_TEXT,
 };
 
-const QStringList NODE_TYPE_NAMES = { "Rectangle", "Ellipse", "Diamond", "Text" };
+const QStringList NODE_TYPE_NAMES = {"Rectangle", "Ellipse", "Diamond", "Text"};
 
 constexpr std::optional<NodeType> GetNodeTypeFromString(const std::string& type_str)
 {
@@ -42,5 +42,21 @@ constexpr const char* GetQuotedStringFromNodeType(const NodeType type)
         return "\"text\"";
     default:
         return "\"\"";
+    }
+}
+
+constexpr const char* GetButtonLabelFromNodeType(const NodeType type)
+{
+    switch (type) {
+    case NTYPE_RECTANGLE:
+        return "rectangle";
+    case NTYPE_ELLIPSE:
+        return "ellipse";
+    case NTYPE_DIAMOND:
+        return "diamond";
+    case NTYPE_TEXT:
+        return "text";
+    default:
+        return "?";
     }
 }
