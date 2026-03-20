@@ -111,7 +111,7 @@ void GUISceneViewer::drawBackground(QPainter* painter, const QRectF& rect)
 bool GUISceneViewer::eventFilter(QObject* watched, QEvent* event)
 {
     if (m_scene->IsDraggingNode() && event->type() == QEvent::MouseMove) {
-        m_scene->MoveGhostNode(mapToScene(mapFromGlobal(
+        m_scene->UpdateGhostNodePositionAndVisibility(mapToScene(mapFromGlobal(
             dynamic_cast<QMouseEvent*>(event)->globalPosition().toPoint()
         )));
     }

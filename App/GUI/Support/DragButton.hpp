@@ -8,6 +8,7 @@ enum NodeType : int;
 
 // === === === === === === === === ===
 
+// Used for secondary canvas toolbar buttons, which you can drag'n'drop to canvas to add a new node
 class DragButton : public QPushButton
 {
     Q_OBJECT

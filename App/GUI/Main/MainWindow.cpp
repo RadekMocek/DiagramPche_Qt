@@ -125,6 +125,18 @@ void GUIMainWindow::OnNodeHoverLeave() const
     ToolbarInfoReset();
 }
 
+void GUIMainWindow::OnGhostNodePlace(const NodeType type) const
+{
+    qDebug() << "#1";
+    m_source->insertPlainText("hello?");
+    /*
+    m_source->insertPlainText(QString("\n[node_%1]\ntype = %2\n")
+                              .arg(m_parser.m_result_nodes.size())
+                              .arg(GetQuotedStringFromNodeType(type))
+    );
+    */
+}
+
 void GUIMainWindow::ToolbarInfoSet(const Node& node) const
 {
     m_tbd_color_picker->SetColor(GetQColorFromTuple(node.color), false);
@@ -418,6 +430,7 @@ void GUIMainWindow::InitCentralWidget()
     connect(m_scene, &GUIScene::NodeCtrlClicked, this, &GUIMainWindow::OnNodeCtrlClick);
     connect(m_scene, &GUIScene::NodeHoverEntered, this, &GUIMainWindow::OnNodeHoverEnter);
     connect(m_scene, &GUIScene::NodeHoverLeft, this, &GUIMainWindow::OnNodeHoverLeave);
+    connect(m_scene, &GUIScene::GhostNodePlaced, this, &GUIMainWindow::OnGhostNodePlace);
 
     m_viewer = new GUISceneViewer(m_scene);
 
@@ -433,25 +446,18 @@ void GUIMainWindow::InitCentralWidget()
 
     // secondary_canvas_toolbar == "sct"
     // drag'n'drop = "dnd"
-    //TODO loop me and add logic, maybe move this init to a separate function
-    const QPointer sct_dnd_btn_rectangle = new DragButton(NTYPE_RECTANGLE);
-    //sct_dnd_btn_rectangle->setMaximumWidth(50);
-    secondary_canvas_toolbar->addWidget(sct_dnd_btn_rectangle);
-    connect(sct_dnd_btn_rectangle, &DragButton::DragStateChanged, m_scene, &GUIScene::OnDragStateChange);
+    for (int i = 0; i < N_NTYPES; i++) {
+        const QPointer sct_dnd_button = new DragButton(static_cast<NodeType>(i));
+        sct_dnd_button->setToolTip(
+            QString("Drag and drop me onto the canvas to add a '%1' node.")
+            .arg(NODE_TYPE_NAMES[i])
+        );
+        connect(sct_dnd_button, &DragButton::DragStateChanged, m_scene, &GUIScene::OnDragStateChange);
+        secondary_canvas_toolbar->addWidget(sct_dnd_button);
+    }
 
-    const QPointer sct_dnd_btn_ellipse = new QPushButton("B");
-    //sct_dnd_btn_ellipse->setMaximumWidth(50);
-    secondary_canvas_toolbar->addWidget(sct_dnd_btn_ellipse);
-
-    const QPointer sct_dnd_btn_diamond = new QPushButton("C");
-    //sct_dnd_btn_diamond->setMaximumWidth(50);
-    secondary_canvas_toolbar->addWidget(sct_dnd_btn_diamond);
-
-    const QPointer sct_dnd_btn_text = new QPushButton("D");
-    //sct_dnd_btn_text->setMaximumWidth(50);
-    secondary_canvas_toolbar->addWidget(sct_dnd_btn_text);
-
-    secondary_canvas_toolbar->addStretch(1); // Buttons on left, slider on right
+    // Buttons on left, slider on right
+    secondary_canvas_toolbar->addStretch(1);
 
     const QPointer sct_slider = new QSlider(Qt::Horizontal);
     //sct_slider->setMaximumWidth(50);

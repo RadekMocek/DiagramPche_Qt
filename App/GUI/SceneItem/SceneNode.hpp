@@ -15,7 +15,7 @@ public:
     [[nodiscard]] QPointF GetExactPointFromPivot(Pivot pivot) const;
     [[nodiscard]] std::string GetID() const { return m_crate.id; }
 
-    //void DebugPrint() const { m_crate.DebugPrint(); }
+    void DebugPrint() const { m_crate.DebugPrint(); }
 
     // Ghost node
     void UpdateGhostNode(const QString& label_value, NodeType type);

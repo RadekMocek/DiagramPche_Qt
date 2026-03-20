@@ -61,11 +61,14 @@ private:
 
     [[nodiscard]] std::optional<std::reference_wrapper<const Node>> GetNodeRefFromId(const std::string& id) const;
 
+    // Slots:
     void OnEmptySpaceClick();
     void OnNodeClick(const std::string& id);
     void OnNodeCtrlClick(const std::string& id) const;
     void OnNodeHoverEnter(const std::string& id) const;
     void OnNodeHoverLeave() const;
+    void OnGhostNodePlace(NodeType type) const;
+    // ---
 
     void ToolbarInfoSet(const Node& node) const;
     void ToolbarInfoReset() const;

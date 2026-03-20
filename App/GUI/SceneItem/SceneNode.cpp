@@ -1,5 +1,3 @@
-#include <QPainter>
-
 #include "SceneNode.hpp"
 #include "../../Helper/Color.hpp"
 #include "../Main/Scene.hpp"

@@ -4,8 +4,7 @@
 #include <queue>
 
 // Qt imports
-#include <QFontMetrics>
-#include <QGraphicsScene>
+#include <QGraphicsView>
 
 // App imports
 #include "../../Helper/AABR.hpp"
@@ -39,7 +38,8 @@ public:
 
     // Ghost node
     [[nodiscard]] bool IsDraggingNode() const { return m_drag_state.has_value(); }
-    void MoveGhostNode(const QPointF pos) { m_ghost_node.setPos(pos); };
+    bool IsCursorOverViewer() const;
+    void UpdateGhostNodePositionAndVisibility(const QPointF pos);
 
 private:
     void mousePressEvent(QGraphicsSceneMouseEvent* mouse_event) override;
@@ -64,6 +64,8 @@ signals:
 
     void NodeHoverEntered(const std::string& id);
     void NodeHoverLeft();
+
+    void GhostNodePlaced(NodeType type);
 
 public slots:
     void OnDragStateChange(std::optional<NodeType> type);
