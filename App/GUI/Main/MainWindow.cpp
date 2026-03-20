@@ -127,14 +127,11 @@ void GUIMainWindow::OnNodeHoverLeave() const
 
 void GUIMainWindow::OnGhostNodePlace(const NodeType type) const
 {
-    qDebug() << "#1";
-    m_source->insertPlainText("hello?");
-    /*
-    m_source->insertPlainText(QString("\n[node_%1]\ntype = %2\n")
+    m_source->moveCursor(QTextCursor::End);
+    m_source->insertPlainText(QString("\n[node.node_%1]\ntype = %2\n")
                               .arg(m_parser.m_result_nodes.size())
                               .arg(GetQuotedStringFromNodeType(type))
     );
-    */
 }
 
 void GUIMainWindow::ToolbarInfoSet(const Node& node) const

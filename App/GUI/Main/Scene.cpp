@@ -118,13 +118,17 @@ void GUIScene::OnDragStateChange(const std::optional<NodeType> type)
     }
     // Type is nullopt but we have the "drag start type" stored in `m_drag_state` => LMB was released
     else if (m_drag_state.has_value()) {
-        // Emit signal before updating `m_drag_state` to nullopt
-        if (IsCursorOverViewer()) {
-            emit GhostNodePlaced(m_drag_state.value());
-        }
-        // Update `m_drag_state` to nullopt and remove ghost node from the scene
+        // We store this before changing to nullopt; it will be send with the signal
+        const auto drag_start_type = m_drag_state.value();
+        // Change to nullopt
         m_drag_state = type;
+        // Remove ghost node BEFORE sending the signal
+        // (the signal will change textedit and that will clear the whole scene, can't remove something from an empty scene)
         removeItem(&m_ghost_node);
+        // Emit signal to add node to diagram
+        if (IsCursorOverViewer()) {
+            emit GhostNodePlaced(drag_start_type);
+        }
     }
     // This should not happen, but if it does, I will know
     else {
