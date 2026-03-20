@@ -67,7 +67,7 @@ private:
     void OnNodeCtrlClick(const std::string& id) const;
     void OnNodeHoverEnter(const std::string& id) const;
     void OnNodeHoverLeave() const;
-    void OnGhostNodePlace(NodeType type) const;
+    void OnGhostNodePlace(NodeType type, QPoint position);
     // ---
 
     void ToolbarInfoSet(const Node& node) const;

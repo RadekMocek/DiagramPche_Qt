@@ -97,11 +97,12 @@ void GUIMainWindow::OnNodeClick(const std::string& id)
 void GUIMainWindow::OnNodeCtrlClick(const std::string& id) const
 {
     if (const auto& node = GetNodeRefFromId(id); node.has_value()) {
-        const QTextCursor cursor(m_source->document()->findBlockByLineNumber(
+        QTextCursor cursor(m_source->document()->findBlockByLineNumber(
             static_cast<int>(node.value().get().node_source.begin.line - 1)
         ));
         m_source->moveCursor(QTextCursor::End);
         // Move to end first so when we jump the [node.id] is at top of the text edit
+        cursor.movePosition(QTextCursor::EndOfLine);
         m_source->setTextCursor(cursor);
         m_source->setFocus();
     }
@@ -125,13 +126,26 @@ void GUIMainWindow::OnNodeHoverLeave() const
     ToolbarInfoReset();
 }
 
-void GUIMainWindow::OnGhostNodePlace(const NodeType type) const
+void GUIMainWindow::OnGhostNodePlace(const NodeType type, const QPoint position)
 {
+    // Prepare new node info
+    const auto new_node_id = std::format("node_{}", m_parser.m_result_nodes.size());
+
+    // Add new node definition to textedit
     m_source->moveCursor(QTextCursor::End);
-    m_source->insertPlainText(QString("\n[node.node_%1]\ntype = %2\n")
-                              .arg(m_parser.m_result_nodes.size())
-                              .arg(GetQuotedStringFromNodeType(type))
+    m_source->insertPlainText(
+        QString("\n[node.%1]\ntype = %2\nxy = [%3, %4]\n")
+        .arg(new_node_id)
+        .arg(GetQuotedStringFromNodeType(type))
+        .arg(position.x())
+        .arg(position.y())
     );
+
+    // Select newly added node
+    OnNodeClick(new_node_id);
+
+    // Move cursor up
+    OnNodeCtrlClick(new_node_id);
 }
 
 void GUIMainWindow::ToolbarInfoSet(const Node& node) const

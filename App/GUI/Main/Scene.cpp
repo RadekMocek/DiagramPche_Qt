@@ -127,7 +127,13 @@ void GUIScene::OnDragStateChange(const std::optional<NodeType> type)
         removeItem(&m_ghost_node);
         // Emit signal to add node to diagram
         if (IsCursorOverViewer()) {
-            emit GhostNodePlaced(drag_start_type);
+            QPointF cursor_position_in_scene;
+            for (const auto* view : views()) {
+                cursor_position_in_scene = view->mapToScene(view->mapFromGlobal(QCursor::pos()));
+            }
+            const QPoint final_position = cursor_position_in_scene.toPoint() + GHOST_OFFSET;
+
+            emit GhostNodePlaced(drag_start_type, final_position);
         }
     }
     // This should not happen, but if it does, I will know

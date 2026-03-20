@@ -65,7 +65,7 @@ signals:
     void NodeHoverEntered(const std::string& id);
     void NodeHoverLeft();
 
-    void GhostNodePlaced(NodeType type);
+    void GhostNodePlaced(NodeType type, QPoint position);
 
 public slots:
     void OnDragStateChange(std::optional<NodeType> type);

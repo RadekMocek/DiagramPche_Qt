@@ -11,10 +11,9 @@ This is part of a IMGUI paradigm research, [go back to main repo](https://github
 
 * General:
   * [ ] View → Secondary canvas toolbar
-    * [ ] Drag'n'Drop new node, button for each node type (beware the canvas scroll and zoom)
-      * [ ] Tooltips
-      * [ ] After adding node, make it selected and jump to its definition in textedit
-      * [ ] Don't forget to mark the file as dirty (dragndrop, change color, change type)
+    * [x] Drag'n'Drop new node, button for each node type (beware the canvas scroll and zoom)
+      * [x] Tooltips
+      * [x] After adding node, make it selected and jump to its definition in textedit
     * [ ] Zoom slider, right aligned
   * Saving/loading:
     * [ ] New, Open, Save, Save as
@@ -23,6 +22,7 @@ This is part of a IMGUI paradigm research, [go back to main repo](https://github
     * [ ] Confirm unsaved open, including loading a debug diagram or an example
     * [ ] Change window name according to opened document (incl. star for unsaved)
     * [ ] _Save → Cancel_ should behave the same as unsavedwarn's _Cancel_
+    * [ ] Don't forget to mark the file as dirty (text change, drag'n'drop, change color, change type)
 * Settings window:
   * [ ] Turn syntax highlight on/off
   * [ ] Appearance: color theme
