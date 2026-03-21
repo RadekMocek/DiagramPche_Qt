@@ -42,3 +42,35 @@ inline QString GetQuotedRGBAHexFromQColor(const QColor& color)
                  static_cast<unsigned char>(color.alpha()));
     return result;
 }
+
+// === === === === === === === === === === === === === === === === === === === === === ===
+
+inline void BenchmarkChangeColorImpl(unsigned char& r, unsigned char& g, unsigned char& b)
+{
+    if (r > 0) {
+        r--;
+    }
+    else if (g > 0) {
+        g--;
+    }
+    else if (b > 0) {
+        b--;
+    }
+    else {
+        r = 255;
+        g = 255;
+        b = 255;
+    }
+}
+
+inline void BenchmarkChangeColor(unsigned char& r, unsigned char& g, unsigned char& b, const int modifier)
+{
+    switch (modifier) {
+    default: return BenchmarkChangeColorImpl(r, g, b);
+    case 1: return BenchmarkChangeColorImpl(r, b, g);
+    case 2: return BenchmarkChangeColorImpl(g, r, b);
+    case 3: return BenchmarkChangeColorImpl(g, b, r);
+    case 4: return BenchmarkChangeColorImpl(b, r, g);
+    case 5: return BenchmarkChangeColorImpl(b, g, r);
+    }
+}

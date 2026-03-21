@@ -18,6 +18,7 @@ This is part of a IMGUI paradigm research, [go back to main repo](https://github
   * [ ] _Save → Cancel_ should behave the same as unsavedwarn's _Cancel_
   * [ ] Don't forget to mark the file as dirty (text change, drag'n'drop, change color, change type)
   * [ ] Unsavedwarn button icons
+  * [ ] Do not allow starting the benchmark on unsaved doc; benchmark should not mark doc as dirty
 * Settings window:
   * [ ] Turn syntax highlight on/off
   * [ ] Appearance: color theme

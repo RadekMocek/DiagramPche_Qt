@@ -23,7 +23,7 @@
 #include "Viewer.hpp"
 
 constexpr auto ICON_SCALE_DEFAULT = 0.9;
-constexpr auto ICON_SCALE_MENU = 0.58;
+constexpr auto ICON_SCALE_MENU = 0.6;
 
 GUIMainWindow::GUIMainWindow()
 {
@@ -143,9 +143,8 @@ void GUIMainWindow::OnGhostNodePlace(const NodeType type, const QPoint position)
     const auto new_node_id = std::format("node_{}", m_parser.m_result_nodes.size());
 
     // Add new node definition to textedit
-    m_source->moveCursor(QTextCursor::End);
-    m_source->insertPlainText(
-        QString("\n[node.%1]\ntype = %2\nxy = [%3, %4]\n")
+    m_source->appendPlainText(
+        QString("\n[node.%1]\ntype = %2\nxy = [%3, %4]")
         .arg(new_node_id)
         .arg(GetQuotedStringFromNodeType(type))
         .arg(position.x())
@@ -165,6 +164,7 @@ void GUIMainWindow::OnZoomChangeRequest(const bool is_plus) const
     const auto slider_step = m_secondary_canvas_toolbar_slider->singleStep();
     const auto current_step = (is_plus) ? slider_step : -slider_step;
     m_secondary_canvas_toolbar_slider->setValue(current_value + current_step);
+    // Callback that triggers after slider value change will handle the actual zoom level change
 }
 
 void GUIMainWindow::ToolbarInfoSet(const Node& node) const
@@ -386,8 +386,12 @@ void GUIMainWindow::InitMainMenuBar()
         }
         m_benchmark_dialog = new BenchmarkDialog(this);
         m_benchmark_dialog->setAttribute(Qt::WA_DeleteOnClose);
+        connect(m_benchmark_dialog, &BenchmarkDialog::ButtonStartClicked, this, &GUIMainWindow::BenchmarkStart);
         m_benchmark_dialog->show();
     });
+
+    // TEMPORARY
+    debug_benchmark_action->activate(QAction::Trigger);
 
     // .: Help :.
     const QPointer help_menu = main_menu_bar->addMenu("Help");

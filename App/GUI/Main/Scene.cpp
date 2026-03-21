@@ -31,9 +31,10 @@ GUIScene::GUIScene(const QFont& font, QObject* parent) :
         NTYPE_RECTANGLE
     })
 {
-    m_ghost_node.setFlag(QGraphicsItem::ItemIsMovable, false);
     // Will be moved from code to follow cursor, not by dragging
-    m_ghost_node.setZValue(DLUserChannelToRealChannel(10, true)); // Draw above all else
+    m_ghost_node.setFlag(QGraphicsItem::ItemIsMovable, false);
+    // Draw above all else
+    m_ghost_node.setZValue(DLUserChannelToRealChannel(10, true));
 }
 
 void GUIScene::Redraw(std::priority_queue<NodePriority>& nodes_pq,
@@ -83,7 +84,7 @@ void GUIScene::mousePressEvent(QGraphicsSceneMouseEvent* mouse_event)
 
 bool GUIScene::IsCursorOverViewer() const
 {
-    for (const auto* view : views()) {
+    for (const auto* view : views()) { // NOLINT(*-use-anyofallof)
         if (view->rect().contains(view->mapFromGlobal(QCursor::pos()))) {
             return true;
         }

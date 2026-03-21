@@ -91,6 +91,8 @@ private:
     void UpdateCursorPositionInfo() const;
 
     // AppFile.cpp
+    void HandleRegularNew() const;
+    //
     void LoadSourceFromFile(const char* filename) const;
 
     // AppSource.cpp
@@ -104,6 +106,9 @@ private:
     void InitSecondaryCanvasToolbar(const QPointer<QVBoxLayout>& canvas_container);
     void InitToolbar();
     void InitState();
+
+    // Benchmark
+    void BenchmarkStart();
 
     // Icons
     QIcon Icon(const int character, const bool is_solid = true) const

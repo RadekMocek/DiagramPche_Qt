@@ -10,4 +10,7 @@ class BenchmarkDialog : public QDialog
 
 public:
     explicit BenchmarkDialog(QWidget* parent);
+
+signals:
+    void ButtonStartClicked();
 };

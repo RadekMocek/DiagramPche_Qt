@@ -15,6 +15,9 @@ BenchmarkDialog::BenchmarkDialog(QWidget* parent) : QDialog(parent)
 
     const QPointer button = new QPushButton("Start benchmark");
     layout->addWidget(button);
+    connect(button, &QPushButton::clicked, [this] {
+        emit ButtonStartClicked();
+    });
 
     setLayout(layout);
 }
