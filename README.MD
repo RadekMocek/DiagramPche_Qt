@@ -28,6 +28,8 @@ This is part of a IMGUI paradigm research, [go back to main repo](https://github
 
 ## Building locally
 
+(This guide works with Qt version 6.10.0. If you have a newer version, replace `6.10.0` in all paths accordingly.)
+
 ### Debian based distros
 
 * Download Qt from <https://www.qt.io/> and install it, then:

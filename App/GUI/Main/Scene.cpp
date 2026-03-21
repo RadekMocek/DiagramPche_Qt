@@ -32,6 +32,8 @@ GUIScene::GUIScene(const QFont& font, QObject* parent) :
     })
 {
     m_ghost_node.setFlag(QGraphicsItem::ItemIsMovable, false);
+    // Will be moved from code to follow cursor, not by dragging
+    m_ghost_node.setZValue(DLUserChannelToRealChannel(10, true)); // Draw above all else
 }
 
 void GUIScene::Redraw(std::priority_queue<NodePriority>& nodes_pq,
@@ -107,6 +109,11 @@ void GUIScene::OnDragStateChange(const std::optional<NodeType> type)
         m_drag_state = type;
         m_ghost_node.UpdateGhostNode("new_node", m_drag_state.value());
         addItem(&m_ghost_node);
+
+        // Visibility will be managed by `UpdateGhostNodePositionAndVisibility`, but that first runs after cursor moves (it's called by GUISceneViewer).
+        // If we just hold the LMB on the DragButton, before we start to move the mouse, the ghost node will appear at the last seen position.
+        // So we hide it here to prevent this "visual bug".
+        m_ghost_node.setVisible(false);
     }
     // Type is nullopt but we have the "drag start type" stored in `m_drag_state` => LMB was released
     else if (m_drag_state.has_value()) {
