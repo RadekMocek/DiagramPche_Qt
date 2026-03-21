@@ -17,6 +17,7 @@ This is part of a IMGUI paradigm research, [go back to main repo](https://github
   * [ ] Change window name according to opened document (incl. star for unsaved)
   * [ ] _Save → Cancel_ should behave the same as unsavedwarn's _Cancel_
   * [ ] Don't forget to mark the file as dirty (text change, drag'n'drop, change color, change type)
+  * [ ] Unsavedwarn button icons
 * Settings window:
   * [ ] Turn syntax highlight on/off
   * [ ] Appearance: color theme
@@ -24,11 +25,6 @@ This is part of a IMGUI paradigm research, [go back to main repo](https://github
   * [ ] Duplicate settings from app: view→grid/toolbar/toolbar2, text editor font size (so all things that can be set and saved are at one place)
 * Benchmark window:
   * [ ] Do
-* Icons:
-  * [ ] Main menu bar → File items
-  * [ ] Toolbar → Drop-down list with node types
-  * [ ] Secondary canvas toolbar → Drag'n'Drop buttons
-  * [ ] UnsavedWarn modal
 
 ## Building locally
 
@@ -77,8 +73,12 @@ An alternative approach would be to choose the _MinGW_ component instead of _MSV
 <br>
 
 * [Inconsolata](https://levien.com/type/myfonts/inconsolata.html) ([SIL Open Font](https://github.com/google/fonts/blob/main/ofl/inconsolata/OFL.txt))
+* [QtAwesome](https://github.com/gamecreature/QtAwesome) ([MIT + CC BY 4.0 + SIL OFL 1.1](https://github.com/gamecreature/QtAwesome/blob/main/LICENSE.md))
 
 ## Problems
 
-* (minor) Syntax highlight highlights commented string as normal string
+* (minor) Syntax highlight:
+  * highlights commented string as normal string
+  * `points = [["", "start", 0, "", "end", 0]]` – first zero is green (not red) for some reason
+  * on linux the keywords are not bold
 * (minor) Canvas reset scrolling after app startup not working as expected

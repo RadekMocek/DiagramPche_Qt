@@ -27,6 +27,10 @@ GUIMainWindow::GUIMainWindow()
     setWindowTitle("Untitled – DiagramPche :: Qt");
     resize(1280, 800);
 
+    m_awesome = new fa::QtAwesome(this);
+    m_awesome->initFontAwesome();
+    m_awesome->setDefaultOption("scale-factor", 0.6);
+
     InitMainMenuBar();
     InitCentralWidget();
     InitToolbar();
@@ -289,28 +293,27 @@ void GUIMainWindow::InitMainMenuBar()
     // .: File :.
     const QPointer file_menu = main_menu_bar->addMenu("File");
     // . New .
-    const QPointer file_new_action = file_menu->addAction("New");
+    const QPointer file_new_action = file_menu->addAction(Icon(fa::fa_file_circle_plus), "New");
     //todo
     // . Open .
-    const QPointer file_open_action = file_menu->addAction("Open");
+    const QPointer file_open_action = file_menu->addAction(Icon(fa::fa_folder_open), "Open");
     //todo
     // . Save .
-    const QPointer file_save_action = file_menu->addAction("Save");
+    const QPointer file_save_action = file_menu->addAction(Icon(fa::fa_floppy_disk, false), "Save");
     //todo
     // . Save as .
-    const QPointer file_saveas_action = file_menu->addAction("Save as");
+    const QPointer file_saveas_action = file_menu->addAction(Icon(fa::fa_floppy_disk), "Save as");
     //todo
     // . Export to SVG .
-    const QPointer file_export_svg_action = file_menu->addAction("Export to SVG");
+    const QPointer file_export_svg_action = file_menu->addAction(Icon(fa::fa_share_from_square), "Export to SVG");
     connect(file_export_svg_action, &QAction::triggered, [this] {
         ExportSVGDialog dialog(this, m_state_dialog_export);
         connect(&dialog, &ExportSVGDialog::ButtonExportClicked, this, &GUIMainWindow::ExportToSvg);
         dialog.exec();
     });
     file_menu->addSeparator();
-
     // . Preferences .
-    const QPointer file_preferences_action = file_menu->addAction("Preferences");
+    const QPointer file_preferences_action = file_menu->addAction(Icon(fa::fa_wrench), "Preferences");
     connect(file_preferences_action, &QAction::triggered, [this] {
         if (m_preferences_dialog) {
             m_preferences_dialog->raise();
@@ -323,7 +326,7 @@ void GUIMainWindow::InitMainMenuBar()
     });
     file_menu->addSeparator();
     // . Exit .
-    const QPointer file_exit_action = file_menu->addAction("Exit");
+    const QPointer file_exit_action = file_menu->addAction(Icon(fa::fa_person_through_window), "Exit");
     connect(file_exit_action, SIGNAL(triggered()), this, SLOT(close()));
 
     // .: View :.
@@ -494,7 +497,7 @@ void GUIMainWindow::InitSecondaryCanvasToolbar(const QPointer<QVBoxLayout>& canv
     // secondary_canvas_toolbar == "sct"
     // drag'n'drop == "dnd"
     for (int i = 0; i < N_NTYPES; i++) {
-        const QPointer sct_dnd_button = new DragButton(static_cast<NodeType>(i));
+        const QPointer sct_dnd_button = new DragButton(static_cast<NodeType>(i), Icon(NODE_TYPE_ICONS[i], false));
         sct_dnd_button->setToolTip(
             QString("Drag and drop me onto the canvas to add a '%1' node.")
             .arg(NODE_TYPE_NAMES[i])
@@ -508,7 +511,7 @@ void GUIMainWindow::InitSecondaryCanvasToolbar(const QPointer<QVBoxLayout>& canv
 
     // Zoom level slider
     m_secondary_canvas_toolbar_slider = new QSlider(Qt::Horizontal);
-    m_secondary_canvas_toolbar_slider->setFixedWidth(200);
+    m_secondary_canvas_toolbar_slider->setFixedWidth(180);
     secondary_canvas_toolbar->addWidget(m_secondary_canvas_toolbar_slider);
 
     constexpr auto CANVAS_FONT_SIZE_BASE = 18;
@@ -605,7 +608,10 @@ void GUIMainWindow::InitToolbar()
     m_toolbar_node_type->addWidget(label_node_type);
 
     m_tbd_type_combo = new QComboBox();
-    m_tbd_type_combo->addItems(NODE_TYPE_NAMES);
+    for (int i = 0; i < N_NTYPES; i++) {
+        m_tbd_type_combo->addItem(Icon(NODE_TYPE_ICONS[i], false), NODE_TYPE_NAMES[i]);
+    }
+
     // using `activated` instead of `currentIndexChanged`, because it does not trigger when the index is changed from code
     connect(m_tbd_type_combo, &QComboBox::activated, [this](const int new_idx) {
         if (m_is_some_node_selected) {

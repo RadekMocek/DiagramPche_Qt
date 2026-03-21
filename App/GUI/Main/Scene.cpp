@@ -82,16 +82,6 @@ void GUIScene::mousePressEvent(QGraphicsSceneMouseEvent* mouse_event)
 bool GUIScene::IsCursorOverViewer() const
 {
     for (const auto* view : views()) {
-        // EDIT: this was resolved by making the scene/view large and hiding the scrollbars
-        /*
-        // Padding so ghost node disappears when it would not 100% fit into the currently visible canvas area
-        // The main motivation for doing this was that the scene view does not move, but it still moves...
-        const qreal scale = view->transform().m11();
-        const auto pad_value_horizontal = GHOST_NODE_WIDTH / 2 * scale;
-        const auto pad_value_vertical = GHOST_NODE_HEIGHT / 2 * scale;
-        const auto padding = QMargins(pad_value_horizontal, pad_value_vertical,
-                                      pad_value_horizontal, pad_value_vertical);
-        */
         if (view->rect().contains(view->mapFromGlobal(QCursor::pos()))) {
             return true;
         }

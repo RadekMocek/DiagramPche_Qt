@@ -3,8 +3,8 @@
 // Qt imports
 #include <QPushButton>
 
-// App fwd declrs
-enum NodeType : int;
+// App imports
+#include "../../Model/NodeType.hpp"
 
 // === === === === === === === === ===
 
@@ -14,7 +14,7 @@ class DragButton : public QPushButton
     Q_OBJECT
 
 public:
-    explicit DragButton(NodeType type, QWidget* parent = nullptr);
+    explicit DragButton(NodeType type, const QIcon& icon, QWidget* parent = nullptr);
 
 private:
     void mousePressEvent(QMouseEvent* event) override;

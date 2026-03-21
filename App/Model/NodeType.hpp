@@ -1,11 +1,11 @@
 #pragma once
 
-//#include "../../Dependency/IconsMaterialDesignIcons.h"
-
 #include <QList>
 
 #include <optional>
 #include <string>
+
+#include "QtAwesome.h"
 
 // These types of node are available
 enum NodeType
@@ -19,6 +19,10 @@ enum NodeType
 // These are the values for the toolbar's ComboBox, where user can change type of the selected node
 const QStringList NODE_TYPE_NAMES = {"Rectangle", "Ellipse", "Diamond", "Text"};
 const auto N_NTYPES = NODE_TYPE_NAMES.length();
+// (used for buttons as well)
+constexpr int NODE_TYPE_ICONS[] = {
+    fa::fa_square, fa::fa_circle, fa::fa_diamond, fa::fa_a
+};
 
 // When parsing TOML, the value of "type=" parameter is converted to this enum
 constexpr std::optional<NodeType> GetNodeTypeFromString(const std::string& type_str)
@@ -49,23 +53,5 @@ constexpr const char* GetQuotedStringFromNodeType(const NodeType type)
         return "\"text\"";
     default:
         return "\"\"";
-    }
-}
-
-//todo
-// Used for icon buttons
-constexpr const char* GetButtonLabelFromNodeType(const NodeType type)
-{
-    switch (type) {
-    case NTYPE_RECTANGLE:
-        return "rectangle";
-    case NTYPE_ELLIPSE:
-        return "ellipse";
-    case NTYPE_DIAMOND:
-        return "diamond";
-    case NTYPE_TEXT:
-        return "text";
-    default:
-        return "?";
     }
 }

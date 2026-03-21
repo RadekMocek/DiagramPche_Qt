@@ -12,6 +12,9 @@ class QSlider;
 class QVBoxLayout;
 QT_END_NAMESPACE
 
+// Non-Qt deps
+#include "QtAwesome.h"
+
 // App imports
 #include "../../Logic/TOML/Parser.hpp"
 #include "../Dialog/BenchmarkDialog.hpp"
@@ -102,6 +105,12 @@ private:
     void InitToolbar();
     void InitState();
 
+    // Icons
+    QIcon Icon(const int character, const bool is_solid = true) const
+    {
+        return m_awesome->icon((is_solid) ? fa::fa_solid : fa::fa_regular, character);
+    }
+
     // = Members=
     // Text editor with the TOML describing the diagram
     QPointer<QPlainTextEdit> m_source;
@@ -144,4 +153,7 @@ private:
 
     // State
     ExportSVGDialogState m_state_dialog_export;
+
+    // Icons
+    QPointer<fa::QtAwesome> m_awesome;
 };

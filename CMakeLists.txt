@@ -9,6 +9,9 @@ project("${PROJECT_NAME}")
 set(CMAKE_BUILD_TYPE Release)
 set(CMAKE_CXX_STANDARD 20)
 
+# == Non-Qt deps ==
+add_subdirectory(Dependency/QtAwesome7)
+
 # == Qt setup ==
 # What is QTDIR ?
 # Windows:
@@ -31,7 +34,11 @@ add_executable("${BINARY_NAME}"
 )
 
 # == Link libraries ==
-target_link_libraries("${BINARY_NAME}" Qt6::Widgets Qt6::Svg)
+target_link_libraries("${BINARY_NAME}"
+        Qt6::Widgets
+        Qt6::Svg
+        QtAwesome
+)
 
 # == Misc ==
 if (MSVC)

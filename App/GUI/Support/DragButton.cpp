@@ -1,11 +1,9 @@
 #include <QMouseEvent>
 
 #include "DragButton.hpp"
-#include "../../Model/NodeType.hpp"
 
-
-DragButton::DragButton(const NodeType type, QWidget* parent) :
-    QPushButton(GetButtonLabelFromNodeType(type), parent),
+DragButton::DragButton(const NodeType type, const QIcon& icon, QWidget* parent) :
+    QPushButton(icon, "", parent),
     m_type(type)
 {
     //
