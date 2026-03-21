@@ -35,7 +35,10 @@ This is part of a IMGUI paradigm research, [go back to main repo](https://github
 ```bash
 sudo apt install cmake ninja-build libxcb-cursor0 libxcb-cursor-dev
 
-export QTDIR=<path_to_qt_installation>/6.10.0/gcc_64/  # Add this line to ~/.bashrc for auto export
+export QTDIR=<path_to_qt_installation>/6.10.0/gcc_64/
+export QT_DIR=<path_to_qt_installation>/6.10.0/gcc_64/
+export Qt6_DIR=<path_to_qt_installation>/6.10.0/gcc_64/
+# ↑ Add these lines to ~/.bashrc for auto export
 
 # Navigate to the root directory of this repository
 
@@ -48,7 +51,9 @@ cmake --build build
   1. Open the project in CLion
   2. Click on the CMake icon at the bottom left corner
   3. Click on the cogwheel icon → _CMake settings_
-  4. In the _Cache variables_ section of the settings, change _Value_ of _Name_ `Qt6_DIR` to `<path_to_qt_installation>/6.10.0/gcc_64/lib/cmake/Qt6`
+  4. In the _Cache variables_ section of the settings, and change:
+     * _Value_ of _Name_ `Qt6_DIR` to `<path_to_qt_installation>/6.10.0/gcc_64/lib/cmake/Qt6`
+     * _Value_ of _Name_ `QT_DIR` to `<path_to_qt_installation>/6.10.0/gcc_64/lib/cmake/Qt6`
 
 ### Windows with Visual Studio
 
@@ -78,7 +83,8 @@ An alternative approach would be to choose the _MinGW_ component instead of _MSV
 ## Problems
 
 * (minor) Syntax highlight:
-  * highlights commented string as normal string
+  * Highlights commented string as normal string
   * `points = [["", "start", 0, "", "end", 0]]` – first zero is green (not red) for some reason
-  * on linux the keywords are not bold
+  * On Linux the keywords are not bold (Windows OK)
 * (minor) Canvas reset scrolling after app startup not working as expected
+* (annoying) On Windows (Linux OK), when dragging canvas via RMB and then releasing RMB outside of canvas on some other widget (e.g. textedit), a context menu for that widget appears, as if we right-clicked on that widget intentionally

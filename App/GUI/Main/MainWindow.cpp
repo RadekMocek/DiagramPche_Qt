@@ -22,6 +22,9 @@
 #include "Scene.hpp"
 #include "Viewer.hpp"
 
+constexpr auto ICON_SCALE_DEFAULT = 0.9;
+constexpr auto ICON_SCALE_MENU = 0.58;
+
 GUIMainWindow::GUIMainWindow()
 {
     setWindowTitle("Untitled – DiagramPche :: Qt");
@@ -29,9 +32,11 @@ GUIMainWindow::GUIMainWindow()
 
     m_awesome = new fa::QtAwesome(this);
     m_awesome->initFontAwesome();
-    m_awesome->setDefaultOption("scale-factor", 0.6);
 
+    m_awesome->setDefaultOption("scale-factor", ICON_SCALE_MENU);
     InitMainMenuBar();
+    m_awesome->setDefaultOption("scale-factor", ICON_SCALE_DEFAULT);
+
     InitCentralWidget();
     InitToolbar();
     InitState();
@@ -497,7 +502,7 @@ void GUIMainWindow::InitSecondaryCanvasToolbar(const QPointer<QVBoxLayout>& canv
     // secondary_canvas_toolbar == "sct"
     // drag'n'drop == "dnd"
     for (int i = 0; i < N_NTYPES; i++) {
-        const QPointer sct_dnd_button = new DragButton(static_cast<NodeType>(i), Icon(NODE_TYPE_ICONS[i], false));
+        const QPointer sct_dnd_button = new DragButton(static_cast<NodeType>(i), Icon(NODE_TYPE_ICONS[i]));
         sct_dnd_button->setToolTip(
             QString("Drag and drop me onto the canvas to add a '%1' node.")
             .arg(NODE_TYPE_NAMES[i])
@@ -609,7 +614,7 @@ void GUIMainWindow::InitToolbar()
 
     m_tbd_type_combo = new QComboBox();
     for (int i = 0; i < N_NTYPES; i++) {
-        m_tbd_type_combo->addItem(Icon(NODE_TYPE_ICONS[i], false), NODE_TYPE_NAMES[i]);
+        m_tbd_type_combo->addItem(Icon(NODE_TYPE_ICONS[i]), NODE_TYPE_NAMES[i]);
     }
 
     // using `activated` instead of `currentIndexChanged`, because it does not trigger when the index is changed from code
