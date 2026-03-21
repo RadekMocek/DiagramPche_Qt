@@ -24,6 +24,13 @@
 
 constexpr auto ICON_SCALE_DEFAULT = 0.9;
 constexpr auto ICON_SCALE_MENU = 0.6;
+constexpr auto CANVAS_FONT_SIZE_BASE = 18;
+constexpr auto CANVAS_FONT_SIZE_STEP = 4;
+constexpr auto CANVAS_FONT_SIZE_MIN = 6;
+constexpr auto CANVAS_FONT_SIZE_MAX = 30;
+constexpr auto SLIDER_INIT = 3;
+constexpr auto SLIDER_MIN = 0;
+constexpr auto SLIDER_MAX = (CANVAS_FONT_SIZE_MAX - CANVAS_FONT_SIZE_MIN) / CANVAS_FONT_SIZE_STEP;
 
 GUIMainWindow::GUIMainWindow()
 {
@@ -43,7 +50,8 @@ GUIMainWindow::GUIMainWindow()
 
     ParseAndRedraw();
 
-    m_viewer->ResetCanvasScrollingAndZoom(); // It moves the canvas but not as expected when called here
+    // It moves the canvas but not as expected when called here
+    ResetCanvasScrollingAndZoom();
 }
 
 // == Logic ==
@@ -279,6 +287,12 @@ void GUIMainWindow::UpdateCursorPositionInfo() const
                                          .arg(cursor.columnNumber()));
 }
 
+void GUIMainWindow::ResetCanvasScrollingAndZoom() const
+{
+    m_secondary_canvas_toolbar_slider->setValue(SLIDER_INIT);
+    m_viewer->ResetCanvasScrolling();
+}
+
 // == GUI init ==
 
 void GUIMainWindow::InitMainMenuBar()
@@ -362,7 +376,7 @@ void GUIMainWindow::InitMainMenuBar()
     view_menu->addSeparator();
     // . Jump to canvas origin .
     m_view_jump_to_origin_action = view_menu->addAction("Jump to canvas origin");
-    // ↑ Is connected later after initializing the viewer
+    connect(m_view_jump_to_origin_action, &QAction::triggered, this, &GUIMainWindow::ResetCanvasScrollingAndZoom);
 
     // .: Debug :.
     const QPointer debug_menu = main_menu_bar->addMenu("Debug");
@@ -387,6 +401,8 @@ void GUIMainWindow::InitMainMenuBar()
         m_benchmark_dialog = new BenchmarkDialog(this);
         m_benchmark_dialog->setAttribute(Qt::WA_DeleteOnClose);
         connect(m_benchmark_dialog, &BenchmarkDialog::ButtonStartClicked, this, &GUIMainWindow::BenchmarkStart);
+        connect(m_benchmark_dialog, &BenchmarkDialog::ButtonStopClicked, this, &GUIMainWindow::BenchmarkStopForce);
+        connect(this, &GUIMainWindow::BenchmarkStatsTx, m_benchmark_dialog, &BenchmarkDialog::BenchmarkStatsRx);
         m_benchmark_dialog->show();
     });
 
@@ -441,8 +457,8 @@ void GUIMainWindow::InitCentralWidget()
     central_widget->setLayout(main_layout);
 
     // Splitter between Text editor & Canvas
-    const QPointer splitter = new QSplitter();
-    splitter->setChildrenCollapsible(false);
+    m_splitter = new QSplitter();
+    m_splitter->setChildrenCollapsible(false);
 
     // Text editor
     m_source = new QPlainTextEdit();
@@ -451,7 +467,7 @@ void GUIMainWindow::InitCentralWidget()
 
     m_highlighter = new Highlighter(m_source->document());
 
-    splitter->addWidget(m_source);
+    m_splitter->addWidget(m_source);
 
     connect(m_source, &QPlainTextEdit::textChanged, this, &GUIMainWindow::ParseAndRedraw);
     connect(m_source, &QPlainTextEdit::cursorPositionChanged, this, &GUIMainWindow::UpdateCursorPositionInfo);
@@ -470,8 +486,6 @@ void GUIMainWindow::InitCentralWidget()
     connect(m_scene, &GUIScene::GhostNodePlaced, this, &GUIMainWindow::OnGhostNodePlace);
 
     m_viewer = new GUISceneViewer(m_scene);
-
-    connect(m_view_jump_to_origin_action, &QAction::triggered, m_viewer, &GUISceneViewer::ResetCanvasScrollingAndZoom);
     connect(m_viewer, &GUISceneViewer::ZoomChangeRequested, this, &GUIMainWindow::OnZoomChangeRequest);
 
     // Canvas + secondary canvas toolbar container
@@ -480,13 +494,13 @@ void GUIMainWindow::InitCentralWidget()
     canvas_container->setContentsMargins(0, 0, 0, 0);
     canvas_container->addWidget(m_viewer);
     InitSecondaryCanvasToolbar(canvas_container);
-    splitter->addWidget(canvas_container_wrapper);
+    m_splitter->addWidget(canvas_container_wrapper);
 
     // Splitter ratio starts at 50/50
     const int half = width() / 2;
-    splitter->setSizes({half, half});
+    m_splitter->setSizes({half, half});
 
-    main_layout->addWidget(splitter, 1);
+    main_layout->addWidget(m_splitter, 1);
 
     // Error label
     QPalette error_text_palette;
@@ -522,14 +536,6 @@ void GUIMainWindow::InitSecondaryCanvasToolbar(const QPointer<QVBoxLayout>& canv
     m_secondary_canvas_toolbar_slider = new QSlider(Qt::Horizontal);
     m_secondary_canvas_toolbar_slider->setFixedWidth(180);
     secondary_canvas_toolbar->addWidget(m_secondary_canvas_toolbar_slider);
-
-    constexpr auto CANVAS_FONT_SIZE_BASE = 18;
-    constexpr auto CANVAS_FONT_SIZE_STEP = 4;
-    constexpr auto CANVAS_FONT_SIZE_MIN = 6;
-    constexpr auto CANVAS_FONT_SIZE_MAX = 30;
-    constexpr auto SLIDER_INIT = 3;
-    constexpr auto SLIDER_MIN = 0;
-    constexpr auto SLIDER_MAX = (CANVAS_FONT_SIZE_MAX - CANVAS_FONT_SIZE_MIN) / CANVAS_FONT_SIZE_STEP;
 
     m_secondary_canvas_toolbar_slider->setRange(SLIDER_MIN, SLIDER_MAX);
     m_secondary_canvas_toolbar_slider->setValue(SLIDER_INIT);

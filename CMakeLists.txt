@@ -55,6 +55,7 @@ target_link_libraries("${BINARY_NAME}"
 # == Misc ==
 if (MSVC)
     target_compile_definitions("${CMAKE_PROJECT_NAME}" PUBLIC _CRT_SECURE_NO_WARNINGS)
+    target_compile_definitions("${CMAKE_PROJECT_NAME}" PUBLIC NOMINMAX)
     #set_target_properties("${CMAKE_PROJECT_NAME}" PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup") # No console
 endif ()
 

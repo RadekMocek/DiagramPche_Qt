@@ -10,6 +10,7 @@ class QComboBox;
 class QLabel;
 class QPlainTextEdit;
 class QSlider;
+class QSplitter;
 class QVBoxLayout;
 QT_END_NAMESPACE
 
@@ -91,6 +92,8 @@ private:
 
     void UpdateCursorPositionInfo() const;
 
+    void ResetCanvasScrollingAndZoom() const;
+
     // AppFile.cpp
     void HandleRegularNew() const;
     //
@@ -110,6 +113,8 @@ private:
 
     // Benchmark
     QCoro::Task<> BenchmarkStart();
+    void BenchmarkStopForce() { m_bench_stop_flag = true; }
+    void SetGUIEnabled(bool value) const;
 
     // Icons
     QIcon Icon(const int character, const bool is_solid = true) const
@@ -118,6 +123,9 @@ private:
     }
 
     // = Members=
+    // Splitter between Text editor & Canvas
+    QPointer<QSplitter> m_splitter;
+
     // Text editor with the TOML describing the diagram
     QPointer<QPlainTextEdit> m_source;
     QPointer<Highlighter> m_highlighter; // Syntax highlight
@@ -160,6 +168,12 @@ private:
     // State
     ExportSVGDialogState m_state_dialog_export;
 
+    // Benchmark
+    bool m_bench_stop_flag = false;
+
     // Icons
     QPointer<fa::QtAwesome> m_awesome;
+
+signals:
+    void BenchmarkStatsTx(int total_nodes, double mem_usage_mib);
 };

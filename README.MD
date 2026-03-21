@@ -78,6 +78,7 @@ An alternative approach would be to choose the _MinGW_ component instead of _MSV
 * [Qt](https://www.qt.io/development/qt-framework) ([LGPL](https://doc.qt.io/qt-6/lgpl.html))
 * [toml++](https://github.com/marzer/tomlplusplus) ([MIT](https://github.com/marzer/tomlplusplus/blob/master/LICENSE))
 * [qcoro](https://github.com/qcoro/qcoro) ([MIT](https://github.com/qcoro/qcoro/blob/main/LICENSE))
+* David Robert Nadeau's `getCurrentRSS` (CC BY 3.0)
 
 <br>
 

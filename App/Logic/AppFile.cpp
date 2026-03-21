@@ -19,5 +19,5 @@ void GUIMainWindow::LoadSourceFromFile(const char* filename) const
         m_source->setPlainText(file.readAll());
     }
 
-    m_viewer->ResetCanvasScrollingAndZoom();
+    ResetCanvasScrollingAndZoom();
 }

@@ -18,13 +18,10 @@ GUISceneViewer::GUISceneViewer(GUIScene* scene, QWidget* parent) :
     scene->setSceneRect(-100000, -100000, 200000, 200000);
 }
 
-void GUISceneViewer::ResetCanvasScrollingAndZoom()
+void GUISceneViewer::ResetCanvasScrolling(const int offset_x, const int offset_y)
 {
-    constexpr auto SCROLLING_OFFSET_DEFAULT = 5;
-
-    resetTransform();
-    centerOn(size().width() / 2 - SCROLLING_OFFSET_DEFAULT,
-             size().height() / 2 - SCROLLING_OFFSET_DEFAULT);
+    centerOn(size().width() / 2 - offset_x,
+             size().height() / 2 - offset_y);
 }
 
 void GUISceneViewer::mousePressEvent(QMouseEvent* event)

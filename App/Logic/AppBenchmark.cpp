@@ -1,12 +1,20 @@
+#include <QMenuBar>
 #include <QPlainTextEdit>
 #include <QSlider>
+#include <QSplitter>
+#include <QToolBar>
+
+#include "../../Dependency/RSS.hpp"
 
 #include "../GUI/Main/MainWindow.hpp"
+#include "../GUI/Main/Viewer.hpp"
 #include "../Helper/Color.hpp"
 
 // (In this benchmark, nodes are being added to the canvas (they are added as pairs connected by arrow))
+// What percentage of the window's width will the text editor occupy during the benchmark
+constexpr auto TEXTEDIT_WIDTH_RATIO = 0.28f;
 // After this passes, add new batch of nodes
-constexpr auto TIME_INTERVAL = 0.3f;
+constexpr auto TIME_INTERVAL = 300; // ms
 // How many nodes to add in a batch?
 constexpr auto N_NODES_IN_INTERVAL = 35;
 // Add this to each node x coordinate
@@ -29,42 +37,40 @@ constexpr auto AUTO_SCROLL_MODULO_X = 600;
 // How many zoom levels we iterate, this corresponds to the slider and MW behavior
 constexpr auto ZOOM_LEVEL_MODULO = 6;
 
-QCoro::Task<> GUIMainWindow::BenchmarkStart()
+void GUIMainWindow::SetGUIEnabled(const bool value) const
 {
-    qDebug() << "bench started";
+    menuBar()->setEnabled(value);
 
-    // Disable everything
-    setEnabled(false);
+    m_toolbar_source_font_size->setEnabled(value);
+    m_toolbar_source_cursor_position->setEnabled(value);
+    // These can be always false (for the benchmark purposes)
+    SetNodeToolbarsEnabled(false);
 
-    // Clear the source
-    HandleRegularNew();
-
-    QTimer timer;
-    timer.setInterval(300);
-    timer.start();
-
-    // The benchmark
-    for (int i = 0; i < 100000; i++) {
-        co_await timer;
-        m_source->appendPlainText(QString("[node.\"%1\"]\nxy=[%1,0]").arg(i));
-    }
-
-    // Enable everything
-    setEnabled(true);
-
-    qDebug() << "bench ended";
+    centralWidget()->setEnabled(value);
 }
 
-/*
-void GUIMainWindow::BenchmarkStart()
+QCoro::Task<> GUIMainWindow::BenchmarkStart()
 {
-    qDebug() << "bench started";
+    // Update state
+    m_bench_stop_flag = false;
+
+    // Clear the source and reset the view
+    HandleRegularNew();
+    m_viewer->ResetCanvasScrolling(0, 0);
 
     // Disable everything
-    setEnabled(false);
+    SetGUIEnabled(false);
 
-    // Clear the source
-    HandleRegularNew();
+    // Change the ratio between textedit and canvas to make canvas bigger (more things to see)
+    const auto window_width = width();
+    const int textedit_width = window_width * TEXTEDIT_WIDTH_RATIO;
+    m_splitter->setSizes({textedit_width, window_width - textedit_width});
+
+    // Reserve string space
+    // Can't do that with QPlainTextEdit?
+
+    qDebug() << "Benchmark started.";
+    // --- --- --- --- --- --- --- ---
 
     // Initialize helper variables
     int node_counter_total_pairs = 0;
@@ -75,11 +81,25 @@ void GUIMainWindow::BenchmarkStart()
     unsigned char color_g = 255;
     unsigned char color_b = 255;
     int zoom_level = 0;
+    int scrolling_x = 0;
+
+    // Set up timer
+    QTimer timer;
+    timer.setInterval(TIME_INTERVAL);
+    timer.start();
 
     // The benchmark
     while (true) {
+        if (m_bench_stop_flag) {
+            qDebug() << "Benchmark stopped.";
+            SetGUIEnabled(true);
+            co_return;
+        }
+        // Do the next batch only when certain amount of time has passed
+        co_await timer;
+
         // Zoom frenzy
-        zoom_level = (zoom_level + 1) % ZOOM_LEVEL_MODULO;
+        zoom_level = (zoom_level + 1) % ZOOM_LEVEL_MODULO; // 0,1,2,3,4,5
         m_secondary_canvas_toolbar_slider->setValue(zoom_level); // Callback will handle the zoom
 
         // Add a new batch of nodes
@@ -95,7 +115,7 @@ void GUIMainWindow::BenchmarkStart()
                 .arg(node_counter_total_pairs).arg(node_counter_total_pairs).arg(z)
                 .arg(node_counter_total_pairs).arg(node_counter_total_pairs)
             );
-
+            // Update values for next iteration
             node_counter_total_pairs++;
             node_counter_row_pairs++;
             x_cor += X_COR_ADDITION;
@@ -103,8 +123,12 @@ void GUIMainWindow::BenchmarkStart()
             BenchmarkChangeColor(color_r, color_g, color_b, zoom_level);
         }
 
-        // Scrolling
-        //todo
+        // Auto scrolling
+        scrolling_x += AUTO_SCROLL_STEP_X;
+        if (scrolling_x > AUTO_SCROLL_MODULO_X) {
+            scrolling_x = 0;
+        }
+        m_viewer->ResetCanvasScrolling(scrolling_x, 0);
 
         // Jump to new row if needed
         if (node_counter_row_pairs > MAX_NODES_ON_ROW) {
@@ -113,14 +137,23 @@ void GUIMainWindow::BenchmarkStart()
             y_cor += Y_COR_ADDITION;
         }
 
+        // Stats
+        const auto node_counter_total = 2 * node_counter_total_pairs;
+        constexpr auto MIBI = 1024.0 * 1024.0;
+        const auto mem_usage_mib = static_cast<double>(getCurrentRSS()) / MIBI;
+
+        // Report to GUI
+        emit BenchmarkStatsTx(node_counter_total, mem_usage_mib);
+
+        // TODO LOG
+
         // End the benchmark check
         if (y_cor > MAX_Y_COR) {
-            qDebug() << "bench ended";
+            qDebug() << "Benchmark done.";
             break;
         }
     }
 
     // Enable everything
-    setEnabled(true);
+    SetGUIEnabled(true);
 }
-*/

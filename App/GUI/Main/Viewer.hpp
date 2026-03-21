@@ -19,7 +19,7 @@ class GUISceneViewer : public QGraphicsView
 public:
     explicit GUISceneViewer(GUIScene* scene, QWidget* parent = nullptr);
 
-    void ResetCanvasScrollingAndZoom();
+    void ResetCanvasScrolling(int offset_x = 5, int offset_y = 5);
 
     bool m_do_show_grid = DO_SHOW_GRID_INIT;
 
