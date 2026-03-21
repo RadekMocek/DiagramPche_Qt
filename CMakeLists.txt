@@ -11,6 +11,17 @@ set(CMAKE_CXX_STANDARD 20)
 
 # == Non-Qt deps ==
 add_subdirectory(Dependency/QtAwesome7)
+set(QCORO_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(QCORO_WITH_QTDBUS OFF CACHE BOOL "" FORCE)
+set(QCORO_WITH_QTNETWORK OFF CACHE BOOL "" FORCE)
+set(QCORO_WITH_QTWEBSOCKETS OFF CACHE BOOL "" FORCE)
+set(QCORO_DISABLE_DEPRECATED_TASK_H ON CACHE BOOL "" FORCE)
+set(QCORO_BUILD_TESTING OFF CACHE BOOL "" FORCE)
+set(QCORO_WITH_QTQUICK OFF CACHE BOOL "" FORCE)
+set(QCORO_WITH_QML OFF CACHE BOOL "" FORCE)
+set(QCORO_WITH_QTTEST OFF CACHE BOOL "" FORCE)
+add_subdirectory(Dependency/qcoro-0.13.0)
+qcoro_enable_coroutines()
 
 # == Qt setup ==
 # What is QTDIR ?
@@ -38,6 +49,7 @@ target_link_libraries("${BINARY_NAME}"
         Qt6::Widgets
         Qt6::Svg
         QtAwesome
+        QCoro6::Core
 )
 
 # == Misc ==

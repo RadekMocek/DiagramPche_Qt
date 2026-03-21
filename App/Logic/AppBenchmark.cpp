@@ -29,6 +29,33 @@ constexpr auto AUTO_SCROLL_MODULO_X = 600;
 // How many zoom levels we iterate, this corresponds to the slider and MW behavior
 constexpr auto ZOOM_LEVEL_MODULO = 6;
 
+QCoro::Task<> GUIMainWindow::BenchmarkStart()
+{
+    qDebug() << "bench started";
+
+    // Disable everything
+    setEnabled(false);
+
+    // Clear the source
+    HandleRegularNew();
+
+    QTimer timer;
+    timer.setInterval(300);
+    timer.start();
+
+    // The benchmark
+    for (int i = 0; i < 100000; i++) {
+        co_await timer;
+        m_source->appendPlainText(QString("[node.\"%1\"]\nxy=[%1,0]").arg(i));
+    }
+
+    // Enable everything
+    setEnabled(true);
+
+    qDebug() << "bench ended";
+}
+
+/*
 void GUIMainWindow::BenchmarkStart()
 {
     qDebug() << "bench started";
@@ -96,3 +123,4 @@ void GUIMainWindow::BenchmarkStart()
     // Enable everything
     setEnabled(true);
 }
+*/

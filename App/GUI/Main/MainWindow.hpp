@@ -2,6 +2,7 @@
 
 // Qt imports
 #include <QMainWindow>
+#include <QCoroTimer>
 
 // Qt fwd declrs
 QT_BEGIN_NAMESPACE
@@ -108,7 +109,7 @@ private:
     void InitState();
 
     // Benchmark
-    void BenchmarkStart();
+    QCoro::Task<> BenchmarkStart();
 
     // Icons
     QIcon Icon(const int character, const bool is_solid = true) const
