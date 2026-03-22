@@ -1,5 +1,6 @@
 #include <QApplication>
 #include <QStyleFactory>
+#include <QStyleHints>
 
 #include "App/GUI/Main/MainWindow.hpp"
 
@@ -11,10 +12,15 @@ int main(int argc, char* argv[])
 
     QApplication app(argc, argv);
 
-    /*
-    qDebug() << QStyleFactory::keys();
-    app.setStyle(QStyleFactory::create("windowsvista"));
-    */
+    if (QStyleFactory::keys().contains("Fusion")) {
+        QApplication::setStyle(QStyleFactory::create("Fusion"));
+    }
+    else {
+        qWarning() << "Fusion style not supported. Falling back to default style.";
+    }
+
+    // Default to light mode
+    QGuiApplication::styleHints()->setColorScheme(Qt::ColorScheme::Light);
 
     QFontDatabase::addApplicationFont("./Resource/Font/Inconsolata-Medium.ttf");
 
@@ -23,7 +29,7 @@ int main(int argc, char* argv[])
     default_font.setPixelSize(FONT_SIZE_DEFAULT);
     QApplication::setFont(default_font);
 
-    app.setWindowIcon(QIcon("./Resource/Icon/icon-256.png"));
+    QApplication::setWindowIcon(QIcon("./Resource/Icon/icon-256.png"));
 
     GUIMainWindow window;
     window.show();

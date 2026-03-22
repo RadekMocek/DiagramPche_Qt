@@ -10,6 +10,7 @@
 #include <QPlainTextEdit>
 #include <QSpinBox>
 #include <QSplitter>
+#include <QStyleHints>
 #include <QSvgGenerator>
 #include <QToolBar>
 
@@ -23,7 +24,6 @@
 #include "Viewer.hpp"
 
 constexpr auto ICON_SCALE_DEFAULT = 0.9;
-constexpr auto ICON_SCALE_MENU = 0.6;
 constexpr auto CANVAS_FONT_SIZE_BASE = 18;
 constexpr auto CANVAS_FONT_SIZE_STEP = 4;
 constexpr auto CANVAS_FONT_SIZE_MIN = 6;
@@ -37,13 +37,12 @@ GUIMainWindow::GUIMainWindow()
     setWindowTitle("Untitled – DiagramPche :: Qt");
     resize(1280, 800);
 
+    // Icons
     m_awesome = new fa::QtAwesome(this);
     m_awesome->initFontAwesome();
-
-    m_awesome->setDefaultOption("scale-factor", ICON_SCALE_MENU);
-    InitMainMenuBar();
     m_awesome->setDefaultOption("scale-factor", ICON_SCALE_DEFAULT);
 
+    InitMainMenuBar();
     InitCentralWidget();
     InitToolbar();
     InitState();
@@ -251,6 +250,18 @@ void GUIMainWindow::ErrorHighlight(const toml::source_region& EH_region) const
     m_source->setExtraSelections(QList({selection}));
 }
 
+void GUIMainWindow::ApplyPreferences() const
+{
+    // (Not ideal, I am updating everything everytime. More ideal would be to check only for the changes)
+    // Keep canvas light?
+    if (m_state_dialog_preferences.do_keep_canvas_light) {
+        //todo
+    }
+    else {
+        //todo
+    }
+}
+
 int GUIMainWindow::GetSourceFontSize() const
 {
     return m_source->font().pixelSize();
@@ -267,7 +278,6 @@ void GUIMainWindow::SetAllToolbarsVisible(const bool value) const
 {
     m_toolbar_source_font_size->setVisible(value);
     m_toolbar_source_cursor_position->setVisible(value);
-    m_toolbar_scene_fps->setVisible(value);
     m_toolbar_node_color->setVisible(value);
     m_toolbar_node_type->setVisible(value);
     m_toolbar_node_id->setVisible(value);
@@ -341,7 +351,8 @@ void GUIMainWindow::InitMainMenuBar()
             m_preferences_dialog->activateWindow();
             return;
         }
-        m_preferences_dialog = new PreferencesDialog(this);
+        m_preferences_dialog = new PreferencesDialog(this, m_state_dialog_preferences);
+        connect(m_preferences_dialog, &PreferencesDialog::ButtonApplyClicked, this, &GUIMainWindow::ApplyPreferences);
         m_preferences_dialog->setAttribute(Qt::WA_DeleteOnClose);
         m_preferences_dialog->show();
     });
@@ -500,7 +511,7 @@ void GUIMainWindow::InitCentralWidget()
     connect(m_scene, &GUIScene::GhostNodePlaced, this, &GUIMainWindow::OnGhostNodePlace);
 
     connect(m_scene, &GUIScene::FPSInfoTx, [this](const int fps) {
-        m_tbd_fps_label->setText(QString::number(fps));
+        m_scene_fps = fps;
     });
 
     m_viewer = new GUISceneViewer(m_scene);
@@ -574,13 +585,19 @@ void GUIMainWindow::InitToolbar()
     constexpr auto FONT_SIZE_SOURCE_MIN = 8;
     constexpr auto FONT_SIZE_SOURCE_MAX = 40;
 
-    const auto SetupToolbar = [](QToolBar* toolbar) {
-        // Currently it seems that the best way to add some right padding to the toolbar is by adding a literal space
-        toolbar->addWidget(new QLabel(" "));
+    const auto SetupToolbar = [](QToolBar* toolbar, const bool is_last = false) {
+        // Pad
+        const QPointer spacer = new QWidget;
+        spacer->setFixedWidth(6);
+        toolbar->addWidget(spacer);
         // Forbid drag'n'droping the toolbar
         toolbar->setMovable(false);
         // Forbid hiding the toolbar via context menu
         toolbar->toggleViewAction()->setEnabled(false);
+        // Separator
+        if (!is_last) {
+            toolbar->addSeparator();
+        }
     };
 
     // .: Toolbar :: Text edit font size :.
@@ -598,21 +615,14 @@ void GUIMainWindow::InitToolbar()
 
     // .: Toolbar :: Text edit cursor position :.
     m_toolbar_source_cursor_position = addToolBar("Text edit cursor position");
-    m_toolbar_source_cursor_position->addWidget(new QLabel(" Cursor pos: "));
+    m_toolbar_source_cursor_position->addWidget(new QLabel("Cursor pos: "));
     m_tbd_cursor_position_label = new QLabel("0,0");
     m_toolbar_source_cursor_position->addWidget(m_tbd_cursor_position_label);
     SetupToolbar(m_toolbar_source_cursor_position);
 
-    // .: Toolbar :: Scene FPS :.
-    m_toolbar_scene_fps = addToolBar("Scene FPS");
-    m_toolbar_scene_fps->addWidget(new QLabel(" Scene FPS: "));
-    m_tbd_fps_label = new QLabel("?");
-    m_toolbar_scene_fps->addWidget(m_tbd_fps_label);
-    SetupToolbar(m_toolbar_scene_fps);
-
     // .: Toolbar :: Selected node color :.
     m_toolbar_node_color = addToolBar("Selected node color");
-    m_toolbar_node_color->addWidget(new QLabel(" Node color: "));
+    m_toolbar_node_color->addWidget(new QLabel("Node color: "));
     m_tbd_color_picker = new ColorPicker(this);
     connect(m_tbd_color_picker, &ColorPicker::ColorChanged, [this](const QColor& new_color) {
         if (m_is_some_node_selected) {
@@ -630,7 +640,7 @@ void GUIMainWindow::InitToolbar()
 
     // .: Toolbar :: Selected node type :.
     m_toolbar_node_type = addToolBar("Selected node type");
-    m_toolbar_node_type->addWidget(new QLabel(" Node type: "));
+    m_toolbar_node_type->addWidget(new QLabel("Node type: "));
     m_tbd_type_combo = new QComboBox();
     for (int i = 0; i < N_NTYPES; i++) {
         m_tbd_type_combo->addItem(Icon(NODE_TYPE_ICONS[i]), NODE_TYPE_NAMES[i]);
@@ -653,10 +663,10 @@ void GUIMainWindow::InitToolbar()
 
     // .: Toolbar :: Selected node ID :.
     m_toolbar_node_id = addToolBar("Selected node ID");
-    m_toolbar_node_id->addWidget(new QLabel(" Node ID: "));
+    m_toolbar_node_id->addWidget(new QLabel("Node ID: "));
     m_tbd_id_label = new QLabel("(No node hovered)");
     m_toolbar_node_id->addWidget(m_tbd_id_label);
-    SetupToolbar(m_toolbar_node_id);
+    SetupToolbar(m_toolbar_node_id, true);
 
     // No node is selected at the start
     SetNodeToolbarsEnabled(false);
@@ -666,4 +676,6 @@ void GUIMainWindow::InitState()
 {
     m_state_dialog_export.path = QDir::current().filePath("diagram.svg");
     m_state_dialog_export.action = ActionAfterExport_DoNothing;
+
+    m_state_dialog_preferences.do_keep_canvas_light = true;
 }

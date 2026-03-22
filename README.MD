@@ -87,9 +87,10 @@ An alternative approach would be to choose the _MinGW_ component instead of _MSV
 
 ## Problems
 
-* (minor) Syntax highlight:
+* (visual) Syntax highlight:
   * Highlights commented string as normal string
   * `points = [["", "start", 0, "", "end", 0]]` – first zero is green (not red) for some reason
   * On Linux the keywords are not bold (Windows OK)
+* (visual) Icons stay black after changing to dark mode (should switch to white as the resto of the font)
 * (minor) Canvas reset scrolling after app startup not working as expected
 * (annoying) On Windows (Linux OK), when dragging canvas via RMB and then releasing RMB outside of canvas on some other widget (e.g. textedit), a context menu for that widget appears, as if we right-clicked on that widget intentionally

@@ -1,9 +1,7 @@
-#include <QComboBox>
 #include <QCheckBox>
 #include <QGroupBox>
 #include <QGuiApplication>
-#include <QLabel>
-#include <QRadioButton>
+#include <QPushButton>
 #include <QSpinBox>
 #include <QStyleHints>
 #include <QTabWidget>
@@ -11,9 +9,7 @@
 
 #include "PreferencesDialog.hpp"
 
-#include <QPushButton>
-
-PreferencesDialog::PreferencesDialog(QWidget* parent) : QDialog(parent)
+PreferencesDialog::PreferencesDialog(QWidget* parent, PreferencesDialogState& state) : QDialog(parent), m_state(state)
 {
     setWindowTitle("Preferences");
 
@@ -21,41 +17,31 @@ PreferencesDialog::PreferencesDialog(QWidget* parent) : QDialog(parent)
     // but does not care about the tabs themselves, so here goes the magic number.
     setMinimumWidth(350);
 
+    InitGUI();
+}
+
+void PreferencesDialog::InitGUI()
+{
     const QPointer layout = new QVBoxLayout();
 
-    // .::.
+    // .: APPEARANCE TAB :.
+    // .:================:.
     const QPointer layout_appearance_wrapper = new QWidget();
     const QPointer layout_appearance = new QVBoxLayout(layout_appearance_wrapper);
-
-    // This "hack" allows for label with a standard icon using a disabled button
-    const QPointer appearance_warning_label = new QPushButton(style()->standardIcon(QStyle::SP_MessageBoxWarning),
-                                                              " App color themes in Qt are platform dependant");
-    appearance_warning_label->setFlat(true); // No border
-    appearance_warning_label->setEnabled(false); // Not clickable
-    layout_appearance->addWidget(appearance_warning_label);
 
     const QPointer group1_1 = new QGroupBox("App color theme");
     const QPointer group1_1_layout = new QHBoxLayout();
 
-
-    const QPointer group1_1_radio_light = new QRadioButton("Light");
-    connect(group1_1_radio_light, &QRadioButton::toggled, [](const bool checked) {
-        if (checked) QGuiApplication::styleHints()->setColorScheme(Qt::ColorScheme::Light);
+    const QPointer appearance_button_light = new QPushButton("Light");
+    connect(appearance_button_light, &QPushButton::clicked, [] {
+        QGuiApplication::styleHints()->setColorScheme(Qt::ColorScheme::Light);
     });
-    group1_1_layout->addWidget(group1_1_radio_light);
-
-    const QPointer group1_1_radio_dark = new QRadioButton("Dark");
-    connect(group1_1_radio_dark, &QRadioButton::toggled, [](const bool checked) {
-        if (checked) QGuiApplication::styleHints()->setColorScheme(Qt::ColorScheme::Dark);
+    group1_1_layout->addWidget(appearance_button_light);
+    const QPointer appearance_button_dark = new QPushButton("Dark");
+    connect(appearance_button_dark, &QPushButton::clicked, [] {
+        QGuiApplication::styleHints()->setColorScheme(Qt::ColorScheme::Dark);
     });
-    group1_1_layout->addWidget(group1_1_radio_dark);
-
-    const QPointer group1_1_radio_unknown = new QRadioButton("Unknown");
-    group1_1_radio_unknown->setChecked(true);
-    connect(group1_1_radio_unknown, &QRadioButton::toggled, [](const bool checked) {
-        if (checked) QGuiApplication::styleHints()->setColorScheme(Qt::ColorScheme::Unknown);
-    });
-    group1_1_layout->addWidget(group1_1_radio_unknown);
+    group1_1_layout->addWidget(appearance_button_dark);
 
     group1_1_layout->addStretch(1);
 
@@ -73,7 +59,8 @@ PreferencesDialog::PreferencesDialog(QWidget* parent) : QDialog(parent)
     group1_2->setLayout(group1_2_layout);
     layout_appearance->addWidget(group1_2);
 
-    // .::.
+    // .: TEXTEDIT TAB :.
+    // .:==============:.
     const QPointer layout_textedit_wrapper = new QWidget();
     const QPointer layout_textedit = new QVBoxLayout(layout_textedit_wrapper);
 
@@ -95,7 +82,8 @@ PreferencesDialog::PreferencesDialog(QWidget* parent) : QDialog(parent)
     group2_2->setLayout(group2_2_layout);
     layout_textedit->addWidget(group2_2);
 
-    // .::.
+    // .: VIEW TAB :.
+    // .:==========:.
     const QPointer layout_view_wrapper = new QWidget();
     const QPointer layout_view = new QVBoxLayout(layout_view_wrapper);
     const QPointer view_toolbar_checkbox = new QCheckBox("Toolbar");
@@ -111,5 +99,14 @@ PreferencesDialog::PreferencesDialog(QWidget* parent) : QDialog(parent)
     tabs->addTab(layout_view_wrapper, "View");
 
     layout->addWidget(tabs);
+
+    // .: APPLY ALL BUTTON :.
+    // .:==================:.
+    const QPointer button_apply_all = new QPushButton("Apply all settings");
+
+    layout->addWidget(button_apply_all);
+    connect(button_apply_all, &QPushButton::clicked, [this] {
+        emit ButtonApplyClicked();
+    });
     setLayout(layout);
 }

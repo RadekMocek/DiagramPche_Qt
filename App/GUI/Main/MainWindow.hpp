@@ -86,6 +86,8 @@ private:
     void ExportToSvg() const;
     void ErrorHighlight(const toml::source_region& EH_region) const;
 
+    void ApplyPreferences() const;
+
     [[nodiscard]] int GetSourceFontSize() const;
     void SetSourceFontSize(int new_size) const;
 
@@ -134,6 +136,7 @@ private:
 
     // This is where diagram will be rendered
     QPointer<GUIScene> m_scene;
+    int m_scene_fps;
 
     // Parent for the scene
     QPointer<GUISceneViewer> m_viewer;
@@ -151,7 +154,6 @@ private:
     QPointer<QToolBar> m_toolbar_node_color;
     QPointer<QToolBar> m_toolbar_node_type;
     QPointer<QToolBar> m_toolbar_node_id;
-    QPointer<QToolBar> m_toolbar_scene_fps;
     // - toolbar dynamics == "tdb"
     bool m_is_some_node_selected = false;
     NodeInfo m_selected_node_info{};
@@ -159,7 +161,6 @@ private:
     QPointer<ColorPicker> m_tbd_color_picker;
     QPointer<QComboBox> m_tbd_type_combo;
     QPointer<QLabel> m_tbd_id_label;
-    QPointer<QLabel> m_tbd_fps_label;
 
     // Secondary canvas toolbar
     QPointer<QWidget> m_secondary_canvas_toolbar_wrapper;
@@ -171,6 +172,7 @@ private:
 
     // State
     ExportSVGDialogState m_state_dialog_export;
+    PreferencesDialogState m_state_dialog_preferences;
 
     // Benchmark
     bool m_bench_stop_flag = false;
