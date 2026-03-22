@@ -267,6 +267,7 @@ void GUIMainWindow::SetAllToolbarsVisible(const bool value) const
 {
     m_toolbar_source_font_size->setVisible(value);
     m_toolbar_source_cursor_position->setVisible(value);
+    m_toolbar_scene_fps->setVisible(value);
     m_toolbar_node_color->setVisible(value);
     m_toolbar_node_type->setVisible(value);
     m_toolbar_node_id->setVisible(value);
@@ -310,6 +311,7 @@ void GUIMainWindow::InitMainMenuBar()
     setMenuBar(main_menu_bar);
 
     // .: File :.
+    // .:======:.
     const QPointer file_menu = main_menu_bar->addMenu("File");
     // . New .
     const QPointer file_new_action = file_menu->addAction(Icon(fa::fa_file_circle_plus), "New");
@@ -343,12 +345,17 @@ void GUIMainWindow::InitMainMenuBar()
         m_preferences_dialog->setAttribute(Qt::WA_DeleteOnClose);
         m_preferences_dialog->show();
     });
+    if (DO_OPEN_PREFERENCES_WINDOW_AT_STARTUP) {
+        // ReSharper disable once CppDFAUnreachableCode
+        file_preferences_action->activate(QAction::Trigger);
+    }
     file_menu->addSeparator();
     // . Exit .
     const QPointer file_exit_action = file_menu->addAction(Icon(fa::fa_person_through_window), "Exit");
     connect(file_exit_action, SIGNAL(triggered()), this, SLOT(close()));
 
     // .: View :.
+    // .:======:.
     const QPointer view_menu = main_menu_bar->addMenu("View");
     // . Toolbar .
     const QPointer view_canvas_toolbar_action = view_menu->addAction("Toolbar");
@@ -379,6 +386,7 @@ void GUIMainWindow::InitMainMenuBar()
     connect(m_view_jump_to_origin_action, &QAction::triggered, this, &GUIMainWindow::ResetCanvasScrollingAndZoom);
 
     // .: Debug :.
+    // .:=======:.
     const QPointer debug_menu = main_menu_bar->addMenu("Debug");
     // .: Render tests :.
     const QPointer debug_render_tests_menu = debug_menu->addMenu("Render tests");
@@ -389,6 +397,10 @@ void GUIMainWindow::InitMainMenuBar()
     const QPointer debug_render_test_2_action = debug_render_tests_menu->addAction("Path label background");
     connect(debug_render_test_2_action, &QAction::triggered, [this] {
         LoadSourceFromFile("./Resource/Example/Debug/PathLabel.toml");
+    });
+    const QPointer debug_render_test_3_action = debug_render_tests_menu->addAction("Benchmark diagram");
+    connect(debug_render_test_3_action, &QAction::triggered, [this] {
+        LoadSourceFromFile("./Resource/Example/Debug/Benchmark.toml");
     });
     // . Benchmark .
     const QPointer debug_benchmark_action = debug_menu->addAction("Benchmark");
@@ -405,11 +417,13 @@ void GUIMainWindow::InitMainMenuBar()
         connect(this, &GUIMainWindow::BenchmarkStatsTx, m_benchmark_dialog, &BenchmarkDialog::BenchmarkStatsRx);
         m_benchmark_dialog->show();
     });
-
-    // TEMPORARY
-    debug_benchmark_action->activate(QAction::Trigger);
+    if (DO_OPEN_BENCHMARK_WINDOW_AT_STARTUP) {
+        // ReSharper disable once CppDFAUnreachableCode
+        debug_benchmark_action->activate(QAction::Trigger);
+    }
 
     // .: Help :.
+    // .:======:.
     const QPointer help_menu = main_menu_bar->addMenu("Help");
     // .: Examples :.
     const QPointer examples_menu = help_menu->addMenu("Examples");
@@ -485,6 +499,10 @@ void GUIMainWindow::InitCentralWidget()
     connect(m_scene, &GUIScene::NodeHoverLeft, this, &GUIMainWindow::OnNodeHoverLeave);
     connect(m_scene, &GUIScene::GhostNodePlaced, this, &GUIMainWindow::OnGhostNodePlace);
 
+    connect(m_scene, &GUIScene::FPSInfoTx, [this](const int fps) {
+        m_tbd_fps_label->setText(QString::number(fps));
+    });
+
     m_viewer = new GUISceneViewer(m_scene);
     connect(m_viewer, &GUISceneViewer::ZoomChangeRequested, this, &GUIMainWindow::OnZoomChangeRequest);
 
@@ -556,19 +574,18 @@ void GUIMainWindow::InitToolbar()
     constexpr auto FONT_SIZE_SOURCE_MIN = 8;
     constexpr auto FONT_SIZE_SOURCE_MAX = 40;
 
-    // These numbers don't really work as expected, otherwise I would give it a proper padding/margin.
-    //constexpr QMargins TOOLBAR_MARGINS(0, 0, 2, 0);
-
-    // Currently it seems that the best way to add some right padding to the toolbar is by adding a literal space
-    const auto AddSpace = [](QToolBar* toolbar) {
+    const auto SetupToolbar = [](QToolBar* toolbar) {
+        // Currently it seems that the best way to add some right padding to the toolbar is by adding a literal space
         toolbar->addWidget(new QLabel(" "));
+        // Forbid drag'n'droping the toolbar
+        toolbar->setMovable(false);
+        // Forbid hiding the toolbar via context menu
+        toolbar->toggleViewAction()->setEnabled(false);
     };
 
     // .: Toolbar :: Text edit font size :.
     m_toolbar_source_font_size = addToolBar("Text edit font size");
-    const QPointer label_font_size = new QLabel(" Font size: ");
-    m_toolbar_source_font_size->addWidget(label_font_size);
-
+    m_toolbar_source_font_size->addWidget(new QLabel(" Font size: "));
     const QPointer widget_font_size = new QSpinBox();
     widget_font_size->setValue(GetSourceFontSize());
     widget_font_size->setMinimum(FONT_SIZE_SOURCE_MIN);
@@ -577,28 +594,25 @@ void GUIMainWindow::InitToolbar()
     connect(widget_font_size, &QSpinBox::valueChanged, [this](const int value) {
         SetSourceFontSize(value);
     });
-
-    AddSpace(m_toolbar_source_font_size);
-    m_toolbar_source_font_size->setMovable(false);
-    m_toolbar_source_font_size->toggleViewAction()->setEnabled(false);
+    SetupToolbar(m_toolbar_source_font_size);
 
     // .: Toolbar :: Text edit cursor position :.
     m_toolbar_source_cursor_position = addToolBar("Text edit cursor position");
-    const QPointer label_cursor_pos = new QLabel(" Cursor pos: ");
-    m_toolbar_source_cursor_position->addWidget(label_cursor_pos);
-
+    m_toolbar_source_cursor_position->addWidget(new QLabel(" Cursor pos: "));
     m_tbd_cursor_position_label = new QLabel("0,0");
     m_toolbar_source_cursor_position->addWidget(m_tbd_cursor_position_label);
+    SetupToolbar(m_toolbar_source_cursor_position);
 
-    AddSpace(m_toolbar_source_cursor_position);
-    m_toolbar_source_cursor_position->setMovable(false);
-    m_toolbar_source_cursor_position->toggleViewAction()->setEnabled(false);
+    // .: Toolbar :: Scene FPS :.
+    m_toolbar_scene_fps = addToolBar("Scene FPS");
+    m_toolbar_scene_fps->addWidget(new QLabel(" Scene FPS: "));
+    m_tbd_fps_label = new QLabel("?");
+    m_toolbar_scene_fps->addWidget(m_tbd_fps_label);
+    SetupToolbar(m_toolbar_scene_fps);
 
     // .: Toolbar :: Selected node color :.
     m_toolbar_node_color = addToolBar("Selected node color");
-    const QPointer label_node_color = new QLabel(" Node color: ");
-    m_toolbar_node_color->addWidget(label_node_color);
-
+    m_toolbar_node_color->addWidget(new QLabel(" Node color: "));
     m_tbd_color_picker = new ColorPicker(this);
     connect(m_tbd_color_picker, &ColorPicker::ColorChanged, [this](const QColor& new_color) {
         if (m_is_some_node_selected) {
@@ -612,21 +626,15 @@ void GUIMainWindow::InitToolbar()
         }
     });
     m_toolbar_node_color->addWidget(m_tbd_color_picker);
-
-    AddSpace(m_toolbar_node_color);
-    m_toolbar_node_color->setMovable(false);
-    m_toolbar_node_color->toggleViewAction()->setEnabled(false);
+    SetupToolbar(m_toolbar_node_color);
 
     // .: Toolbar :: Selected node type :.
     m_toolbar_node_type = addToolBar("Selected node type");
-    const QPointer label_node_type = new QLabel(" Node type: ");
-    m_toolbar_node_type->addWidget(label_node_type);
-
+    m_toolbar_node_type->addWidget(new QLabel(" Node type: "));
     m_tbd_type_combo = new QComboBox();
     for (int i = 0; i < N_NTYPES; i++) {
         m_tbd_type_combo->addItem(Icon(NODE_TYPE_ICONS[i]), NODE_TYPE_NAMES[i]);
     }
-
     // using `activated` instead of `currentIndexChanged`, because it does not trigger when the index is changed from code
     connect(m_tbd_type_combo, &QComboBox::activated, [this](const int new_idx) {
         if (m_is_some_node_selected) {
@@ -641,22 +649,14 @@ void GUIMainWindow::InitToolbar()
         }
     });
     m_toolbar_node_type->addWidget(m_tbd_type_combo);
-
-    AddSpace(m_toolbar_node_type);
-    m_toolbar_node_type->setMovable(false);
-    m_toolbar_node_type->toggleViewAction()->setEnabled(false);
+    SetupToolbar(m_toolbar_node_type);
 
     // .: Toolbar :: Selected node ID :.
     m_toolbar_node_id = addToolBar("Selected node ID");
-    const QPointer label_node_id = new QLabel(" Node ID: ");
-    m_toolbar_node_id->addWidget(label_node_id);
-
+    m_toolbar_node_id->addWidget(new QLabel(" Node ID: "));
     m_tbd_id_label = new QLabel("(No node hovered)");
     m_toolbar_node_id->addWidget(m_tbd_id_label);
-
-    AddSpace(m_toolbar_node_id);
-    m_toolbar_node_id->setMovable(false);
-    m_toolbar_node_id->toggleViewAction()->setEnabled(false);
+    SetupToolbar(m_toolbar_node_id);
 
     // No node is selected at the start
     SetNodeToolbarsEnabled(false);

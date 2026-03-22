@@ -1,4 +1,5 @@
 #include <QGraphicsSceneMouseEvent>
+#include <QTimer>
 
 #include "Scene.hpp"
 #include "../../Model/Node.hpp"
@@ -35,6 +36,12 @@ GUIScene::GUIScene(const QFont& font, QObject* parent) :
     m_ghost_node.setFlag(QGraphicsItem::ItemIsMovable, false);
     // Draw above all else
     m_ghost_node.setZValue(DLUserChannelToRealChannel(10, true));
+
+    // FPS measure
+    m_fps_timer = new QTimer(this);
+    connect(m_fps_timer, SIGNAL(timeout()), this, SLOT(FPSTimerShot()));
+    m_fps_timer->setInterval(1000);
+    m_fps_timer->start();
 }
 
 void GUIScene::Redraw(std::priority_queue<NodePriority>& nodes_pq,
@@ -140,4 +147,17 @@ void GUIScene::OnDragStateChange(const std::optional<NodeType> type)
     else {
         qDebug() << "GUIScene::OnDragStateChange unreachable!?";
     }
+}
+
+// === === === === === === === === === === === === === === === === === === === === === === === === === === === === === === === === === === === === === ===
+
+void GUIScene::drawForeground(QPainter* painter, const QRectF& rect)
+{
+    m_fps_counter++;
+}
+
+void GUIScene::FPSTimerShot()
+{
+    emit FPSInfoTx(m_fps_counter);
+    m_fps_counter = 0;
 }

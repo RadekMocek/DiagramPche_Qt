@@ -30,11 +30,13 @@ class GUIScene;
 class GUISceneViewer;
 class ColorPicker;
 
-// === App config  === === === === === === === === ===
+// === App config  === === === === === === === === === === ===
 constexpr auto FONT_FAMILY_DEFAULT = "Inconsolata";
 constexpr auto DO_SHOW_PRIMARY_TOOLBAR_INIT = true;
 constexpr auto DO_SHOW_SECONDARY_TOOLBAR_INIT = true;
-// === === === === === === === === === === === === ===
+constexpr auto DO_OPEN_BENCHMARK_WINDOW_AT_STARTUP = false;
+constexpr auto DO_OPEN_PREFERENCES_WINDOW_AT_STARTUP = true;
+// === === === === === === === === === === === === === === ===
 
 class GUIMainWindow : public QMainWindow
 {
@@ -149,6 +151,7 @@ private:
     QPointer<QToolBar> m_toolbar_node_color;
     QPointer<QToolBar> m_toolbar_node_type;
     QPointer<QToolBar> m_toolbar_node_id;
+    QPointer<QToolBar> m_toolbar_scene_fps;
     // - toolbar dynamics == "tdb"
     bool m_is_some_node_selected = false;
     NodeInfo m_selected_node_info{};
@@ -156,6 +159,7 @@ private:
     QPointer<ColorPicker> m_tbd_color_picker;
     QPointer<QComboBox> m_tbd_type_combo;
     QPointer<QLabel> m_tbd_id_label;
+    QPointer<QLabel> m_tbd_fps_label;
 
     // Secondary canvas toolbar
     QPointer<QWidget> m_secondary_canvas_toolbar_wrapper;

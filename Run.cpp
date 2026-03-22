@@ -1,4 +1,5 @@
 #include <QApplication>
+#include <QStyleFactory>
 
 #include "App/GUI/Main/MainWindow.hpp"
 
@@ -9,6 +10,11 @@ int main(int argc, char* argv[])
     // --- --- --- --- --- --- --- --- --- ---
 
     QApplication app(argc, argv);
+
+    /*
+    qDebug() << QStyleFactory::keys();
+    app.setStyle(QStyleFactory::create("windowsvista"));
+    */
 
     QFontDatabase::addApplicationFont("./Resource/Font/Inconsolata-Medium.ttf");
 

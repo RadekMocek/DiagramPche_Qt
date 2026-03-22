@@ -5,6 +5,7 @@
 
 // Qt imports
 #include <QGraphicsView>
+#include <QPointer>
 
 // App imports
 #include "../../Helper/AABR.hpp"
@@ -38,8 +39,8 @@ public:
 
     // Ghost node
     [[nodiscard]] bool IsDraggingNode() const { return m_drag_state.has_value(); }
-    bool IsCursorOverViewer() const;
-    void UpdateGhostNodePositionAndVisibility(const QPointF pos);
+    [[nodiscard]] bool IsCursorOverViewer() const;
+    void UpdateGhostNodePositionAndVisibility(QPointF pos);
 
 private:
     void mousePressEvent(QGraphicsSceneMouseEvent* mouse_event) override;
@@ -57,6 +58,14 @@ private:
     std::optional<NodeType> m_drag_state;
     SceneNode m_ghost_node;
 
+    // FPS measure
+    QPointer<QTimer> m_fps_timer;
+    int m_fps_counter;
+    void drawForeground(QPainter* painter, const QRectF& rect) override;
+
+private slots:
+    void FPSTimerShot();
+
 signals:
     void EmptySpaceClicked();
     void NodeClicked(const std::string& id);
@@ -66,6 +75,8 @@ signals:
     void NodeHoverLeft();
 
     void GhostNodePlaced(NodeType type, QPoint position);
+
+    void FPSInfoTx(int fps);
 
 public slots:
     void OnDragStateChange(std::optional<NodeType> type);
