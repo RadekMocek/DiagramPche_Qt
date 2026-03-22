@@ -101,13 +101,17 @@ private:
     // AppFile.cpp
     void HandleRegularNew();
     void HandleRegularOpen();
+    bool HandleRegularSave();
+    void HandleOpenExample(const QString& filename);
     //
     void LoadSourceFromFile(const QString& filename, bool is_example);
+    bool SaveSourceToFile(const QString& filename) const;
     bool SaveSourceToFileFromDialog();
 
     // AppDialog.cpp
     QString SaveTOMLDialog();
     QString OpenTOMLDialog();
+    int UnsavedWarningDialog();
 
     // AppSource.cpp
     void ReplaceInMSource(const toml::source_region& source, const QString& new_str) const;
@@ -132,6 +136,9 @@ private:
         return m_awesome->icon((is_solid) ? fa::fa_solid : fa::fa_regular, character);
     }
 
+    // Override
+    void closeEvent(QCloseEvent* event) override;
+
     // = Members=
     // Splitter between Text editor & Canvas
     QPointer<QSplitter> m_splitter;
@@ -140,7 +147,8 @@ private:
     QPointer<QPlainTextEdit> m_source;
     QPointer<Highlighter> m_highlighter; // Syntax highlight
     std::optional<QString> m_source_filename = std::nullopt;
-    bool m_is_source_dirty = false; // Has the document been edited w/o saving the changes?
+    std::optional<QString> GetMSourceFilename();
+    void SetMSourceFilename(const std::optional<QString>& filename);
 
     // This is where diagram will be rendered
     QPointer<GUIScene> m_scene;

@@ -34,7 +34,7 @@ constexpr auto SLIDER_MAX = (CANVAS_FONT_SIZE_MAX - CANVAS_FONT_SIZE_MIN) / CANV
 
 GUIMainWindow::GUIMainWindow()
 {
-    setWindowTitle("Untitled – DiagramPche :: Qt");
+    setWindowTitle("[*] Untitled – DiagramPche :: Qt");
     resize(1280, 800);
 
     // Icons
@@ -58,7 +58,7 @@ GUIMainWindow::GUIMainWindow()
         // We have to use a timer to mark the document as non-dirty after that happens.
         // I am not sure what exactly happens under the hood but calling just `m_is_source_dirty = false;` without timer won't work.
         // It has something to do with the syntax highlighter. This issue stops when i turn off syntax highlighting.
-        m_is_source_dirty = false;
+        setWindowModified(false);
     });
 }
 
@@ -67,7 +67,7 @@ GUIMainWindow::GUIMainWindow()
 void GUIMainWindow::OnSourceChange()
 {
     //qDebug() << "OnSourceChange";
-    m_is_source_dirty = true;
+    setWindowModified(true);
     ParseAndRedraw();
 }
 
@@ -355,38 +355,44 @@ void GUIMainWindow::InitMainMenuBar()
     // .: File :.
     // .:======:.
     const QPointer file_menu = main_menu_bar->addMenu("File");
-    // . New .
-    const QPointer file_new_action = file_menu->addAction(Icon(fa::fa_file_circle_plus), "New");
-    connect(file_new_action, &QAction::triggered, [this] {
-        if (!m_is_source_dirty) {
-            HandleRegularNew();
+
+    // Helper function to DRY
+    const auto HandlePossibleUnsaved = [this](const std::function<void()>& Func) {
+        if (!isWindowModified()) {
+            Func();
         }
         else {
-            qDebug() << "todo" << m_is_source_dirty;
-            //todo
+            switch (UnsavedWarningDialog()) {
+            case QMessageBox::Save:
+                if (HandleRegularSave()) {
+                    Func();
+                }
+                break;
+            case QMessageBox::Discard:
+                Func();
+                break;
+            case QMessageBox::Cancel:
+                break;
+            default:
+                break;
+            }
         }
+    };
+
+    // . New .
+    const QPointer file_new_action = file_menu->addAction(Icon(fa::fa_file_circle_plus), "New");
+    connect(file_new_action, &QAction::triggered, [this, HandlePossibleUnsaved] {
+        HandlePossibleUnsaved([this] { HandleRegularNew(); });
     });
     // . Open .
     const QPointer file_open_action = file_menu->addAction(Icon(fa::fa_folder_open), "Open");
-    connect(file_open_action, &QAction::triggered, [this] {
-        if (!m_is_source_dirty) {
-            HandleRegularOpen();
-        }
-        else {
-            qDebug() << "todo";
-            //todo
-        }
+    connect(file_open_action, &QAction::triggered, [this, HandlePossibleUnsaved] {
+        HandlePossibleUnsaved([this] { HandleRegularOpen(); });
     });
     // . Save .
     const QPointer file_save_action = file_menu->addAction(Icon(fa::fa_floppy_disk, false), "Save");
     connect(file_save_action, &QAction::triggered, [this] {
-        if (!m_is_source_dirty) {
-            //todo
-        }
-        else {
-            qDebug() << "todo";
-            //todo
-        }
+        HandleRegularSave();
     });
     // . Save as .
     const QPointer file_saveas_action = file_menu->addAction(Icon(fa::fa_floppy_disk), "Save as");
@@ -463,15 +469,15 @@ void GUIMainWindow::InitMainMenuBar()
     const QPointer debug_render_tests_menu = debug_menu->addMenu("Render tests");
     const QPointer debug_render_test_1_action = debug_render_tests_menu->addAction("Z-axis, out-of-order");
     connect(debug_render_test_1_action, &QAction::triggered, [this] {
-        LoadSourceFromFile("./Resource/Example/Debug/Z-axis.toml", true);
+        HandleOpenExample("./Resource/Example/Debug/Z-axis.toml");
     });
     const QPointer debug_render_test_2_action = debug_render_tests_menu->addAction("Path label background");
     connect(debug_render_test_2_action, &QAction::triggered, [this] {
-        LoadSourceFromFile("./Resource/Example/Debug/PathLabel.toml", true);
+        HandleOpenExample("./Resource/Example/Debug/PathLabel.toml");
     });
     const QPointer debug_render_test_3_action = debug_render_tests_menu->addAction("Benchmark diagram");
     connect(debug_render_test_3_action, &QAction::triggered, [this] {
-        LoadSourceFromFile("./Resource/Example/Debug/Benchmark.toml", true);
+        HandleOpenExample("./Resource/Example/Debug/Benchmark.toml");
     });
     // . Benchmark .
     const QPointer debug_benchmark_action = debug_menu->addAction("Benchmark");
@@ -499,13 +505,9 @@ void GUIMainWindow::InitMainMenuBar()
     // .: Examples :.
     const QPointer examples_menu = help_menu->addMenu("Examples");
     const QPointer example_1_action = examples_menu->addAction("Example 1: CPU block diagram");
-    connect(example_1_action, &QAction::triggered, [this] {
-        LoadSourceFromFile("./Resource/Example/Example1.toml", true);
-    });
+    connect(example_1_action, &QAction::triggered, [this] { HandleOpenExample("./Resource/Example/Example1.toml"); });
     const QPointer example_2_action = examples_menu->addAction("Example 2: BPMN");
-    connect(example_2_action, &QAction::triggered, [this] {
-        LoadSourceFromFile("./Resource/Example/Example2.toml", true);
-    });
+    connect(example_2_action, &QAction::triggered, [this] { HandleOpenExample("./Resource/Example/Example2.toml"); });
     // . About .
     const QPointer about_action = help_menu->addAction("About");
     connect(about_action, &QAction::triggered, [this] {
@@ -746,4 +748,47 @@ void GUIMainWindow::InitState()
     m_state_dialog_preferences.do_show_primary_toolbar = DO_SHOW_PRIMARY_TOOLBAR_INIT;
     m_state_dialog_preferences.do_show_canvas_grid = DO_SHOW_GRID_INIT;
     m_state_dialog_preferences.do_show_secondary_toolbar = DO_SHOW_SECONDARY_TOOLBAR_INIT;
+}
+
+std::optional<QString> GUIMainWindow::GetMSourceFilename()
+{
+    return m_source_filename;
+}
+
+void GUIMainWindow::SetMSourceFilename(const std::optional<QString>& filename)
+{
+    m_source_filename = filename;
+    if (m_source_filename.has_value()) {
+        setWindowTitle(QString("[*] %1 – DiagramPche :: Qt").arg(m_source_filename.value()));
+    }
+    else {
+        setWindowTitle("[*] Untitled – DiagramPche :: Qt");
+    }
+}
+
+void GUIMainWindow::closeEvent(QCloseEvent* event)
+{
+    if (isWindowModified()) {
+        switch (UnsavedWarningDialog()) {
+        case QMessageBox::Save:
+            if (HandleRegularSave()) {
+                event->accept();
+            }
+            else {
+                event->ignore();
+            }
+            break;
+        case QMessageBox::Discard:
+            event->accept();
+            break;
+        case QMessageBox::Cancel:
+            event->ignore();
+            break;
+        default:
+            break;
+        }
+    }
+    else {
+        event->accept();
+    }
 }
