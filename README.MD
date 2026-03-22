@@ -19,11 +19,6 @@ This is part of a IMGUI paradigm research, [go back to main repo](https://github
   * [ ] Don't forget to mark the file as dirty (text change, drag'n'drop, change color, change type)
   * [ ] Unsavedwarn button icons
   * [ ] Do not allow starting the benchmark on unsaved doc; benchmark should not mark doc as dirty
-* Settings window:
-  * [ ] Turn syntax highlight on/off
-  * [ ] Appearance: color theme
-  * [ ] Option for forcing light canvas regardless of color theme
-  * [ ] Duplicate settings from app: view→grid/toolbar/toolbar2, text editor font size (so all things that can be set and saved are at one place)
 * Benchmark window:
   * [ ] Do
 
@@ -94,3 +89,4 @@ An alternative approach would be to choose the _MinGW_ component instead of _MSV
 * (visual) Icons stay black after changing to dark mode (should switch to white as the resto of the font)
 * (minor) Canvas reset scrolling after app startup not working as expected
 * (annoying) On Windows (Linux OK), when dragging canvas via RMB and then releasing RMB outside of canvas on some other widget (e.g. textedit), a context menu for that widget appears, as if we right-clicked on that widget intentionally
+* (different to IMGUI) Settings in preferences window, that can also be changed from toolbar/menubar, won't get updated immediatelly when changed from those places (they get updated after reopening the preferences window). Preferences window also has an 'apply all' button. This could be improved, but would require additional logic.

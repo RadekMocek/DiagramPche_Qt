@@ -254,12 +254,22 @@ void GUIMainWindow::ApplyPreferences() const
 {
     // (Not ideal, I am updating everything everytime. More ideal would be to check only for the changes)
     // Keep canvas light?
-    if (m_state_dialog_preferences.do_keep_canvas_light) {
-        //todo
+    m_viewer->m_is_background_light = m_state_dialog_preferences.is_canvas_light;
+    // Redraw so the color change is visible immediatelly and not only after first interaction
+    m_viewer->viewport()->update();
+    // Source font size
+    m_source_font_size_spinbox->setValue(m_state_dialog_preferences.source_font_size);
+    // Syntax highlight
+    if (m_state_dialog_preferences.is_syntax_highlight_enabled) {
+        m_highlighter->setDocument(m_source->document());
     }
     else {
-        //todo
+        m_highlighter->setDocument(nullptr);
     }
+    // View
+    m_view_primary_toolbar_checkable_action->setChecked(m_state_dialog_preferences.do_show_primary_toolbar);
+    m_view_canvas_grid_checkable_action->setChecked(m_state_dialog_preferences.do_show_canvas_grid);
+    m_view_secondary_toolbar_checkable_action->setChecked(m_state_dialog_preferences.do_show_secondary_toolbar);
 }
 
 int GUIMainWindow::GetSourceFontSize() const
@@ -351,15 +361,17 @@ void GUIMainWindow::InitMainMenuBar()
             m_preferences_dialog->activateWindow();
             return;
         }
+        // These can be set from elsewhere so need to update them in dialog state before showing it
+        m_state_dialog_preferences.source_font_size = GetSourceFontSize();
+        m_state_dialog_preferences.do_show_primary_toolbar = m_view_primary_toolbar_checkable_action->isChecked();
+        m_state_dialog_preferences.do_show_canvas_grid = m_view_canvas_grid_checkable_action->isChecked();
+        m_state_dialog_preferences.do_show_secondary_toolbar = m_view_secondary_toolbar_checkable_action->isChecked();
+        // Show dialog
         m_preferences_dialog = new PreferencesDialog(this, m_state_dialog_preferences);
         connect(m_preferences_dialog, &PreferencesDialog::ButtonApplyClicked, this, &GUIMainWindow::ApplyPreferences);
         m_preferences_dialog->setAttribute(Qt::WA_DeleteOnClose);
         m_preferences_dialog->show();
     });
-    if (DO_OPEN_PREFERENCES_WINDOW_AT_STARTUP) {
-        // ReSharper disable once CppDFAUnreachableCode
-        file_preferences_action->activate(QAction::Trigger);
-    }
     file_menu->addSeparator();
     // . Exit .
     const QPointer file_exit_action = file_menu->addAction(Icon(fa::fa_person_through_window), "Exit");
@@ -369,26 +381,26 @@ void GUIMainWindow::InitMainMenuBar()
     // .:======:.
     const QPointer view_menu = main_menu_bar->addMenu("View");
     // . Toolbar .
-    const QPointer view_canvas_toolbar_action = view_menu->addAction("Toolbar");
-    view_canvas_toolbar_action->setCheckable(true);
-    view_canvas_toolbar_action->setChecked(DO_SHOW_PRIMARY_TOOLBAR_INIT);
-    connect(view_canvas_toolbar_action, &QAction::toggled, [this](const bool is_checked) {
+    m_view_primary_toolbar_checkable_action = view_menu->addAction("Toolbar");
+    m_view_primary_toolbar_checkable_action->setCheckable(true);
+    m_view_primary_toolbar_checkable_action->setChecked(DO_SHOW_PRIMARY_TOOLBAR_INIT);
+    connect(m_view_primary_toolbar_checkable_action, &QAction::toggled, [this](const bool is_checked) {
         SetAllToolbarsVisible(is_checked);
     });
     view_menu->addSeparator();
     // . Canvas grid .
-    const QPointer view_canvas_grid_action = view_menu->addAction("Canvas grid");
-    view_canvas_grid_action->setCheckable(true);
-    view_canvas_grid_action->setChecked(DO_SHOW_GRID_INIT);
-    connect(view_canvas_grid_action, &QAction::toggled, [this](const bool is_checked) {
+    m_view_canvas_grid_checkable_action = view_menu->addAction("Canvas grid");
+    m_view_canvas_grid_checkable_action->setCheckable(true);
+    m_view_canvas_grid_checkable_action->setChecked(DO_SHOW_GRID_INIT);
+    connect(m_view_canvas_grid_checkable_action, &QAction::toggled, [this](const bool is_checked) {
         m_viewer->m_do_show_grid = is_checked;
         m_scene->update();
     });
     // . Secondary canvas toolbar .
-    const QPointer view_secondary_toolbar_action = view_menu->addAction("Secondary canvas toolbar");
-    view_secondary_toolbar_action->setCheckable(true);
-    view_secondary_toolbar_action->setChecked(DO_SHOW_SECONDARY_TOOLBAR_INIT);
-    connect(view_secondary_toolbar_action, &QAction::toggled, [this](const bool is_checked) {
+    m_view_secondary_toolbar_checkable_action = view_menu->addAction("Secondary canvas toolbar");
+    m_view_secondary_toolbar_checkable_action->setCheckable(true);
+    m_view_secondary_toolbar_checkable_action->setChecked(DO_SHOW_SECONDARY_TOOLBAR_INIT);
+    connect(m_view_secondary_toolbar_checkable_action, &QAction::toggled, [this](const bool is_checked) {
         m_secondary_canvas_toolbar_wrapper->setVisible(is_checked);
     });
     view_menu->addSeparator();
@@ -582,9 +594,6 @@ void GUIMainWindow::InitSecondaryCanvasToolbar(const QPointer<QVBoxLayout>& canv
 
 void GUIMainWindow::InitToolbar()
 {
-    constexpr auto FONT_SIZE_SOURCE_MIN = 8;
-    constexpr auto FONT_SIZE_SOURCE_MAX = 40;
-
     const auto SetupToolbar = [](QToolBar* toolbar, const bool is_last = false) {
         // Pad
         const QPointer spacer = new QWidget;
@@ -603,12 +612,12 @@ void GUIMainWindow::InitToolbar()
     // .: Toolbar :: Text edit font size :.
     m_toolbar_source_font_size = addToolBar("Text edit font size");
     m_toolbar_source_font_size->addWidget(new QLabel(" Font size: "));
-    const QPointer widget_font_size = new QSpinBox();
-    widget_font_size->setValue(GetSourceFontSize());
-    widget_font_size->setMinimum(FONT_SIZE_SOURCE_MIN);
-    widget_font_size->setMaximum(FONT_SIZE_SOURCE_MAX);
-    m_toolbar_source_font_size->addWidget(widget_font_size);
-    connect(widget_font_size, &QSpinBox::valueChanged, [this](const int value) {
+    m_source_font_size_spinbox = new QSpinBox();
+    m_source_font_size_spinbox->setValue(GetSourceFontSize());
+    m_source_font_size_spinbox->setMinimum(FONT_SIZE_SOURCE_MIN);
+    m_source_font_size_spinbox->setMaximum(FONT_SIZE_SOURCE_MAX);
+    m_toolbar_source_font_size->addWidget(m_source_font_size_spinbox);
+    connect(m_source_font_size_spinbox, &QSpinBox::valueChanged, [this](const int value) {
         SetSourceFontSize(value);
     });
     SetupToolbar(m_toolbar_source_font_size);
@@ -677,5 +686,12 @@ void GUIMainWindow::InitState()
     m_state_dialog_export.path = QDir::current().filePath("diagram.svg");
     m_state_dialog_export.action = ActionAfterExport_DoNothing;
 
-    m_state_dialog_preferences.do_keep_canvas_light = true;
+    constexpr auto IS_CANVAS_BG_LIGHT = true;
+    m_viewer->m_is_background_light = IS_CANVAS_BG_LIGHT;
+    m_state_dialog_preferences.is_canvas_light = IS_CANVAS_BG_LIGHT;
+    m_state_dialog_preferences.source_font_size = GetSourceFontSize();
+    m_state_dialog_preferences.is_syntax_highlight_enabled = true;
+    m_state_dialog_preferences.do_show_primary_toolbar = DO_SHOW_PRIMARY_TOOLBAR_INIT;
+    m_state_dialog_preferences.do_show_canvas_grid = DO_SHOW_GRID_INIT;
+    m_state_dialog_preferences.do_show_secondary_toolbar = DO_SHOW_SECONDARY_TOOLBAR_INIT;
 }

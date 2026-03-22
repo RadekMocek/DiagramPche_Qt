@@ -1,16 +1,16 @@
 #pragma once
 
-#include <QPointer>
 #include <QScrollBar>
 
 #include "Scene.hpp"
 
-// ===  GUISceneViewer config  === === === === === === === === === === ===
-inline QColor COLOR_CANVAS_BACKGROUND = QColor::fromRgb(240, 240, 240);
+// ===  GUISceneViewer config  === === === === === === === === === === === ===
+inline QColor COLOR_CANVAS_BACKGROUND_LIGHT = QColor::fromRgb(240, 240, 240);
+inline QColor COLOR_CANVAS_BACKGROUND_DARK = QColor::fromRgb(15, 15, 15);
 constexpr qreal GRID_STEP_BASE = 100.0;
 constexpr bool DO_SHOW_GRID_INIT = true;
 inline QColor COLOR_GRID_LINE = QColor::fromRgb(200, 200, 200, 40);
-// === === === === === === === === === === === === === === === === === ===
+// === === === === === === === === === === === === === === === === === === ===
 
 class GUISceneViewer : public QGraphicsView
 {
@@ -22,6 +22,7 @@ public:
     void ResetCanvasScrolling(int offset_x = 5, int offset_y = 5);
 
     bool m_do_show_grid = DO_SHOW_GRID_INIT;
+    bool m_is_background_light{};
 
 private:
     void mouseMoveEvent(QMouseEvent* event) override;

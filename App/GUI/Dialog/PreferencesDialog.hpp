@@ -4,14 +4,30 @@
 #include <QDialog>
 #include <QPointer>
 
-// === === === === === === === === ===
+// Qt fwd declrs
+QT_BEGIN_NAMESPACE
+class QRadioButton;
+class QSpinBox;
+QT_END_NAMESPACE
+
+// === === === === === === === === === === ===
 
 struct PreferencesDialogState
 {
-    bool do_keep_canvas_light;
+    bool is_canvas_light;
+    int source_font_size;
+    bool is_syntax_highlight_enabled;
+    bool do_show_primary_toolbar;
+    bool do_show_canvas_grid;
+    bool do_show_secondary_toolbar;
 };
 
-// === === === === === === === === ===
+// === === === === === === === === === === ===
+
+// === Config ==== === === === === === === ===
+constexpr auto FONT_SIZE_SOURCE_MIN = 8;
+constexpr auto FONT_SIZE_SOURCE_MAX = 40;
+// === === === === === === === === === === ===
 
 class PreferencesDialog : public QDialog
 {
@@ -24,7 +40,13 @@ private:
     PreferencesDialogState& m_state;
     void InitGUI();
 
-    QPointer<QCheckBox> m_appareance_keep_canvas_light;
+    QPointer<QRadioButton> m_appareance_canvas_light;
+    QPointer<QRadioButton> m_appareance_canvas_dark;
+    QPointer<QSpinBox> m_textedit_font_size;
+    QPointer<QCheckBox> m_textedit_syntax_highlight;
+    QPointer<QCheckBox> m_view_primary_toolbar;
+    QPointer<QCheckBox> m_view_canvas_grid;
+    QPointer<QCheckBox> m_view_secondary_toolbar;
 
 signals:
     void ButtonApplyClicked();

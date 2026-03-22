@@ -35,7 +35,6 @@ constexpr auto FONT_FAMILY_DEFAULT = "Inconsolata";
 constexpr auto DO_SHOW_PRIMARY_TOOLBAR_INIT = true;
 constexpr auto DO_SHOW_SECONDARY_TOOLBAR_INIT = true;
 constexpr auto DO_OPEN_BENCHMARK_WINDOW_AT_STARTUP = false;
-constexpr auto DO_OPEN_PREFERENCES_WINDOW_AT_STARTUP = true;
 // === === === === === === === === === === === === === === ===
 
 class GUIMainWindow : public QMainWindow
@@ -121,7 +120,7 @@ private:
     void SetGUIEnabled(bool value) const;
 
     // Icons
-    QIcon Icon(const int character, const bool is_solid = true) const
+    [[nodiscard]] QIcon Icon(const int character, const bool is_solid = true) const
     {
         return m_awesome->icon((is_solid) ? fa::fa_solid : fa::fa_regular, character);
     }
@@ -136,7 +135,7 @@ private:
 
     // This is where diagram will be rendered
     QPointer<GUIScene> m_scene;
-    int m_scene_fps;
+    int m_scene_fps{};
 
     // Parent for the scene
     QPointer<GUISceneViewer> m_viewer;
@@ -147,6 +146,12 @@ private:
 
     // MainMenuBar
     QPointer<QAction> m_view_jump_to_origin_action;
+
+    // These are in some way synced with preferences
+    QPointer<QSpinBox> m_source_font_size_spinbox;
+    QPointer<QAction> m_view_primary_toolbar_checkable_action;
+    QPointer<QAction> m_view_canvas_grid_checkable_action;
+    QPointer<QAction> m_view_secondary_toolbar_checkable_action;
 
     // Toolbar
     QPointer<QToolBar> m_toolbar_source_font_size;
@@ -171,8 +176,8 @@ private:
     QPointer<PreferencesDialog> m_preferences_dialog;
 
     // State
-    ExportSVGDialogState m_state_dialog_export;
-    PreferencesDialogState m_state_dialog_preferences;
+    ExportSVGDialogState m_state_dialog_export{};
+    PreferencesDialogState m_state_dialog_preferences{};
 
     // Benchmark
     bool m_bench_stop_flag = false;

@@ -75,7 +75,7 @@ void GUISceneViewer::wheelEvent(QWheelEvent* event)
 
 void GUISceneViewer::drawBackground(QPainter* painter, const QRectF& rect)
 {
-    painter->fillRect(rect, COLOR_CANVAS_BACKGROUND);
+    painter->fillRect(rect, (m_is_background_light) ? COLOR_CANVAS_BACKGROUND_LIGHT : COLOR_CANVAS_BACKGROUND_DARK);
     if (!m_do_show_grid) return;
 
     painter->setRenderHint(QPainter::Antialiasing, true);
