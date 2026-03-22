@@ -70,6 +70,7 @@ private:
     [[nodiscard]] std::optional<std::reference_wrapper<const Node>> GetNodeRefFromId(const std::string& id) const;
 
     // Slots:
+    void OnSourceChange();
     void OnEmptySpaceClick();
     void OnNodeClick(const std::string& id);
     void OnNodeCtrlClick(const std::string& id) const;
@@ -98,9 +99,15 @@ private:
     void ResetCanvasScrollingAndZoom() const;
 
     // AppFile.cpp
-    void HandleRegularNew() const;
+    void HandleRegularNew();
+    void HandleRegularOpen();
     //
-    void LoadSourceFromFile(const char* filename) const;
+    void LoadSourceFromFile(const QString& filename, bool is_example);
+    bool SaveSourceToFileFromDialog();
+
+    // AppDialog.cpp
+    QString SaveTOMLDialog();
+    QString OpenTOMLDialog();
 
     // AppSource.cpp
     void ReplaceInMSource(const toml::source_region& source, const QString& new_str) const;
@@ -132,6 +139,8 @@ private:
     // Text editor with the TOML describing the diagram
     QPointer<QPlainTextEdit> m_source;
     QPointer<Highlighter> m_highlighter; // Syntax highlight
+    std::optional<QString> m_source_filename = std::nullopt;
+    bool m_is_source_dirty = false; // Has the document been edited w/o saving the changes?
 
     // This is where diagram will be rendered
     QPointer<GUIScene> m_scene;

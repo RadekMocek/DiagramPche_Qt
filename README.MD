@@ -90,3 +90,4 @@ An alternative approach would be to choose the _MinGW_ component instead of _MSV
 * (minor) Canvas reset scrolling after app startup not working as expected
 * (annoying) On Windows (Linux OK), when dragging canvas via RMB and then releasing RMB outside of canvas on some other widget (e.g. textedit), a context menu for that widget appears, as if we right-clicked on that widget intentionally
 * (different to IMGUI) Settings in preferences window, that can also be changed from toolbar/menubar, won't get updated immediatelly when changed from those places (they get updated after reopening the preferences window). Preferences window also has an 'apply all' button. This could be improved, but would require additional logic.
+* (sad) Turning on syntax highlight in preferences window and hitting apply will mark the document as dirty.

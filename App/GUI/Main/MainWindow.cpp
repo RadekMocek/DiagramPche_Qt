@@ -51,9 +51,25 @@ GUIMainWindow::GUIMainWindow()
 
     // It moves the canvas but not as expected when called here
     ResetCanvasScrollingAndZoom();
+
+    // Sad but necessary
+    QTimer::singleShot(0, this, [this] {
+        // After this ctor, m_source sends signal about text being changed.
+        // We have to use a timer to mark the document as non-dirty after that happens.
+        // I am not sure what exactly happens under the hood but calling just `m_is_source_dirty = false;` without timer won't work.
+        // It has something to do with the syntax highlighter. This issue stops when i turn off syntax highlighting.
+        m_is_source_dirty = false;
+    });
 }
 
 // == Logic ==
+
+void GUIMainWindow::OnSourceChange()
+{
+    //qDebug() << "OnSourceChange";
+    m_is_source_dirty = true;
+    ParseAndRedraw();
+}
 
 void GUIMainWindow::ParseAndRedraw()
 {
@@ -252,6 +268,8 @@ void GUIMainWindow::ErrorHighlight(const toml::source_region& EH_region) const
 
 void GUIMainWindow::ApplyPreferences() const
 {
+    m_source->blockSignals(true);
+
     // (Not ideal, I am updating everything everytime. More ideal would be to check only for the changes)
     // Keep canvas light?
     m_viewer->m_is_background_light = m_state_dialog_preferences.is_canvas_light;
@@ -270,6 +288,10 @@ void GUIMainWindow::ApplyPreferences() const
     m_view_primary_toolbar_checkable_action->setChecked(m_state_dialog_preferences.do_show_primary_toolbar);
     m_view_canvas_grid_checkable_action->setChecked(m_state_dialog_preferences.do_show_canvas_grid);
     m_view_secondary_toolbar_checkable_action->setChecked(m_state_dialog_preferences.do_show_secondary_toolbar);
+
+    // This is enough to not mark doc as dirty when syntax highlighting is off.
+    // But when it's on, it sends signal after this and marks document as dirty :(.
+    m_source->blockSignals(false);
 }
 
 int GUIMainWindow::GetSourceFontSize() const
@@ -335,16 +357,42 @@ void GUIMainWindow::InitMainMenuBar()
     const QPointer file_menu = main_menu_bar->addMenu("File");
     // . New .
     const QPointer file_new_action = file_menu->addAction(Icon(fa::fa_file_circle_plus), "New");
-    //todo
+    connect(file_new_action, &QAction::triggered, [this] {
+        if (!m_is_source_dirty) {
+            HandleRegularNew();
+        }
+        else {
+            qDebug() << "todo" << m_is_source_dirty;
+            //todo
+        }
+    });
     // . Open .
     const QPointer file_open_action = file_menu->addAction(Icon(fa::fa_folder_open), "Open");
-    //todo
+    connect(file_open_action, &QAction::triggered, [this] {
+        if (!m_is_source_dirty) {
+            HandleRegularOpen();
+        }
+        else {
+            qDebug() << "todo";
+            //todo
+        }
+    });
     // . Save .
     const QPointer file_save_action = file_menu->addAction(Icon(fa::fa_floppy_disk, false), "Save");
-    //todo
+    connect(file_save_action, &QAction::triggered, [this] {
+        if (!m_is_source_dirty) {
+            //todo
+        }
+        else {
+            qDebug() << "todo";
+            //todo
+        }
+    });
     // . Save as .
     const QPointer file_saveas_action = file_menu->addAction(Icon(fa::fa_floppy_disk), "Save as");
-    //todo
+    connect(file_saveas_action, &QAction::triggered, [this] {
+        SaveSourceToFileFromDialog();
+    });
     // . Export to SVG .
     const QPointer file_export_svg_action = file_menu->addAction(Icon(fa::fa_share_from_square), "Export to SVG");
     connect(file_export_svg_action, &QAction::triggered, [this] {
@@ -415,15 +463,15 @@ void GUIMainWindow::InitMainMenuBar()
     const QPointer debug_render_tests_menu = debug_menu->addMenu("Render tests");
     const QPointer debug_render_test_1_action = debug_render_tests_menu->addAction("Z-axis, out-of-order");
     connect(debug_render_test_1_action, &QAction::triggered, [this] {
-        LoadSourceFromFile("./Resource/Example/Debug/Z-axis.toml");
+        LoadSourceFromFile("./Resource/Example/Debug/Z-axis.toml", true);
     });
     const QPointer debug_render_test_2_action = debug_render_tests_menu->addAction("Path label background");
     connect(debug_render_test_2_action, &QAction::triggered, [this] {
-        LoadSourceFromFile("./Resource/Example/Debug/PathLabel.toml");
+        LoadSourceFromFile("./Resource/Example/Debug/PathLabel.toml", true);
     });
     const QPointer debug_render_test_3_action = debug_render_tests_menu->addAction("Benchmark diagram");
     connect(debug_render_test_3_action, &QAction::triggered, [this] {
-        LoadSourceFromFile("./Resource/Example/Debug/Benchmark.toml");
+        LoadSourceFromFile("./Resource/Example/Debug/Benchmark.toml", true);
     });
     // . Benchmark .
     const QPointer debug_benchmark_action = debug_menu->addAction("Benchmark");
@@ -451,9 +499,13 @@ void GUIMainWindow::InitMainMenuBar()
     // .: Examples :.
     const QPointer examples_menu = help_menu->addMenu("Examples");
     const QPointer example_1_action = examples_menu->addAction("Example 1: CPU block diagram");
-    connect(example_1_action, &QAction::triggered, [this] { LoadSourceFromFile("./Resource/Example/Example1.toml"); });
+    connect(example_1_action, &QAction::triggered, [this] {
+        LoadSourceFromFile("./Resource/Example/Example1.toml", true);
+    });
     const QPointer example_2_action = examples_menu->addAction("Example 2: BPMN");
-    connect(example_2_action, &QAction::triggered, [this] { LoadSourceFromFile("./Resource/Example/Example2.toml"); });
+    connect(example_2_action, &QAction::triggered, [this] {
+        LoadSourceFromFile("./Resource/Example/Example2.toml", true);
+    });
     // . About .
     const QPointer about_action = help_menu->addAction("About");
     connect(about_action, &QAction::triggered, [this] {
@@ -506,7 +558,7 @@ void GUIMainWindow::InitCentralWidget()
 
     m_splitter->addWidget(m_source);
 
-    connect(m_source, &QPlainTextEdit::textChanged, this, &GUIMainWindow::ParseAndRedraw);
+    connect(m_source, &QPlainTextEdit::textChanged, this, &GUIMainWindow::OnSourceChange);
     connect(m_source, &QPlainTextEdit::cursorPositionChanged, this, &GUIMainWindow::UpdateCursorPositionInfo);
 
     // Canvas
