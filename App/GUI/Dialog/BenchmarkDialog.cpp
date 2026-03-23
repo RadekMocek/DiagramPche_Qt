@@ -1,3 +1,5 @@
+#include <QCloseEvent>
+#include <QComboBox>
 #include <QGroupBox>
 #include <QLabel>
 #include <QProgressBar>
@@ -5,13 +7,10 @@
 #include <QVBoxLayout>
 
 #include "BenchmarkDialog.hpp"
-
-#include <qevent.h>
-
 #include "../../Helper/Color.hpp"
 #include "../../Helper/CPU.hpp"
 
-BenchmarkDialog::BenchmarkDialog(QWidget* parent, const bool is_saved, BenchmarkStatsState& crate) :
+BenchmarkDialog::BenchmarkDialog(QWidget* parent, BenchmarkStatsState& crate) :
     QDialog(parent),
     m_is_benchmark_running(false),
     m_crate(crate)
@@ -20,14 +19,35 @@ BenchmarkDialog::BenchmarkDialog(QWidget* parent, const bool is_saved, Benchmark
 
     const QPointer layout = new QVBoxLayout();
 
-    m_intro_text = new QLabel("TODO");
-    layout->addWidget(m_intro_text);
+    m_group_init = new QGroupBox();
+    const QPointer group_init_layout = new QVBoxLayout();
+
+    QPalette error_text_palette;
+    error_text_palette.setColor(QPalette::WindowText, COLOR_ERROR);
+    const QPointer warning_label = new QLabel(
+        "Save your work before running the benchmark.\nRunning the benchmark will discard the current document.\n"
+    );
+    warning_label->setPalette(error_text_palette);
+    group_init_layout->addWidget(warning_label);
+
+    group_init_layout->addWidget(new QLabel("Syntax highlight may affect performance:"));
+    const QPointer button_syntax_highlight = new QPushButton("Syntax highlight on/off");
+    connect(button_syntax_highlight, &QPushButton::clicked, this, &BenchmarkDialog::ButtonSwitchSyntaxHighlightClicked);
+    group_init_layout->addWidget(button_syntax_highlight);
+
+    group_init_layout->addWidget(new QLabel("\nChoose one of the three benchmarks:"));
+    m_combo_benchmark_type = new QComboBox();
+    m_combo_benchmark_type->addItems(BENCHMARK_TYPE_NAMES);
+    group_init_layout->addWidget(m_combo_benchmark_type);
+
+    m_group_init->setLayout(group_init_layout);
+    layout->addWidget(m_group_init);
 
     // --- --- --- --- --- --- --- --- --- --- --- --- ---
 
-    m_progress_bar=new QProgressBar();
+    m_progress_bar = new QProgressBar();
     // All zeroes to make "endless" loading (undetermined progress bar)
-    m_progress_bar->setRange(0,0);
+    m_progress_bar->setRange(0, 0);
     layout->addWidget(m_progress_bar);
 
     m_group_stats = new QGroupBox("Stats");
@@ -49,9 +69,11 @@ BenchmarkDialog::BenchmarkDialog(QWidget* parent, const bool is_saved, Benchmark
 
     // --- --- --- --- --- --- --- --- --- --- --- --- ---
 
+    layout->addSpacerItem(new QSpacerItem(0, 8));
+
     m_button_start = new QPushButton("Start benchmark");
     connect(m_button_start, &QPushButton::clicked, [this] {
-        emit ButtonStartClicked();
+        emit ButtonStartClicked(static_cast<BenchmarkType>(m_combo_benchmark_type->currentIndex()));
         ChangeState(true);
     });
     layout->addWidget(m_button_start);
@@ -66,30 +88,17 @@ BenchmarkDialog::BenchmarkDialog(QWidget* parent, const bool is_saved, Benchmark
 
     setLayout(layout);
     ChangeState(false);
-
-    if (!is_saved) {
-        QPalette error_text_palette;
-        error_text_palette.setColor(QPalette::WindowText, COLOR_ERROR);
-
-        m_button_start->setVisible(false);
-        const QPointer warning_label = new QLabel(
-            "You have unsaved changes, save your work before running the benchmark.\n"
-            "(You have to reopen this window after doing that.)\n"
-            "(If you don't wish to save this, select File → New → Discard.)"
-        );
-        warning_label->setPalette(error_text_palette);
-        layout->addWidget(warning_label);
-    }
 }
 
 void BenchmarkDialog::ChangeState(const bool is_benchmark_running)
 {
     m_is_benchmark_running = is_benchmark_running;
 
-    m_intro_text->setVisible(!is_benchmark_running);
+    m_group_init->setVisible(!is_benchmark_running);
+    m_button_start->setVisible(!is_benchmark_running);
+
     m_progress_bar->setVisible(is_benchmark_running);
     m_group_stats->setVisible(is_benchmark_running);
-    m_button_start->setVisible(!is_benchmark_running);
     m_button_stop->setVisible(is_benchmark_running);
 
     if (is_benchmark_running) {
@@ -110,6 +119,11 @@ void BenchmarkDialog::OnBenchmarkStatsCrateUpdate() const
     m_stats_total_nodes->setText(QString::number(m_crate.total_nodes));
     m_stats_mem_usage_mib->setText(QString("%1 MiB").arg(m_crate.mem_usage_mib, 0, 'f', 1));
     m_stats_cpu_usage->setText(QString("%1 %").arg(CPUStats::GetCurrentValue(), 0, 'f', 1));
+}
+
+void BenchmarkDialog::OnBenchmarkDone()
+{
+    ChangeState(false);
 }
 
 void BenchmarkDialog::closeEvent(QCloseEvent* event)

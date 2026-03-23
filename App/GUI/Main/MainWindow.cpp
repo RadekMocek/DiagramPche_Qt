@@ -475,10 +475,10 @@ void GUIMainWindow::InitMainMenuBar()
     connect(debug_render_test_2_action, &QAction::triggered, [this] {
         HandleOpenExample("./Resource/Example/Debug/PathLabel.toml");
     });
-    const QPointer debug_render_test_3_action = debug_render_tests_menu->addAction("Benchmark diagram");
-    connect(debug_render_test_3_action, &QAction::triggered, [this] {
-        HandleOpenExample("./Resource/Example/Debug/Benchmark.toml");
-    });
+    const QPointer debug_render_test_3_action = debug_render_tests_menu->addAction("Benchmark light");
+    connect(debug_render_test_3_action, &QAction::triggered, [this] { HandleOpenExample(BENCHMARK_LIGHT_PATH); });
+    const QPointer debug_render_test_4_action = debug_render_tests_menu->addAction("Benchmark heavy");
+    connect(debug_render_test_4_action, &QAction::triggered, [this] { HandleOpenExample(BENCHMARK_HEAVY_PATH); });
     // . Benchmark .
     const QPointer debug_benchmark_action = debug_menu->addAction("Benchmark");
     connect(debug_benchmark_action, &QAction::triggered, [this] {
@@ -487,13 +487,16 @@ void GUIMainWindow::InitMainMenuBar()
             m_benchmark_dialog->activateWindow();
             return;
         }
-        m_benchmark_dialog = new BenchmarkDialog(this, !isWindowModified(), m_state_benchmark_stats);
+        m_benchmark_dialog = new BenchmarkDialog(this, m_state_benchmark_stats);
         m_benchmark_dialog->setAttribute(Qt::WA_DeleteOnClose);
         connect(m_benchmark_dialog, &BenchmarkDialog::ButtonStartClicked, this, &GUIMainWindow::BenchmarkStart);
         connect(m_benchmark_dialog, &BenchmarkDialog::ButtonStopClicked, this, &GUIMainWindow::BenchmarkStopForce);
+        connect(m_benchmark_dialog, &BenchmarkDialog::ButtonSwitchSyntaxHighlightClicked,
+                this, &GUIMainWindow::OnSyntaxHighlightSwitchRequest);
 
         connect(this, &GUIMainWindow::BenchmarkStatsCrateUpdated,
                 m_benchmark_dialog, &BenchmarkDialog::OnBenchmarkStatsCrateUpdate);
+        connect(this, &GUIMainWindow::BenchmarkDone, m_benchmark_dialog, &BenchmarkDialog::OnBenchmarkDone);
 
         m_benchmark_dialog->show();
     });

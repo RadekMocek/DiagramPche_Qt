@@ -10,11 +10,21 @@ This is part of a IMGUI paradigm research, [go back to main repo](https://github
 ## TODO
 
 * Benchmark window:
-  * [x] Do not allow starting the benchmark on unsaved document
-  * [x] Benchmark should not mark the document as dirty
-  * [x] Set bench-window unclosable when bench running and show loading bar
-  * [ ] Show FPS, total nodes, app ram usage, system cpu usage; win+linux
-  * [ ] Do...
+  * Before the benchmark starts:
+    * [x] Warn about benchmark discard current document
+    * [x] Allow disabling syntax highlight
+    * [x] Choose between 3 different benchmarks
+  * Do this automatically on the benchmark start:
+    * [x] Disable user interaction
+    * [ ] Reserve string space for gradual benchmark (can't do that with QPlainTextEdit?)
+    * [x] Change text/canvas layout ratio
+    * [x] Maximize the window
+    * [x] Move the bench-window window top-left of the parent
+  * During the benchmark:
+    * [x] Set bench-window unclosable when bench running and show undetermined progress bar
+    * [x] Don't mark the document as dirty
+    * [x] Show FPS, total nodes, app ram usage, system cpu usage; win+linux
+    * [ ] Record data for saving
 
 ## Building locally
 

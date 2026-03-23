@@ -10,7 +10,9 @@
 #include "../GUI/Main/Viewer.hpp"
 #include "../Helper/Color.hpp"
 
-// (In this benchmark, nodes are being added to the canvas (they are added as pairs connected by arrow))
+// (In benchmark type GRADUAL, nodes are being added to the canvas (they are added as pairs connected by arrow))
+// (While benchmarking, we also scroll and zoom, so we have some movement)
+// (Benchmarks type LIGHT and HEAVY have prepared TOML and just do scroll and zoom above them)
 // What percentage of the window's width will the text editor occupy during the benchmark
 constexpr auto TEXTEDIT_WIDTH_RATIO = 0.28f;
 // After this passes, add new batch of nodes
@@ -29,7 +31,6 @@ constexpr auto Y_COR_ADDITION = 100;
 constexpr auto MAX_ROWS = 21;
 // Used for the ending condition
 constexpr auto MAX_Y_COR = Y_COR_ADDITION * MAX_ROWS;
-// (While benchmarking, we also scroll and zoom, so we have some movement)
 // Amount of scrolling right after each node batch added
 constexpr auto AUTO_SCROLL_STEP_X = 10;
 // When to wrap to the beggining with the scrolling
@@ -49,7 +50,7 @@ void GUIMainWindow::SetGUIEnabled(const bool value) const
     centralWidget()->setEnabled(value);
 }
 
-QCoro::Task<> GUIMainWindow::BenchmarkStart()
+QCoro::Task<> GUIMainWindow::BenchmarkStart(const BenchmarkType type)
 {
     // Update state
     m_bench_stop_flag = false;
@@ -66,8 +67,11 @@ QCoro::Task<> GUIMainWindow::BenchmarkStart()
     const int textedit_width = window_width * TEXTEDIT_WIDTH_RATIO;
     m_splitter->setSizes({textedit_width, window_width - textedit_width});
 
-    // Reserve string space
+    // Reserve string space if type == BENCHMARK_GRADUAL
     // Can't do that with QPlainTextEdit?
+
+    // Maximize the window
+    setWindowState(Qt::WindowMaximized);
 
     qDebug() << "Benchmark started.";
     // --- --- --- --- --- --- --- ---
@@ -89,15 +93,26 @@ QCoro::Task<> GUIMainWindow::BenchmarkStart()
     timer.start();
 
     // The benchmark
+    if (type == BENCHMARK_LIGHT) {
+        HandleOpenExample(BENCHMARK_LIGHT_PATH);
+    }
+    else if (type == BENCHMARK_HEAVY) {
+        HandleOpenExample(BENCHMARK_HEAVY_PATH);
+    }
+
     while (true) {
         if (m_bench_stop_flag) {
             qDebug() << "Benchmark stopped.";
             SetGUIEnabled(true);
             setWindowModified(false);
+            emit BenchmarkDone();
             co_return;
         }
         // Do the next batch only when certain amount of time has passed
         co_await timer;
+
+        // Keep dialog top left
+        m_benchmark_dialog->move(m_benchmark_dialog->parentWidget()->geometry().topLeft());
 
         // Zoom frenzy
         zoom_level = (zoom_level + 1) % ZOOM_LEVEL_MODULO; // 0,1,2,3,4,5
@@ -106,16 +121,20 @@ QCoro::Task<> GUIMainWindow::BenchmarkStart()
         // Add a new batch of nodes
         for (int i = 0; i < N_NODES_IN_INTERVAL; i++) {
             const auto z = node_counter_row_pairs % Z_MODULO;
-            m_source->appendPlainText(
-                QString(
-                    "[node.\"A%1\"]\nxy=[%2,%3]\nz=%4\ncolor=[%5,%6,%7,128]\n"
-                    "[node.\"B%8\"]\nxy=[\"A%9\",\"bottom-right\",10,10]\nz=%10\ntype=\"ellipse\"\n"
-                    "[[path]]\nstart=[\"A%11\",\"left\",0,0]\nend=[\"B%12\",\"right\",0,0]\n"
-                )
-                .arg(node_counter_total_pairs).arg(x_cor).arg(y_cor).arg(z).arg(color_r).arg(color_g).arg(color_b)
-                .arg(node_counter_total_pairs).arg(node_counter_total_pairs).arg(z)
-                .arg(node_counter_total_pairs).arg(node_counter_total_pairs)
-            );
+
+            if (type == BENCHMARK_GRADUAL) {
+                m_source->appendPlainText(
+                    QString(
+                        "[node.\"A%1\"]\nxy=[%2,%3]\nz=%4\ncolor=[%5,%6,%7,128]\n"
+                        "[node.\"B%8\"]\nxy=[\"A%9\",\"bottom-right\",10,10]\nz=%10\ntype=\"ellipse\"\n"
+                        "[[path]]\nstart=[\"A%11\",\"left\",0,0]\nend=[\"B%12\",\"right\",0,0]\n"
+                    )
+                    .arg(node_counter_total_pairs).arg(x_cor).arg(y_cor).arg(z).arg(color_r).arg(color_g).arg(color_b)
+                    .arg(node_counter_total_pairs).arg(node_counter_total_pairs).arg(z)
+                    .arg(node_counter_total_pairs).arg(node_counter_total_pairs)
+                );
+            }
+
             // Update values for next iteration
             node_counter_total_pairs++;
             node_counter_row_pairs++;
@@ -125,8 +144,8 @@ QCoro::Task<> GUIMainWindow::BenchmarkStart()
         }
 
         // Auto scrolling
-        scrolling_x += AUTO_SCROLL_STEP_X;
-        if (scrolling_x > AUTO_SCROLL_MODULO_X) {
+        scrolling_x -= AUTO_SCROLL_STEP_X;
+        if (scrolling_x < -AUTO_SCROLL_MODULO_X) {
             scrolling_x = 0;
         }
         m_viewer->ResetCanvasScrolling(scrolling_x, 0);
@@ -161,4 +180,15 @@ QCoro::Task<> GUIMainWindow::BenchmarkStart()
     // Enable everything
     SetGUIEnabled(true);
     setWindowModified(false);
+    emit BenchmarkDone();
+}
+
+void GUIMainWindow::OnSyntaxHighlightSwitchRequest() const
+{
+    if (m_highlighter->document()) {
+        m_highlighter->setDocument(nullptr);
+    }
+    else {
+        m_highlighter->setDocument(m_source->document());
+    }
 }

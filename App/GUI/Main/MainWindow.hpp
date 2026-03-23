@@ -30,6 +30,9 @@ class GUIScene;
 class GUISceneViewer;
 class ColorPicker;
 
+constexpr auto BENCHMARK_LIGHT_PATH = "./Resource/Example/Debug/BenchmarkLight.toml";
+constexpr auto BENCHMARK_HEAVY_PATH = "./Resource/Example/Debug/BenchmarkHeavy.toml";
+
 // === App config  === === === === === === === === === === ===
 constexpr auto FONT_FAMILY_DEFAULT = "Inconsolata";
 constexpr auto DO_SHOW_PRIMARY_TOOLBAR_INIT = true;
@@ -126,9 +129,10 @@ private:
     void InitState();
 
     // Benchmark
-    QCoro::Task<> BenchmarkStart();
+    QCoro::Task<> BenchmarkStart(BenchmarkType type);
     void BenchmarkStopForce() { m_bench_stop_flag = true; }
     void SetGUIEnabled(bool value) const;
+    void OnSyntaxHighlightSwitchRequest() const;
 
     // Icons
     [[nodiscard]] QIcon Icon(const int character, const bool is_solid = true) const
@@ -205,4 +209,5 @@ private:
 
 signals:
     void BenchmarkStatsCrateUpdated();
+    void BenchmarkDone();
 };
