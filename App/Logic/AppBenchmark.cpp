@@ -93,6 +93,7 @@ QCoro::Task<> GUIMainWindow::BenchmarkStart()
         if (m_bench_stop_flag) {
             qDebug() << "Benchmark stopped.";
             SetGUIEnabled(true);
+            setWindowModified(false);
             co_return;
         }
         // Do the next batch only when certain amount of time has passed
@@ -143,7 +144,10 @@ QCoro::Task<> GUIMainWindow::BenchmarkStart()
         const auto mem_usage_mib = static_cast<double>(getCurrentRSS()) / MIBI;
 
         // Report to GUI
-        emit BenchmarkStatsTx(node_counter_total, mem_usage_mib);
+        m_state_benchmark_stats.scene_fps = m_scene_fps;
+        m_state_benchmark_stats.total_nodes = node_counter_total;
+        m_state_benchmark_stats.mem_usage_mib = mem_usage_mib;
+        emit BenchmarkStatsCrateUpdated();
 
         // TODO LOG
 
@@ -156,4 +160,5 @@ QCoro::Task<> GUIMainWindow::BenchmarkStart()
 
     // Enable everything
     SetGUIEnabled(true);
+    setWindowModified(false);
 }

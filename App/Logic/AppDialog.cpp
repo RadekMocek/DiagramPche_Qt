@@ -19,7 +19,7 @@ int GUIMainWindow::UnsavedWarningDialog()
 
     QMessageBox dialog;
     dialog.setText("You have unsaved changes");
-    dialog.setInformativeText(QString("Do you want to save changes to\n'%1'?").arg(filename));
+    dialog.setInformativeText(QString("Do you want to save changes to '%1'?").arg(filename));
     dialog.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
     dialog.setDefaultButton(QMessageBox::Save);
     return dialog.exec();

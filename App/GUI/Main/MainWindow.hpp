@@ -34,7 +34,7 @@ class ColorPicker;
 constexpr auto FONT_FAMILY_DEFAULT = "Inconsolata";
 constexpr auto DO_SHOW_PRIMARY_TOOLBAR_INIT = true;
 constexpr auto DO_SHOW_SECONDARY_TOOLBAR_INIT = true;
-constexpr auto DO_OPEN_BENCHMARK_WINDOW_AT_STARTUP = false;
+constexpr auto DO_OPEN_BENCHMARK_WINDOW_AT_STARTUP = true;
 // === === === === === === === === === === === === === === ===
 
 class GUIMainWindow : public QMainWindow
@@ -195,6 +195,7 @@ private:
     // State
     ExportSVGDialogState m_state_dialog_export{};
     PreferencesDialogState m_state_dialog_preferences{};
+    BenchmarkStatsState m_state_benchmark_stats{};
 
     // Benchmark
     bool m_bench_stop_flag = false;
@@ -203,5 +204,5 @@ private:
     QPointer<fa::QtAwesome> m_awesome;
 
 signals:
-    void BenchmarkStatsTx(int total_nodes, double mem_usage_mib);
+    void BenchmarkStatsCrateUpdated();
 };

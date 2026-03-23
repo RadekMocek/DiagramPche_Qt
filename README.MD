@@ -10,8 +10,11 @@ This is part of a IMGUI paradigm research, [go back to main repo](https://github
 ## TODO
 
 * Benchmark window:
-  * [ ] Do not allow starting the benchmark on unsaved doc; benchmark should not mark doc as dirty
-  * [ ] Do
+  * [x] Do not allow starting the benchmark on unsaved document
+  * [x] Benchmark should not mark the document as dirty
+  * [x] Set bench-window unclosable when bench running and show loading bar
+  * [ ] Show FPS, total nodes, app ram usage, system cpu usage; win+linux
+  * [ ] Do...
 
 ## Building locally
 
@@ -65,6 +68,7 @@ An alternative approach would be to choose the _MinGW_ component instead of _MSV
 * [toml++](https://github.com/marzer/tomlplusplus) ([MIT](https://github.com/marzer/tomlplusplus/blob/master/LICENSE))
 * [qcoro](https://github.com/qcoro/qcoro) ([MIT](https://github.com/qcoro/qcoro/blob/main/LICENSE))
 * David Robert Nadeau's `getCurrentRSS` (CC BY 3.0)
+* [cpp-linux-system-stats](https://github.com/improvess/cpp-linux-system-stats) ([Apache-2.0](https://github.com/improvess/cpp-linux-system-stats/blob/main/LICENSE))
 
 <br>
 

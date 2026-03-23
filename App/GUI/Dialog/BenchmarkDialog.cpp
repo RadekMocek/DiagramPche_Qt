@@ -1,11 +1,20 @@
 #include <QGroupBox>
 #include <QLabel>
+#include <QProgressBar>
 #include <QPushButton>
 #include <QVBoxLayout>
 
 #include "BenchmarkDialog.hpp"
 
-BenchmarkDialog::BenchmarkDialog(QWidget* parent) : QDialog(parent)
+#include <qevent.h>
+
+#include "../../Helper/Color.hpp"
+#include "../../Helper/CPU.hpp"
+
+BenchmarkDialog::BenchmarkDialog(QWidget* parent, const bool is_saved, BenchmarkStatsState& crate) :
+    QDialog(parent),
+    m_is_benchmark_running(false),
+    m_crate(crate)
 {
     setWindowTitle("Benchmark");
 
@@ -16,15 +25,24 @@ BenchmarkDialog::BenchmarkDialog(QWidget* parent) : QDialog(parent)
 
     // --- --- --- --- --- --- --- --- --- --- --- --- ---
 
+    m_progress_bar=new QProgressBar();
+    // All zeroes to make "endless" loading (undetermined progress bar)
+    m_progress_bar->setRange(0,0);
+    layout->addWidget(m_progress_bar);
+
     m_group_stats = new QGroupBox("Stats");
     const QPointer group_stats_layout = new QGridLayout();
 
-    group_stats_layout->addWidget(new QLabel("Total nodes drawn: "), 0, 0, Qt::AlignRight);
-    m_stats_total_nodes = new QLabel("?");
-    group_stats_layout->addWidget(m_stats_total_nodes, 0, 1);
-    group_stats_layout->addWidget(new QLabel("Working set size: "), 1, 0, Qt::AlignRight);
-    m_stats_mem_usage_mib = new QLabel("?");
-    group_stats_layout->addWidget(m_stats_mem_usage_mib, 1, 1);
+    const auto AddRow = [group_stats_layout](const char* name, QPointer<QLabel>& member, const int row_n) {
+        group_stats_layout->addWidget(new QLabel(name), row_n, 0, Qt::AlignRight);
+        member = new QLabel("?");
+        group_stats_layout->addWidget(member, row_n, 1);
+    };
+
+    AddRow("Scene framerate: ", m_stats_scene_fps, 0);
+    AddRow("Total nodes drawn: ", m_stats_total_nodes, 1);
+    AddRow("Working set size: ", m_stats_mem_usage_mib, 2);
+    AddRow("System CPU usage: ", m_stats_cpu_usage, 3);
 
     m_group_stats->setLayout(group_stats_layout);
     layout->addWidget(m_group_stats);
@@ -48,18 +66,58 @@ BenchmarkDialog::BenchmarkDialog(QWidget* parent) : QDialog(parent)
 
     setLayout(layout);
     ChangeState(false);
+
+    if (!is_saved) {
+        QPalette error_text_palette;
+        error_text_palette.setColor(QPalette::WindowText, COLOR_ERROR);
+
+        m_button_start->setVisible(false);
+        const QPointer warning_label = new QLabel(
+            "You have unsaved changes, save your work before running the benchmark.\n"
+            "(You have to reopen this window after doing that.)\n"
+            "(If you don't wish to save this, select File → New → Discard.)"
+        );
+        warning_label->setPalette(error_text_palette);
+        layout->addWidget(warning_label);
+    }
 }
 
-void BenchmarkDialog::ChangeState(const bool is_benchmark_running) const
+void BenchmarkDialog::ChangeState(const bool is_benchmark_running)
 {
+    m_is_benchmark_running = is_benchmark_running;
+
     m_intro_text->setVisible(!is_benchmark_running);
+    m_progress_bar->setVisible(is_benchmark_running);
     m_group_stats->setVisible(is_benchmark_running);
     m_button_start->setVisible(!is_benchmark_running);
     m_button_stop->setVisible(is_benchmark_running);
+
+    if (is_benchmark_running) {
+        // Hide close button
+        setWindowFlags(Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint);
+        show();
+    }
+    else {
+        // Restore close button
+        setWindowFlags(Qt::Dialog);
+        show();
+    }
 }
 
-void BenchmarkDialog::BenchmarkStatsRx(const int total_nodes, const double mem_usage_mib) const
+void BenchmarkDialog::OnBenchmarkStatsCrateUpdate() const
 {
-    m_stats_total_nodes->setText(QString::number(total_nodes));
-    m_stats_mem_usage_mib->setText(QString("%1 MiB").arg(mem_usage_mib, 0, 'f', 1));
+    m_stats_scene_fps->setText(QString("%1 FPS").arg(m_crate.scene_fps));
+    m_stats_total_nodes->setText(QString::number(m_crate.total_nodes));
+    m_stats_mem_usage_mib->setText(QString("%1 MiB").arg(m_crate.mem_usage_mib, 0, 'f', 1));
+    m_stats_cpu_usage->setText(QString("%1 %").arg(CPUStats::GetCurrentValue(), 0, 'f', 1));
+}
+
+void BenchmarkDialog::closeEvent(QCloseEvent* event)
+{
+    if (m_is_benchmark_running) {
+        event->ignore();
+    }
+    else {
+        event->accept();
+    }
 }

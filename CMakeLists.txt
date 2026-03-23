@@ -45,7 +45,7 @@ add_executable("${BINARY_NAME}"
 )
 
 # == Link libraries ==
-target_link_libraries("${BINARY_NAME}"
+target_link_libraries("${BINARY_NAME}" PRIVATE
         Qt6::Widgets
         Qt6::Svg
         QtAwesome
@@ -55,8 +55,12 @@ target_link_libraries("${BINARY_NAME}"
 # == Misc ==
 if (MSVC)
     target_compile_definitions("${CMAKE_PROJECT_NAME}" PUBLIC _CRT_SECURE_NO_WARNINGS)
-    target_compile_definitions("${CMAKE_PROJECT_NAME}" PUBLIC NOMINMAX)
     #set_target_properties("${CMAKE_PROJECT_NAME}" PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup") # No console
+endif ()
+
+if (WIN32)
+    target_link_libraries("${BINARY_NAME}" PRIVATE pdh)
+    target_compile_definitions("${CMAKE_PROJECT_NAME}" PUBLIC NOMINMAX)
 endif ()
 
 # == Resources ==

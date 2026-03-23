@@ -487,11 +487,14 @@ void GUIMainWindow::InitMainMenuBar()
             m_benchmark_dialog->activateWindow();
             return;
         }
-        m_benchmark_dialog = new BenchmarkDialog(this);
+        m_benchmark_dialog = new BenchmarkDialog(this, !isWindowModified(), m_state_benchmark_stats);
         m_benchmark_dialog->setAttribute(Qt::WA_DeleteOnClose);
         connect(m_benchmark_dialog, &BenchmarkDialog::ButtonStartClicked, this, &GUIMainWindow::BenchmarkStart);
         connect(m_benchmark_dialog, &BenchmarkDialog::ButtonStopClicked, this, &GUIMainWindow::BenchmarkStopForce);
-        connect(this, &GUIMainWindow::BenchmarkStatsTx, m_benchmark_dialog, &BenchmarkDialog::BenchmarkStatsRx);
+
+        connect(this, &GUIMainWindow::BenchmarkStatsCrateUpdated,
+                m_benchmark_dialog, &BenchmarkDialog::OnBenchmarkStatsCrateUpdate);
+
         m_benchmark_dialog->show();
     });
     if (DO_OPEN_BENCHMARK_WINDOW_AT_STARTUP) {

@@ -3,9 +3,12 @@
 #include <QStyleHints>
 
 #include "App/GUI/Main/MainWindow.hpp"
+#include "App/Helper/CPU.hpp"
 
 int main(int argc, char* argv[])
 {
+    CPUStats::Init();
+
     // --- App config  --- --- --- --- --- ---
     constexpr auto FONT_SIZE_DEFAULT = 20;
     // --- --- --- --- --- --- --- --- --- ---
