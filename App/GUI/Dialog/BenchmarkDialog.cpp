@@ -8,7 +8,6 @@
 
 #include "BenchmarkDialog.hpp"
 #include "../../Helper/Color.hpp"
-#include "../../Helper/CPU.hpp"
 
 BenchmarkDialog::BenchmarkDialog(QWidget* parent, BenchmarkStatsState& crate) :
     QDialog(parent),
@@ -118,7 +117,7 @@ void BenchmarkDialog::OnBenchmarkStatsCrateUpdate() const
     m_stats_scene_fps->setText(QString("%1 FPS").arg(m_crate.scene_fps));
     m_stats_total_nodes->setText(QString::number(m_crate.total_nodes));
     m_stats_mem_usage_mib->setText(QString("%1 MiB").arg(m_crate.mem_usage_mib, 0, 'f', 1));
-    m_stats_cpu_usage->setText(QString("%1 %").arg(CPUStats::GetCurrentValue(), 0, 'f', 1));
+    m_stats_cpu_usage->setText(QString("%1 %").arg(m_crate.cpu_usage_system, 0, 'f', 1));
 }
 
 void BenchmarkDialog::OnBenchmarkDone()

@@ -8,7 +8,9 @@
 
 #include "../GUI/Main/MainWindow.hpp"
 #include "../GUI/Main/Viewer.hpp"
+#include "../Helper/BenchmarkCSV.hpp"
 #include "../Helper/Color.hpp"
+#include "../Helper/CPU.hpp"
 
 // (In benchmark type GRADUAL, nodes are being added to the canvas (they are added as pairs connected by arrow))
 // (While benchmarking, we also scroll and zoom, so we have some movement)
@@ -37,6 +39,9 @@ constexpr auto AUTO_SCROLL_STEP_X = 10;
 constexpr auto AUTO_SCROLL_MODULO_X = 600;
 // How many zoom levels we iterate, this corresponds to the slider and MW behavior
 constexpr auto ZOOM_LEVEL_MODULO = 6;
+// Precalculated
+constexpr auto BENCHMARK_LIGHT_N_NODES = 12;
+constexpr auto BENCHMARK_HEAVY_N_NODES = 10780;
 
 void GUIMainWindow::SetGUIEnabled(const bool value) const
 {
@@ -73,10 +78,8 @@ QCoro::Task<> GUIMainWindow::BenchmarkStart(const BenchmarkType type)
     // Maximize the window
     setWindowState(Qt::WindowMaximized);
 
-    qDebug() << "Benchmark started.";
-    // --- --- --- --- --- --- --- ---
-
     // Initialize helper variables
+    auto node_counter_total = 0;
     int node_counter_total_pairs = 0;
     int node_counter_row_pairs = 0;
     int x_cor = 0;
@@ -87,18 +90,29 @@ QCoro::Task<> GUIMainWindow::BenchmarkStart(const BenchmarkType type)
     int zoom_level = 0;
     int scrolling_x = 0;
 
+    // Init log vars
+    int log_index = 0;
+    BenchmarkLogResults log_data{};
+
     // Set up timer
     QTimer timer;
     timer.setInterval(TIME_INTERVAL);
     timer.start();
 
+    // --- --- --- --- --- --- --- ---
     // The benchmark
     if (type == BENCHMARK_LIGHT) {
         HandleOpenExample(BENCHMARK_LIGHT_PATH);
+        node_counter_total = BENCHMARK_LIGHT_N_NODES;
     }
     else if (type == BENCHMARK_HEAVY) {
         HandleOpenExample(BENCHMARK_HEAVY_PATH);
+        node_counter_total = BENCHMARK_HEAVY_N_NODES;
     }
+
+    const auto time_start = std::chrono::steady_clock::now();
+
+    qDebug() << "Benchmark started.";
 
     while (true) {
         if (m_bench_stop_flag) {
@@ -120,9 +134,8 @@ QCoro::Task<> GUIMainWindow::BenchmarkStart(const BenchmarkType type)
 
         // Add a new batch of nodes
         for (int i = 0; i < N_NODES_IN_INTERVAL; i++) {
-            const auto z = node_counter_row_pairs % Z_MODULO;
-
             if (type == BENCHMARK_GRADUAL) {
+                const auto z = node_counter_row_pairs % Z_MODULO;
                 m_source->appendPlainText(
                     QString(
                         "[node.\"A%1\"]\nxy=[%2,%3]\nz=%4\ncolor=[%5,%6,%7,128]\n"
@@ -134,7 +147,6 @@ QCoro::Task<> GUIMainWindow::BenchmarkStart(const BenchmarkType type)
                     .arg(node_counter_total_pairs).arg(node_counter_total_pairs)
                 );
             }
-
             // Update values for next iteration
             node_counter_total_pairs++;
             node_counter_row_pairs++;
@@ -158,21 +170,40 @@ QCoro::Task<> GUIMainWindow::BenchmarkStart(const BenchmarkType type)
         }
 
         // Stats
-        const auto node_counter_total = 2 * node_counter_total_pairs;
+        if (type == BENCHMARK_GRADUAL) {
+            node_counter_total = 2 * node_counter_total_pairs;
+        }
         constexpr auto MIBI = 1024.0 * 1024.0;
         const auto mem_usage_mib = static_cast<double>(getCurrentRSS()) / MIBI;
 
         // Report to GUI
-        m_state_benchmark_stats.scene_fps = m_scene_fps;
-        m_state_benchmark_stats.total_nodes = node_counter_total;
-        m_state_benchmark_stats.mem_usage_mib = mem_usage_mib;
-        emit BenchmarkStatsCrateUpdated();
+        if (zoom_level % 3 == 1) {
+            const auto cpu_usage = CPUStats::GetCurrentValue();
 
-        // TODO LOG
+            m_state_benchmark_stats.scene_fps = m_scene_fps;
+            m_state_benchmark_stats.total_nodes = node_counter_total;
+            m_state_benchmark_stats.mem_usage_mib = mem_usage_mib;
+            m_state_benchmark_stats.cpu_usage_system = cpu_usage;
+            emit BenchmarkStatsCrateUpdated();
+
+            // LOG
+            log_data.timestamp[log_index] = ChronoTrigger(time_start).count();
+            log_data.fps[log_index] = m_scene_fps;
+            log_data.n_nodes[log_index] = node_counter_total;
+            log_data.mem_mib[log_index] = mem_usage_mib;
+            log_data.cpu_usage[log_index] = cpu_usage;
+            log_index++;
+        }
 
         // End the benchmark check
         if (y_cor > MAX_Y_COR) {
             qDebug() << "Benchmark done.";
+            if (const auto filename = "./results.csv"; WriteBenchmarkResultsToCSV(filename, log_data)) {
+                qDebug() << "Benchmark data written to '" << filename << "'.";
+            }
+            else {
+                qDebug() << "Error writing benchmark data to file.";
+            }
             break;
         }
     }

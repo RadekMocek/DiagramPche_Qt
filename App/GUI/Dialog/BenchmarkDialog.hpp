@@ -19,6 +19,7 @@ struct BenchmarkStatsState
     int scene_fps;
     int total_nodes;
     double mem_usage_mib;
+    float cpu_usage_system;
 };
 
 // === === === === === === === === ===

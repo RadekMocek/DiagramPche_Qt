@@ -24,7 +24,9 @@ This is part of a IMGUI paradigm research, [go back to main repo](https://github
     * [x] Set bench-window unclosable when bench running and show undetermined progress bar
     * [x] Don't mark the document as dirty
     * [x] Show FPS, total nodes, app ram usage, system cpu usage; win+linux
-    * [ ] Record data for saving
+    * [x] Record shown data with timestamp
+  * Post:
+    * [x] Export to CSV
 
 ## Building locally
 
