@@ -1,6 +1,8 @@
 #pragma once
 
 #include <array>
+#include <chrono>
+#include <fstream>
 
 constexpr auto LOG_CAPACITY = 52;
 
@@ -42,4 +44,11 @@ template <
 auto ChronoTrigger(std::chrono::time_point<clock_t, duration_t> const& time_start)
 {
     return std::chrono::duration_cast<result_t>(clock_t::now() - time_start);
+}
+
+inline long long GetUNIXTimestamp()
+{
+    return std::chrono::duration_cast<std::chrono::seconds>(
+        std::chrono::system_clock::now().time_since_epoch()
+    ).count();
 }

@@ -173,13 +173,13 @@ QCoro::Task<> GUIMainWindow::BenchmarkStart(const BenchmarkType type)
         if (type == BENCHMARK_GRADUAL) {
             node_counter_total = 2 * node_counter_total_pairs;
         }
-        constexpr auto MIBI = 1024.0 * 1024.0;
-        const auto mem_usage_mib = static_cast<double>(getCurrentRSS()) / MIBI;
 
-        // Report to GUI
         if (zoom_level % 3 == 1) {
+            constexpr auto MIBI = 1024.0 * 1024.0;
+            const auto mem_usage_mib = static_cast<double>(getCurrentRSS()) / MIBI;
             const auto cpu_usage = CPUStats::GetCurrentValue();
 
+            // Report to GUI
             m_state_benchmark_stats.scene_fps = m_scene_fps;
             m_state_benchmark_stats.total_nodes = node_counter_total;
             m_state_benchmark_stats.mem_usage_mib = mem_usage_mib;
@@ -198,8 +198,11 @@ QCoro::Task<> GUIMainWindow::BenchmarkStart(const BenchmarkType type)
         // End the benchmark check
         if (y_cor > MAX_Y_COR) {
             qDebug() << "Benchmark done.";
-            if (const auto filename = "./results.csv"; WriteBenchmarkResultsToCSV(filename, log_data)) {
-                qDebug() << "Benchmark data written to '" << filename << "'.";
+            // ReSharper disable once CppTooWideScopeInitStatement
+            const auto filename = QString("./BenchStats_Qt_%1_%2.csv").arg(type).arg(GetUNIXTimestamp());
+
+            if (WriteBenchmarkResultsToCSV(filename.toUtf8(), log_data)) {
+                qDebug() << "Benchmark data written to:" << filename;
             }
             else {
                 qDebug() << "Error writing benchmark data to file.";

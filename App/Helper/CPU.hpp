@@ -1,7 +1,6 @@
 #pragma once
 
 #ifdef _WIN32
-#include "TCHAR.h"
 #include "pdh.h"
 #else
 #include "../../Dependency/linux-system-usage.hpp"
@@ -23,11 +22,11 @@ public:
 #ifdef _WIN32
         // "Creates a new query that is used to manage the collection of performance data."
         // Params: [where to collect data, null means realtime] [tag to retrieve data later, not needed] [the handle we'll use to monitor the performance]
-        PdhOpenQuery(nullptr, NULL, &cpu_query);
+        PdhOpenQueryW(nullptr, 0, &cpu_query);
 
         // "Adds the specified language-neutral counter to the query."
         // Params: [handle] [counter path] [tag to retrieve data later, not needed] [counter handle]
-        PdhAddEnglishCounter(cpu_query, L"\\Processor(_Total)\\% Processor Time", NULL, &cpu_total);
+        PdhAddEnglishCounterW(cpu_query, L"\\Processor(_Total)\\% Processor Time", 0, &cpu_total);
 
         // "Collects the current raw data value for all counters in the specified query and updates the status code of each counter."
         PdhCollectQueryData(cpu_query);
