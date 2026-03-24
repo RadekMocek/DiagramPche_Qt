@@ -69,7 +69,7 @@ QCoro::Task<> GUIMainWindow::BenchmarkStart(const BenchmarkType type)
 
     // Change the ratio between textedit and canvas to make canvas bigger (more things to see)
     const auto window_width = width();
-    const int textedit_width = window_width * TEXTEDIT_WIDTH_RATIO;
+    const int textedit_width = window_width * TEXTEDIT_WIDTH_RATIO; // NOLINT(*-narrowing-conversions)
     m_splitter->setSizes({textedit_width, window_width - textedit_width});
 
     // Reserve string space if type == BENCHMARK_GRADUAL
@@ -132,27 +132,35 @@ QCoro::Task<> GUIMainWindow::BenchmarkStart(const BenchmarkType type)
         zoom_level = (zoom_level + 1) % ZOOM_LEVEL_MODULO; // 0,1,2,3,4,5
         m_secondary_canvas_toolbar_slider->setValue(zoom_level); // Callback will handle the zoom
 
-        // Add a new batch of nodes
-        for (int i = 0; i < N_NODES_IN_INTERVAL; i++) {
-            if (type == BENCHMARK_GRADUAL) {
+        if (type == BENCHMARK_GRADUAL) {
+            QString batch;
+            batch.reserve(188);
+            for (int i = 0; i < N_NODES_IN_INTERVAL; i++) {
                 const auto z = node_counter_row_pairs % Z_MODULO;
-                m_source->appendPlainText(
-                    QString(
-                        "[node.\"A%1\"]\nxy=[%2,%3]\nz=%4\ncolor=[%5,%6,%7,128]\n"
-                        "[node.\"B%8\"]\nxy=[\"A%9\",\"bottom-right\",10,10]\nz=%10\ntype=\"ellipse\"\n"
-                        "[[path]]\nstart=[\"A%11\",\"left\",0,0]\nend=[\"B%12\",\"right\",0,0]\n"
-                    )
-                    .arg(node_counter_total_pairs).arg(x_cor).arg(y_cor).arg(z).arg(color_r).arg(color_g).arg(color_b)
-                    .arg(node_counter_total_pairs).arg(node_counter_total_pairs).arg(z)
-                    .arg(node_counter_total_pairs).arg(node_counter_total_pairs)
-                );
+                batch += QString(
+                             "[node.\"A%1\"]\nxy=[%2,%3]\nz=%4\ncolor=[%5,%6,%7,128]\n"
+                             "[node.\"B%8\"]\nxy=[\"A%9\",\"bottom-right\",10,10]\nz=%10\ntype=\"ellipse\"\n"
+                             "[[path]]\nstart=[\"A%11\",\"left\",0,0]\nend=[\"B%12\",\"right\",0,0]\n"
+                         )
+                         .arg(node_counter_total_pairs).arg(x_cor).arg(y_cor).arg(z).arg(color_r).arg(color_g).arg(
+                             color_b)
+                         .arg(node_counter_total_pairs).arg(node_counter_total_pairs).arg(z)
+                         .arg(node_counter_total_pairs).arg(node_counter_total_pairs);
+
+                node_counter_total_pairs++;
+                node_counter_row_pairs++;
+                x_cor += X_COR_ADDITION;
+                BenchmarkChangeColor(color_r, color_g, color_b, zoom_level);
             }
-            // Update values for next iteration
-            node_counter_total_pairs++;
-            node_counter_row_pairs++;
-            x_cor += X_COR_ADDITION;
-            // Modify the color for next node; accepts number from 0 to 5 as last param to shuffle things up, we can use zoom level
-            BenchmarkChangeColor(color_r, color_g, color_b, zoom_level);
+            m_source->appendPlainText(batch);
+        }
+        else {
+            for (int i = 0; i < N_NODES_IN_INTERVAL; i++) {
+                node_counter_total_pairs++;
+                node_counter_row_pairs++;
+                x_cor += X_COR_ADDITION;
+                BenchmarkChangeColor(color_r, color_g, color_b, zoom_level);
+            }
         }
 
         // Auto scrolling
