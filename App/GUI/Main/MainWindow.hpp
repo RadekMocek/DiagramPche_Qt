@@ -134,11 +134,14 @@ private:
     void InitToolbar();
     void InitState();
 
-    // Benchmark
+    // Benchmark nodes
     QCoro::Task<> BenchmarkStart(BenchmarkType type);
     void BenchmarkStopForce() { m_bench_stop_flag = true; }
     void SetGUIEnabled(bool value) const;
     void OnSyntaxHighlightSwitchRequest() const;
+
+    // Benchmark widgets
+    QCoro::Task<> WidgetbenchStart();
 
     // Icons
     [[nodiscard]] QIcon Icon(const int character, const bool is_solid = true) const

@@ -87,7 +87,7 @@ GUIMainWindow::GUIMainWindow()
         BenchmarkStart(static_cast<BenchmarkType>(args_benchmark_type_num));
     }
     else if (args_do_benchmark_widgets) {
-        //todo
+        WidgetbenchStart();
     }
 
     // Sad but necessary
@@ -540,13 +540,9 @@ void GUIMainWindow::InitMainMenuBar()
     });
     const QPointer debug_widgetbench_action = debug_menu->addAction("Benchmark widgets");
     connect(debug_widgetbench_action, &QAction::triggered, [this] {
-        /*TODO*/
         WidgetbenchDialog dialog(this, true, 16);
         dialog.exec();
     });
-
-    //TODO temporary
-    debug_widgetbench_action->activate(QAction::Trigger);
 
     // .: Help :.
     // .:======:.

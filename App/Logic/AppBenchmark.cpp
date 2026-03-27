@@ -230,7 +230,7 @@ QCoro::Task<> GUIMainWindow::BenchmarkStart(const BenchmarkType type)
 
     // Enable everything
     SetGUIEnabled(true);
-    setWindowModified(false);
+    setWindowModified(false); // no dirty
     emit BenchmarkDone();
 }
 
