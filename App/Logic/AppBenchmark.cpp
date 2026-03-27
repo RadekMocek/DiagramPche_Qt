@@ -239,6 +239,11 @@ QCoro::Task<> GUIMainWindow::BenchmarkStart(const BenchmarkType type)
     setWindowModified(false); // no dirty
     m_keep_measuring_CPU = false;
     emit BenchmarkDone();
+    // Exit ?
+    // ReSharper disable once CppRedundantBooleanExpressionArgument
+    if (EXIT_AFTER_BENCHMARK_FROM_TERMINAL && m_is_benchmark_run_from_terminal) {
+        close();
+    }
 }
 
 void GUIMainWindow::OnSyntaxHighlightSwitchRequest() const

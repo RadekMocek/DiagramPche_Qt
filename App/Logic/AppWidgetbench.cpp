@@ -10,8 +10,7 @@
 QCoro::Task<> GUIMainWindow::WidgetbenchStart()
 {
     // ReSharper disable once CppTooWideScopeInitStatement
-    //constexpr auto WIDGETBENCH_STOP = 2048;
-    constexpr auto WIDGETBENCH_STOP = 16;
+    constexpr auto DURATION_THRESHOLD_MS = 15000;
 
     // Maximize the window
     setWindowState(Qt::WindowMaximized);
@@ -40,7 +39,8 @@ QCoro::Task<> GUIMainWindow::WidgetbenchStart()
         log_data.n_batches.push_back(n_batches);
         log_data.batch_iter.push_back(batch_iter);
         // LOG DURATION
-        log_data.duration.push_back(ChronoTrigger(timestamp_window_queued).count());
+        const auto duration_ms = ChronoTrigger(timestamp_window_queued).count();
+        log_data.duration.push_back(duration_ms);
         // LOG RAM
         constexpr auto MIBI = 1024.0 * 1024.0;
         log_data.mem_mib.push_back(static_cast<double>(getCurrentRSS()) / MIBI);
@@ -51,12 +51,12 @@ QCoro::Task<> GUIMainWindow::WidgetbenchStart()
         m_source->setPlainText(QString("[node.\"%1 %2\"]").arg(n_batches).arg(batch_iter));
         // Prepare batch for the next iter
         batch_iter++;
-        if (batch_iter > 10) {
+        if (batch_iter > 9) {
             batch_iter = 0;
             n_batches *= 2;
         }
         // Widgetbench stop condition
-        if (n_batches > WIDGETBENCH_STOP) {
+        if (duration_ms > DURATION_THRESHOLD_MS) {
             // Save
             // ReSharper disable once CppTooWideScopeInitStatement
             const auto filename = QString("./widgetbechres_DearImGui_%1_%2.csv")
@@ -75,5 +75,11 @@ QCoro::Task<> GUIMainWindow::WidgetbenchStart()
             m_keep_measuring_CPU = false;
             break;
         }
+    }
+
+    // Exit ?
+    // ReSharper disable once CppRedundantBooleanExpressionArgument
+    if (EXIT_AFTER_BENCHMARK_FROM_TERMINAL && m_is_benchmark_run_from_terminal) {
+        close();
     }
 }

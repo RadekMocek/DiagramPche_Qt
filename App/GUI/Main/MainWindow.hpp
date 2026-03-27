@@ -45,6 +45,7 @@ constexpr auto BENCHMARK_HEAVY_PATH = "./Resource/Example/Debug/BenchmarkHeavy.t
 constexpr auto FONT_FAMILY_DEFAULT = "Inconsolata";
 constexpr auto DO_SHOW_PRIMARY_TOOLBAR_INIT = true;
 constexpr auto DO_SHOW_SECONDARY_TOOLBAR_INIT = true;
+constexpr auto EXIT_AFTER_BENCHMARK_FROM_TERMINAL = true;
 // === === === === === === === === === === === === === === ===
 
 class GUIMainWindow : public QMainWindow
@@ -215,6 +216,7 @@ private:
 
     // Benchmark
     bool m_bench_stop_flag = false; // Stop button in GUI
+    bool m_is_benchmark_run_from_terminal{};
     // - CPU usage
     float m_CPU_usage{};
     bool m_keep_measuring_CPU = false;

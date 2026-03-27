@@ -63,11 +63,13 @@ GUIMainWindow::GUIMainWindow()
     auto args_do_benchmark_nodes = false;
     auto args_benchmark_type_num = 0;
     auto args_do_benchmark_widgets = false;
+    auto is_benchmark_run_from_terminal = false;
     if (args.size() == 4 && args[1] == "b") {
         constexpr auto benchmark_type_err_msg =
             "Second parameter (benchmark type) must be a number:\n\n\t0 - light\n\t1 - heavy\n\t2 - gradual\n\n";
 
         args_do_benchmark_nodes = true;
+        is_benchmark_run_from_terminal = true;
 
         bool is_parse_ok;
         args_benchmark_type_num = args[2].toInt(&is_parse_ok);
@@ -89,7 +91,10 @@ GUIMainWindow::GUIMainWindow()
     }
     else if (args.size() == 2 && args[1] == "w") {
         args_do_benchmark_widgets = true;
+        is_benchmark_run_from_terminal = true;
     }
+
+    m_is_benchmark_run_from_terminal = is_benchmark_run_from_terminal;
 
     if (args_do_benchmark_nodes) {
         BenchmarkStart(static_cast<BenchmarkType>(args_benchmark_type_num));
