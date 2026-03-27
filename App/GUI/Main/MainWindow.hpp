@@ -30,6 +30,13 @@ class GUIScene;
 class GUISceneViewer;
 class ColorPicker;
 
+// Foe benchmark filenames
+#ifdef _WIN32
+constexpr auto OS_ID = "win";
+#else
+constexpr auto OS_ID = "lin";
+#endif
+
 constexpr auto BENCHMARK_LIGHT_PATH = "./Resource/Example/Debug/BenchmarkLight.toml";
 constexpr auto BENCHMARK_HEAVY_PATH = "./Resource/Example/Debug/BenchmarkHeavy.toml";
 
@@ -37,7 +44,6 @@ constexpr auto BENCHMARK_HEAVY_PATH = "./Resource/Example/Debug/BenchmarkHeavy.t
 constexpr auto FONT_FAMILY_DEFAULT = "Inconsolata";
 constexpr auto DO_SHOW_PRIMARY_TOOLBAR_INIT = true;
 constexpr auto DO_SHOW_SECONDARY_TOOLBAR_INIT = true;
-constexpr auto DO_OPEN_BENCHMARK_WINDOW_AT_STARTUP = true;
 // === === === === === === === === === === === === === === ===
 
 class GUIMainWindow : public QMainWindow

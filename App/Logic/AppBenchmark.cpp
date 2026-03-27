@@ -91,8 +91,10 @@ QCoro::Task<> GUIMainWindow::BenchmarkStart(const BenchmarkType type)
     int scrolling_x = 0;
 
     // Init log vars
-    int log_index = 0;
     BenchmarkLogResults log_data{};
+
+    // Sleep for a bit
+    co_await QCoro::sleepFor(std::chrono::milliseconds(16));
 
     // Set up timer
     QTimer timer;
@@ -125,8 +127,10 @@ QCoro::Task<> GUIMainWindow::BenchmarkStart(const BenchmarkType type)
         // Do the next batch only when certain amount of time has passed
         co_await timer;
 
-        // Keep dialog top left
-        m_benchmark_dialog->move(m_benchmark_dialog->parentWidget()->geometry().topLeft());
+        // Keep dialog top left (dialog is not visible if benchmark started from the terminal, so the check is necessary
+        if (m_benchmark_dialog) {
+            m_benchmark_dialog->move(m_benchmark_dialog->parentWidget()->geometry().topLeft());
+        }
 
         // Zoom frenzy
         zoom_level = (zoom_level + 1) % ZOOM_LEVEL_MODULO; // 0,1,2,3,4,5
@@ -142,8 +146,8 @@ QCoro::Task<> GUIMainWindow::BenchmarkStart(const BenchmarkType type)
                              "[node.\"B%8\"]\nxy=[\"A%9\",\"bottom-right\",10,10]\nz=%10\ntype=\"ellipse\"\n"
                              "[[path]]\nstart=[\"A%11\",\"left\",0,0]\nend=[\"B%12\",\"right\",0,0]\n"
                          )
-                         .arg(node_counter_total_pairs).arg(x_cor).arg(y_cor).arg(z).arg(color_r).arg(color_g).arg(
-                             color_b)
+                         .arg(node_counter_total_pairs).arg(x_cor).arg(y_cor).arg(z)
+                         .arg(color_r).arg(color_g).arg(color_b)
                          .arg(node_counter_total_pairs).arg(node_counter_total_pairs).arg(z)
                          .arg(node_counter_total_pairs).arg(node_counter_total_pairs);
 
@@ -153,6 +157,7 @@ QCoro::Task<> GUIMainWindow::BenchmarkStart(const BenchmarkType type)
                 BenchmarkChangeColor(color_r, color_g, color_b, zoom_level);
             }
             m_source->appendPlainText(batch);
+            setWindowModified(false); // no dirty
         }
         else {
             for (int i = 0; i < N_NODES_IN_INTERVAL; i++) {
@@ -195,19 +200,23 @@ QCoro::Task<> GUIMainWindow::BenchmarkStart(const BenchmarkType type)
             emit BenchmarkStatsCrateUpdated();
 
             // LOG
-            log_data.timestamp[log_index] = ChronoTrigger(time_start).count();
-            log_data.fps[log_index] = m_scene_fps;
-            log_data.n_nodes[log_index] = node_counter_total;
-            log_data.mem_mib[log_index] = mem_usage_mib;
-            log_data.cpu_usage[log_index] = cpu_usage;
-            log_index++;
+            log_data.timestamp.push_back(ChronoTrigger(time_start).count());
+            log_data.fps.push_back(m_scene_fps);
+            log_data.n_nodes.push_back(node_counter_total);
+            log_data.mem_mib.push_back(mem_usage_mib);
+            log_data.cpu_usage.push_back(cpu_usage);
         }
 
         // End the benchmark check
         if (y_cor > MAX_Y_COR) {
             qDebug() << "Benchmark done.";
+
+            const auto bench_id = std::format("b{}", static_cast<int>(type));
+            const auto sh_info = (m_highlighter->document()) ? "shon" : "shoff";
+
             // ReSharper disable once CppTooWideScopeInitStatement
-            const auto filename = QString("./BenchStats_Qt_%1_%2.csv").arg(type).arg(GetUNIXTimestamp());
+            const auto filename = QString("./bnchres_Qt_%1_%2_%3_%4.csv")
+                                  .arg(OS_ID).arg(bench_id).arg(sh_info).arg(GetUNIXTimestamp());
 
             if (WriteBenchmarkResultsToCSV(filename.toUtf8(), log_data)) {
                 qDebug() << "Benchmark data written to:" << filename;

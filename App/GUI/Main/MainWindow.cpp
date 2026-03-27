@@ -52,6 +52,44 @@ GUIMainWindow::GUIMainWindow()
     // It moves the canvas but not as expected when called here
     ResetCanvasScrollingAndZoom();
 
+    // cmd args
+    const auto& args = QCoreApplication::arguments();
+    auto args_do_benchmark_nodes = false;
+    auto args_benchmark_type_num = 0;
+    auto args_do_benchmark_widgets = false;
+    if (args.size() == 4 && args[1] == "b") {
+        constexpr auto benchmark_type_err_msg =
+            "Second parameter (benchmark type) must be a number:\n\n\t0 - light\n\t1 - heavy\n\t2 - gradual\n\n";
+
+        args_do_benchmark_nodes = true;
+
+        bool is_parse_ok;
+        args_benchmark_type_num = args[2].toInt(&is_parse_ok);
+        if (!is_parse_ok) {
+            qDebug() << benchmark_type_err_msg;
+            args_do_benchmark_nodes = false;
+        }
+        if (args_benchmark_type_num < 0 || args_benchmark_type_num > 2) {
+            qDebug() << benchmark_type_err_msg;
+            args_do_benchmark_nodes = false;
+        }
+
+        if (args[3] == "0") {
+            m_highlighter->setDocument(nullptr);
+        }
+
+    }
+    else if (args.size() == 2 && args[1] == "w") {
+        args_do_benchmark_widgets = true;
+    }
+
+    if (args_do_benchmark_nodes) {
+        BenchmarkStart(static_cast<BenchmarkType>(args_benchmark_type_num));
+    }
+    else if (args_do_benchmark_widgets) {
+        //todo
+    }
+
     // Sad but necessary
     QTimer::singleShot(0, this, [this] {
         // After this ctor, m_source sends signal about text being changed.
@@ -480,7 +518,7 @@ void GUIMainWindow::InitMainMenuBar()
     const QPointer debug_render_test_4_action = debug_render_tests_menu->addAction("Benchmark heavy");
     connect(debug_render_test_4_action, &QAction::triggered, [this] { HandleOpenExample(BENCHMARK_HEAVY_PATH); });
     // . Benchmark .
-    const QPointer debug_benchmark_action = debug_menu->addAction("Benchmark");
+    const QPointer debug_benchmark_action = debug_menu->addAction("Benchmark nodes");
     connect(debug_benchmark_action, &QAction::triggered, [this] {
         if (m_benchmark_dialog) {
             m_benchmark_dialog->raise();
@@ -500,10 +538,8 @@ void GUIMainWindow::InitMainMenuBar()
 
         m_benchmark_dialog->show();
     });
-    if (DO_OPEN_BENCHMARK_WINDOW_AT_STARTUP) {
-        // ReSharper disable once CppDFAUnreachableCode
-        debug_benchmark_action->activate(QAction::Trigger);
-    }
+    const QPointer debug_widgetbench_action = debug_menu->addAction("Benchmark widgets");
+    connect(debug_widgetbench_action, &QAction::triggered, [] { /*TODO*/ });
 
     // .: Help :.
     // .:======:.
