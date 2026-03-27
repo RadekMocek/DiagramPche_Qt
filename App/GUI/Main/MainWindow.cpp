@@ -18,6 +18,7 @@
 #include "../../Helper/Color.hpp"
 #include "../../Welcome.hpp"
 #include "../Dialog/ExportSVGDialog.hpp"
+#include "../Dialog/Widgetbench.hpp"
 #include "../Support/ColorPicker.hpp"
 #include "../Support/DragButton.hpp"
 #include "Scene.hpp"
@@ -77,7 +78,6 @@ GUIMainWindow::GUIMainWindow()
         if (args[3] == "0") {
             m_highlighter->setDocument(nullptr);
         }
-
     }
     else if (args.size() == 2 && args[1] == "w") {
         args_do_benchmark_widgets = true;
@@ -539,7 +539,14 @@ void GUIMainWindow::InitMainMenuBar()
         m_benchmark_dialog->show();
     });
     const QPointer debug_widgetbench_action = debug_menu->addAction("Benchmark widgets");
-    connect(debug_widgetbench_action, &QAction::triggered, [] { /*TODO*/ });
+    connect(debug_widgetbench_action, &QAction::triggered, [this] {
+        /*TODO*/
+        WidgetbenchDialog dialog(this, true, 16);
+        dialog.exec();
+    });
+
+    //TODO temporary
+    debug_widgetbench_action->activate(QAction::Trigger);
 
     // .: Help :.
     // .:======:.
