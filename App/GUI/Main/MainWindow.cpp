@@ -10,12 +10,14 @@
 #include <QPlainTextEdit>
 #include <QSpinBox>
 #include <QSplitter>
+#include <QStackedWidget>
 #include <QStyleHints>
 #include <QSvgGenerator>
 #include <QToolBar>
 
 #include "MainWindow.hpp"
 #include "../../Helper/Color.hpp"
+#include "../../Helper/CPU.hpp"
 #include "../../Welcome.hpp"
 #include "../Dialog/ExportSVGDialog.hpp"
 #include "../Dialog/Widgetbench.hpp"
@@ -53,6 +55,9 @@ GUIMainWindow::GUIMainWindow()
     // It moves the canvas but not as expected when called here
     ResetCanvasScrollingAndZoom();
 
+    // Fill with initial value
+    m_CPU_usage = CPUStats::GetCurrentValue();
+
     // cmd args
     const auto& args = QCoreApplication::arguments();
     auto args_do_benchmark_nodes = false;
@@ -77,6 +82,9 @@ GUIMainWindow::GUIMainWindow()
 
         if (args[3] == "0") {
             m_highlighter->setDocument(nullptr);
+        }
+        else if (args[3] == "2") {
+            m_source_wrapper->setCurrentIndex(1);
         }
     }
     else if (args.size() == 2 && args[1] == "w") {
@@ -597,13 +605,19 @@ void GUIMainWindow::InitCentralWidget()
     m_splitter->setChildrenCollapsible(false);
 
     // Text editor
+    m_source_wrapper = new QStackedWidget();
+
     m_source = new QPlainTextEdit();
     m_source->setPlainText(WELCOME_TOML);
     m_source->setLineWrapMode(QPlainTextEdit::NoWrap);
 
     m_highlighter = new Highlighter(m_source->document());
 
-    m_splitter->addWidget(m_source);
+    m_source_wrapper->addWidget(m_source); // Index 0
+    m_source_wrapper->addWidget(new QWidget()); // Index 1 (for hiding in benchmark and keeping empty space)
+    m_source_wrapper->setCurrentIndex(0);
+
+    m_splitter->addWidget(m_source_wrapper);
 
     connect(m_source, &QPlainTextEdit::textChanged, this, &GUIMainWindow::OnSourceChange);
     connect(m_source, &QPlainTextEdit::cursorPositionChanged, this, &GUIMainWindow::UpdateCursorPositionInfo);

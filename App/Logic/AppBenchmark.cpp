@@ -2,6 +2,7 @@
 #include <QPlainTextEdit>
 #include <QSlider>
 #include <QSplitter>
+#include <QStackedWidget>
 #include <QToolBar>
 
 #include "../../Dependency/RSS.hpp"
@@ -30,7 +31,7 @@ constexpr auto MAX_NODES_ON_ROW = 220;
 // When we reach `MAX_NODES_ON_ROW`, we go on a new row, this is the offset of the new row
 constexpr auto Y_COR_ADDITION = 100;
 // How many rows do we want? When we have this much of rows, benchmark ends
-constexpr auto MAX_ROWS = 21;
+constexpr auto MAX_ROWS = 26;
 // Used for the ending condition
 constexpr auto MAX_Y_COR = Y_COR_ADDITION * MAX_ROWS;
 // Amount of scrolling right after each node batch added
@@ -41,7 +42,7 @@ constexpr auto AUTO_SCROLL_MODULO_X = 600;
 constexpr auto ZOOM_LEVEL_MODULO = 6;
 // Precalculated
 constexpr auto BENCHMARK_LIGHT_N_NODES = 12;
-constexpr auto BENCHMARK_HEAVY_N_NODES = 10780;
+constexpr auto BENCHMARK_HEAVY_N_NODES = 13230;
 
 void GUIMainWindow::SetGUIEnabled(const bool value) const
 {
@@ -92,6 +93,7 @@ QCoro::Task<> GUIMainWindow::BenchmarkStart(const BenchmarkType type)
 
     // Init log vars
     BenchmarkLogResults log_data{};
+    CPUMeasureStart(); // This enables 'm_keep_measuring_CPU', set to false when done
 
     // Sleep for a bit
     co_await QCoro::sleepFor(std::chrono::milliseconds(16));
@@ -120,7 +122,8 @@ QCoro::Task<> GUIMainWindow::BenchmarkStart(const BenchmarkType type)
         if (m_bench_stop_flag) {
             qDebug() << "Benchmark stopped.";
             SetGUIEnabled(true);
-            setWindowModified(false);
+            setWindowModified(false); // no dirty
+            m_keep_measuring_CPU = false;
             emit BenchmarkDone();
             co_return;
         }
@@ -190,21 +193,20 @@ QCoro::Task<> GUIMainWindow::BenchmarkStart(const BenchmarkType type)
         if (zoom_level % 3 == 1) {
             constexpr auto MIBI = 1024.0 * 1024.0;
             const auto mem_usage_mib = static_cast<double>(getCurrentRSS()) / MIBI;
-            const auto cpu_usage = CPUStats::GetCurrentValue();
 
             // Report to GUI
             m_state_benchmark_stats.scene_fps = m_scene_fps;
             m_state_benchmark_stats.total_nodes = node_counter_total;
             m_state_benchmark_stats.mem_usage_mib = mem_usage_mib;
-            m_state_benchmark_stats.cpu_usage_system = cpu_usage;
+            m_state_benchmark_stats.cpu_usage_system = m_CPU_usage;
             emit BenchmarkStatsCrateUpdated();
 
             // LOG
             log_data.timestamp.push_back(ChronoTrigger(time_start).count());
-            log_data.fps.push_back(m_scene_fps);
+            log_data.fps.push_back(static_cast<float>(m_scene_fps));
             log_data.n_nodes.push_back(node_counter_total);
             log_data.mem_mib.push_back(mem_usage_mib);
-            log_data.cpu_usage.push_back(cpu_usage);
+            log_data.cpu_usage.push_back(m_CPU_usage);
         }
 
         // End the benchmark check
@@ -212,11 +214,15 @@ QCoro::Task<> GUIMainWindow::BenchmarkStart(const BenchmarkType type)
             qDebug() << "Benchmark done.";
 
             const auto bench_id = std::format("b{}", static_cast<int>(type));
-            const auto sh_info = (m_highlighter->document()) ? "shon" : "shoff";
+
+            auto bench_info = (m_highlighter->document()) ? "shon" : "shoff";
+            if (m_source_wrapper->currentIndex() == 1) {
+                bench_info = "txoff";
+            }
 
             // ReSharper disable once CppTooWideScopeInitStatement
             const auto filename = QString("./bnchres_Qt_%1_%2_%3_%4.csv")
-                                  .arg(OS_ID).arg(bench_id).arg(sh_info).arg(GetUNIXTimestamp());
+                                  .arg(OS_ID).arg(bench_id).arg(bench_info).arg(GetUNIXTimestamp());
 
             if (WriteBenchmarkResultsToCSV(filename.toUtf8(), log_data)) {
                 qDebug() << "Benchmark data written to:" << filename;
@@ -231,6 +237,7 @@ QCoro::Task<> GUIMainWindow::BenchmarkStart(const BenchmarkType type)
     // Enable everything
     SetGUIEnabled(true);
     setWindowModified(false); // no dirty
+    m_keep_measuring_CPU = false;
     emit BenchmarkDone();
 }
 

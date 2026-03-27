@@ -14,7 +14,7 @@ BenchmarkDialog::BenchmarkDialog(QWidget* parent, BenchmarkStatsState& crate) :
     m_is_benchmark_running(false),
     m_crate(crate)
 {
-    setWindowTitle("Benchmark");
+    setWindowTitle("Benchmark nodes");
 
     const QPointer layout = new QVBoxLayout();
 
@@ -33,6 +33,11 @@ BenchmarkDialog::BenchmarkDialog(QWidget* parent, BenchmarkStatsState& crate) :
     const QPointer button_syntax_highlight = new QPushButton("Syntax highlight on/off");
     connect(button_syntax_highlight, &QPushButton::clicked, this, &BenchmarkDialog::ButtonSwitchSyntaxHighlightClicked);
     group_init_layout->addWidget(button_syntax_highlight);
+
+    group_init_layout->addWidget(
+        new QLabel("Or you can hide the text editor completely by running\n"
+            "'.\\DiagramPche_Qt.exe b ? 2', where '?' is the benchmark type (0/1/2).")
+    );
 
     group_init_layout->addWidget(new QLabel("\nChoose one of the three benchmarks:"));
     m_combo_benchmark_type = new QComboBox();

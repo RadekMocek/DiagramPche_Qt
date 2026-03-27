@@ -15,8 +15,8 @@ QCoro::Task<> GUIMainWindow::WidgetbenchStart()
 
     // Maximize the window
     setWindowState(Qt::WindowMaximized);
-    // Refresh CPU usage (?)
-    CPUStats::GetCurrentValue();
+    // Start measuring CPU usage
+    CPUMeasureStart(); // This enables 'm_keep_measuring_CPU', set to false when done
     // Sleep for a bit
     co_await QCoro::sleepFor(std::chrono::milliseconds(16));
 
@@ -30,8 +30,6 @@ QCoro::Task<> GUIMainWindow::WidgetbenchStart()
     while (true) {
         // Sleep for a bit
         co_await QCoro::sleepFor(std::chrono::milliseconds(16));
-        // Refresh CPU usage (?)
-        CPUStats::GetCurrentValue();
         // Start time measure
         timestamp_window_queued = std::chrono::steady_clock::now();
         // Show the window
@@ -47,7 +45,7 @@ QCoro::Task<> GUIMainWindow::WidgetbenchStart()
         constexpr auto MIBI = 1024.0 * 1024.0;
         log_data.mem_mib.push_back(static_cast<double>(getCurrentRSS()) / MIBI);
         // LOG CPU
-        log_data.cpu_usage.push_back(CPUStats::GetCurrentValue());
+        log_data.cpu_usage.push_back(m_CPU_usage);
         // --- --- --- --- --- --- --- --- --- --- --- ---
         // Report progress
         m_source->setPlainText(QString("[node.\"%1 %2\"]").arg(n_batches).arg(batch_iter));
@@ -74,6 +72,7 @@ QCoro::Task<> GUIMainWindow::WidgetbenchStart()
             m_source->setPlainText("[node.\"Widget benchmark done\"]");
             setWindowModified(false); // no dirty
             // End
+            m_keep_measuring_CPU = false;
             break;
         }
     }

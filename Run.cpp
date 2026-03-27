@@ -7,6 +7,7 @@
 
 int main(int argc, char* argv[])
 {
+    // Init CPU measuring for benchmarking purposes
     CPUStats::Init();
 
     // --- App config  --- --- --- --- --- ---

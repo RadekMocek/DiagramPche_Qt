@@ -6,6 +6,8 @@
 #include "../../Dependency/linux-system-usage.hpp"
 #endif
 
+constexpr auto CPU_MEASURE_INTERVAL_MS = 500;
+
 class CPUStats
 {
 private:

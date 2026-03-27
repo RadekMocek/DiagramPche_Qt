@@ -11,6 +11,7 @@ class QLabel;
 class QPlainTextEdit;
 class QSlider;
 class QSplitter;
+class QStackedWidget;
 class QVBoxLayout;
 QT_END_NAMESPACE
 
@@ -134,13 +135,14 @@ private:
     void InitToolbar();
     void InitState();
 
-    // Benchmark nodes
+    // Benchmark
+    QCoro::Task<> CPUMeasureStart();
+    // - Benchmark nodes
     QCoro::Task<> BenchmarkStart(BenchmarkType type);
     void BenchmarkStopForce() { m_bench_stop_flag = true; }
     void SetGUIEnabled(bool value) const;
     void OnSyntaxHighlightSwitchRequest() const;
-
-    // Benchmark widgets
+    // - Benchmark widgets
     QCoro::Task<> WidgetbenchStart();
 
     // Icons
@@ -157,6 +159,7 @@ private:
     QPointer<QSplitter> m_splitter;
 
     // Text editor with the TOML describing the diagram
+    QPointer<QStackedWidget> m_source_wrapper;
     QPointer<QPlainTextEdit> m_source;
     QPointer<Highlighter> m_highlighter; // Syntax highlight
     std::optional<QString> m_source_filename = std::nullopt;
@@ -211,7 +214,10 @@ private:
     BenchmarkStatsState m_state_benchmark_stats{};
 
     // Benchmark
-    bool m_bench_stop_flag = false;
+    bool m_bench_stop_flag = false; // Stop button in GUI
+    // - CPU usage
+    float m_CPU_usage{};
+    bool m_keep_measuring_CPU = false;
 
     // Icons
     QPointer<fa::QtAwesome> m_awesome;
