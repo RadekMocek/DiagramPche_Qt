@@ -59,7 +59,7 @@ QCoro::Task<> GUIMainWindow::WidgetbenchStart()
         if (duration_ms > DURATION_THRESHOLD_MS) {
             // Save
             // ReSharper disable once CppTooWideScopeInitStatement
-            const auto filename = QString("./widgetbechres_DearImGui_%1_%2.csv")
+            const auto filename = QString("./widgetbechres_Qt_%1_%2.csv")
                                   .arg(OS_ID).arg(GetUNIXTimestamp());
 
             if (WriteWidgetbenchResultsToCSV(filename.toUtf8(), log_data)) {
