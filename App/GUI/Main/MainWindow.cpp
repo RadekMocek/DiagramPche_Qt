@@ -66,7 +66,7 @@ GUIMainWindow::GUIMainWindow()
     auto is_benchmark_run_from_terminal = false;
     if (args.size() == 4 && args[1] == "b") {
         constexpr auto benchmark_type_err_msg =
-            "Second parameter (benchmark type) must be a number:\n\n\t0 - light\n\t1 - heavy\n\t2 - gradual\n\n";
+            "Second parameter (benchmark type) must be a number:\n\n\t0 - light\n\t1 - heavy\n\t2 - gradual\n\t3 - complete 3in1\n\n";
 
         args_do_benchmark_nodes = true;
         is_benchmark_run_from_terminal = true;
@@ -77,7 +77,7 @@ GUIMainWindow::GUIMainWindow()
             qDebug() << benchmark_type_err_msg;
             args_do_benchmark_nodes = false;
         }
-        if (args_benchmark_type_num < 0 || args_benchmark_type_num > 2) {
+        if (args_benchmark_type_num < 0 || args_benchmark_type_num > 3) {
             qDebug() << benchmark_type_err_msg;
             args_do_benchmark_nodes = false;
         }
@@ -422,7 +422,7 @@ void GUIMainWindow::InitMainMenuBar()
             case QMessageBox::Discard:
                 Func();
                 break;
-            case QMessageBox::Cancel:
+            case QMessageBox::Cancel: // NOLINT(*-branch-clone)
                 break;
             default:
                 break;

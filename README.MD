@@ -7,15 +7,6 @@ This is part of a IMGUI paradigm research, [go back to main repo](https://github
   * [Dependencies](#dependencies)
   * [Problems](#problems)
 
-## TODO
-
-* Widgetbench:
-  * [x] New stop condition – stop immediatelly if showing the window took more than 15 seconds
-  * [x] Change >10 to >9
-* Benchmarks generally:
-  * [x] Make benchmarks that are run from terminal close the app at the end so they can be chained in a script
-  * [x] The scripts
-
 ## Building locally
 
 (This guide works with Qt version 6.10.0. If you have a newer version, replace `6.10.0` in all paths accordingly.)

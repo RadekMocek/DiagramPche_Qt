@@ -82,7 +82,7 @@ QCoro::Task<> GUIMainWindow::BenchmarkStart(const BenchmarkType type)
     // Initialize helper variables
     auto node_counter_total = 0;
     int node_counter_total_pairs = 0;
-    int node_counter_row_pairs = 0;
+    int gradual_node_id = 0;
     int x_cor = 0;
     int y_cor = 0;
     unsigned char color_r = 255;
@@ -90,13 +90,14 @@ QCoro::Task<> GUIMainWindow::BenchmarkStart(const BenchmarkType type)
     unsigned char color_b = 255;
     int zoom_level = 0;
     int scrolling_x = 0;
+    int complete_bench_phase_n = 1;
 
     // Init log vars
     BenchmarkLogResults log_data{};
     CPUMeasureStart(); // This enables 'm_keep_measuring_CPU', set to false when done
 
     // Sleep for a bit
-    co_await QCoro::sleepFor(std::chrono::milliseconds(16));
+    co_await QCoro::sleepFor(std::chrono::milliseconds(500));
 
     // Set up timer
     QTimer timer;
@@ -112,6 +113,9 @@ QCoro::Task<> GUIMainWindow::BenchmarkStart(const BenchmarkType type)
     else if (type == BENCHMARK_HEAVY) {
         HandleOpenExample(BENCHMARK_HEAVY_PATH);
         node_counter_total = BENCHMARK_HEAVY_N_NODES;
+    }
+    else if (type == BENCHMARK_COMPLETE) {
+        m_source->setPlainText("[node.\"Hang onto yer helmet!\\nThe complete benchmark has started...\"]\n");
     }
 
     const auto time_start = std::chrono::steady_clock::now();
@@ -139,11 +143,15 @@ QCoro::Task<> GUIMainWindow::BenchmarkStart(const BenchmarkType type)
         zoom_level = (zoom_level + 1) % ZOOM_LEVEL_MODULO; // 0,1,2,3,4,5
         m_secondary_canvas_toolbar_slider->setValue(zoom_level); // Callback will handle the zoom
 
-        if (type == BENCHMARK_GRADUAL) {
+        const auto is_gradual =
+            type == BENCHMARK_GRADUAL
+            || (type == BENCHMARK_COMPLETE && complete_bench_phase_n == 2);
+
+        if (is_gradual) {
             QString batch;
             batch.reserve(188);
             for (int i = 0; i < N_NODES_IN_INTERVAL; i++) {
-                const auto z = node_counter_row_pairs % Z_MODULO;
+                const auto z = gradual_node_id % Z_MODULO;
                 batch += QString(
                              "[node.\"A%1\"]\nxy=[%2,%3]\nz=%4\ncolor=[%5,%6,%7,128]\n"
                              "[node.\"B%8\"]\nxy=[\"A%9\",\"bottom-right\",10,10]\nz=%10\ntype=\"ellipse\"\n"
@@ -155,7 +163,7 @@ QCoro::Task<> GUIMainWindow::BenchmarkStart(const BenchmarkType type)
                          .arg(node_counter_total_pairs).arg(node_counter_total_pairs);
 
                 node_counter_total_pairs++;
-                node_counter_row_pairs++;
+                gradual_node_id++;
                 x_cor += X_COR_ADDITION;
                 BenchmarkChangeColor(color_r, color_g, color_b, zoom_level);
             }
@@ -164,8 +172,7 @@ QCoro::Task<> GUIMainWindow::BenchmarkStart(const BenchmarkType type)
         }
         else {
             for (int i = 0; i < N_NODES_IN_INTERVAL; i++) {
-                node_counter_total_pairs++;
-                node_counter_row_pairs++;
+                gradual_node_id++;
                 x_cor += X_COR_ADDITION;
                 BenchmarkChangeColor(color_r, color_g, color_b, zoom_level);
             }
@@ -179,14 +186,14 @@ QCoro::Task<> GUIMainWindow::BenchmarkStart(const BenchmarkType type)
         m_viewer->ResetCanvasScrolling(scrolling_x, 0);
 
         // Jump to new row if needed
-        if (node_counter_row_pairs > MAX_NODES_ON_ROW) {
-            node_counter_row_pairs = 0;
+        if (gradual_node_id > MAX_NODES_ON_ROW) {
+            gradual_node_id = 0;
             x_cor = 0;
             y_cor += Y_COR_ADDITION;
         }
 
         // Stats
-        if (type == BENCHMARK_GRADUAL) {
+        if (is_gradual) {
             node_counter_total = 2 * node_counter_total_pairs;
         }
 
@@ -211,26 +218,33 @@ QCoro::Task<> GUIMainWindow::BenchmarkStart(const BenchmarkType type)
 
         // End the benchmark check
         if (y_cor > MAX_Y_COR) {
-            qDebug() << "Benchmark done.";
-
-            const auto bench_id = std::format("b{}", static_cast<int>(type));
-
-            auto bench_info = (m_highlighter->document()) ? "shon" : "shoff";
-            if (m_source_wrapper->currentIndex() == 1) {
-                bench_info = "txoff";
-            }
-
-            // ReSharper disable once CppTooWideScopeInitStatement
-            const auto filename = QString("./bnchres_Qt_%1_%2_%3_%4.csv")
-                                  .arg(OS_ID).arg(bench_id).arg(bench_info).arg(GetUNIXTimestamp());
-
-            if (WriteBenchmarkResultsToCSV(filename.toUtf8(), log_data)) {
-                qDebug() << "Benchmark data written to:" << filename;
+            if (type == BENCHMARK_COMPLETE && complete_bench_phase_n < 3) {
+                complete_bench_phase_n++;
+                x_cor = 0;
+                y_cor = 0;
             }
             else {
-                qDebug() << "Error writing benchmark data to file.";
+                qDebug() << "Benchmark done.";
+
+                const auto bench_id = std::format("b{}", static_cast<int>(type));
+
+                auto bench_info = (m_highlighter->document()) ? "shon" : "shoff";
+                if (m_source_wrapper->currentIndex() == 1) {
+                    bench_info = "txoff";
+                }
+
+                // ReSharper disable once CppTooWideScopeInitStatement
+                const auto filename = QString("./bnchres_Qt_%1_%2_%3_%4.csv")
+                                      .arg(OS_ID).arg(bench_id).arg(bench_info).arg(GetUNIXTimestamp());
+
+                if (WriteBenchmarkResultsToCSV(filename.toUtf8(), log_data)) {
+                    qDebug() << "Benchmark data written to:" << filename;
+                }
+                else {
+                    qDebug() << "Error writing benchmark data to file.";
+                }
+                break;
             }
-            break;
         }
     }
 

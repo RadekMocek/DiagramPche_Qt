@@ -26,10 +26,10 @@ struct BenchmarkStatsState
 
 enum BenchmarkType
 {
-    BENCHMARK_LIGHT, BENCHMARK_HEAVY, BENCHMARK_GRADUAL
+    BENCHMARK_LIGHT, BENCHMARK_HEAVY, BENCHMARK_GRADUAL, BENCHMARK_COMPLETE
 };
 
-const QStringList BENCHMARK_TYPE_NAMES = {"Light", "Heavy", "Gradual"};
+const QStringList BENCHMARK_TYPE_NAMES = {"Light", "Heavy", "Gradual", "Complete 3in1"};
 
 // === === === === === === === === ===
 
