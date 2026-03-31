@@ -2,7 +2,6 @@
 
 // Qt imports
 #include <QDialog>
-#include <QPointer>
 
 class WidgetbenchDialog : public QDialog
 {

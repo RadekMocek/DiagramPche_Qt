@@ -1,0 +1,106 @@
+[variables]
+wid = 850
+hei = 535
+ihei = 396
+ipad = 12
+nipad = -12
+iwid = 408
+
+[node.bg]
+value = ""
+size = ["wid", "hei"]
+z = 0
+color = "#f8f8f8ff"
+
+[node.osbar]
+value = "(dekorace okna s názvem souboru a indikátorem neuložených změn)                    [_][o][x]"
+size = ["wid", 22]
+label_pos = "left"
+color = "#c2c2c2ff"
+
+[node.menubar]
+value = "(lišta nabídek) File | View | Help"
+xy = ["osbar", "bottom-left", 0, -1]
+size = ["wid", 22]
+label_pos = "left"
+color = "#dbdbdbff"
+
+[node.toolbar]
+value = "(panel nástrojů) Velikost písma: [12 +-], Změna barvy uzlu:    , atd."
+size = ["wid", 50]
+label_pos = "left"
+xy = ["menubar", "bottom-left", 0, -1]
+color = "#f0f0f0ff"
+
+[node.picker]
+value = ""
+size = [20, 20]
+xy = ["toolbar", "top-right", -294, 15]
+color = "#f2d6c6ff"
+z = 5
+
+[node.statusbar]
+value = "(stavový řádek) Chyba: neexistující ID 'n3'"
+pivot = "bottom-left"
+xy = ["bg", "bottom-left", 0, 0]
+size = ["wid", 22]
+label_pos = "left"
+color = "#f0f0f0ff"
+
+[node.errhighlight]
+pivot = "bottom-left"
+xy = ["textedit", "bottom-left", 90, -1]
+value = ""
+color = [211, 1, 2, 80]
+color_border = [0, 0, 0, 0]
+size = [35, 16]
+
+[node.textedit]
+value = "(textový editor)\n\n[[node]]\nid = \"n1\"\nvalue = \"Uzel diagramu\"\ncolor = \"#f2d6c6ff\"\n\n[[node]]\nid = \"n2\"\nvalue = \"Další uzel\"\nbase = \"n1\"\nx = 80\ny = 150\n\n[[path]]\nstart = \"n1\"\nend = \"n2\"\n\n[[path]]\nstart = \"n3\""
+xy = ["toolbar", "bottom-left", "ipad", "ipad"]
+size = ["iwid", "ihei"]
+label_pos = "top-left"
+
+[node.scrollbar]
+pivot = "top-right"
+xy = ["textedit", "top-right", 0, 0]
+value = ""
+size = [15, "ihei"]
+color = "#f0f0f0ff"
+
+[node.srollhandle]
+pivot = "top"
+xy = ["scrollbar", "top", 0, 30]
+value = ""
+size = [13, 300]
+color = "#dbdbdbff"
+color_border = "#00000000"
+
+[node.canvas]
+pivot = "top-right"
+xy = ["toolbar", "bottom-right", "nipad", "ipad"]
+size = ["iwid", "ihei"]
+label_pos = "top-left"
+value = "(plátno)"
+z = 2
+
+[node.toolbar2]
+pivot = "bottom-right"
+xy = ["canvas", "bottom-right", 0, 0]
+size = ["iwid", 20]
+color = "#f0f0f0ff"
+label_pos = "right"
+value = "Úroveň přiblížení: [======<>   ]"
+
+[node.n1]
+value = "Uzel diagramu"
+xy = ["canvas", "top-left", 65, 100]
+color = "#f2d6c6ff"
+
+[node.n2]
+value = "Další uzel"
+xy = ["n1", "top-left", 80, 150]
+
+[[path]]
+start = ["n1", "bottom", 0, 0]
+end = ["n2", "top", 0, 0]

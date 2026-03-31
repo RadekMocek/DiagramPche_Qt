@@ -195,7 +195,7 @@ void GUIMainWindow::OnNodeCtrlClick(const std::string& id) const
 
 void GUIMainWindow::OnNodeHoverEnter(const std::string& id) const
 {
-    if (m_is_some_node_selected) {
+    if (m_is_some_node_selected || m_viewer->IsUserDraggingCanvas()) {
         return;
     }
     if (const auto& node = GetNodeRefFromId(id); node.has_value()) {
@@ -257,17 +257,18 @@ void GUIMainWindow::ToolbarInfoReset() const
 
 void GUIMainWindow::ExportToSvg() const
 {
-    constexpr auto SVG_PADDING = 25;
     // Qt has the ability to save content of QGraphicsScene into a SVG file
     QSvgGenerator svg_generator;
 
-    // We need to calculate the SVG canvas size, so the diagram occupies 100% of the canvas (excluding SVG_PADDING)
+    // We need to calculate the SVG canvas size, so the diagram occupies 100% of the canvas (excluding `svg_padding`)
+    const auto svg_padding = m_state_dialog_export.padding;
+
     const auto scene_aabr = m_scene->GetSceneAABR().toRect();
     const auto scene_aabr_size = scene_aabr.size();
-    const QRect viewbox(scene_aabr.left() - SVG_PADDING,
-                        scene_aabr.top() - SVG_PADDING,
-                        scene_aabr_size.width() + 2 * SVG_PADDING,
-                        scene_aabr.height() + 2 * SVG_PADDING);
+    const QRect viewbox(scene_aabr.left() - svg_padding,
+                        scene_aabr.top() - svg_padding,
+                        scene_aabr_size.width() + 2 * svg_padding,
+                        scene_aabr.height() + 2 * svg_padding);
 
     svg_generator.setSize(scene_aabr_size);
     svg_generator.setViewBox(viewbox);
@@ -566,12 +567,14 @@ void GUIMainWindow::InitMainMenuBar()
     connect(example_1_action, &QAction::triggered, [this] { HandleOpenExample("./Resource/Example/Example1.toml"); });
     const QPointer example_2_action = examples_menu->addAction("Example 2: BPMN");
     connect(example_2_action, &QAction::triggered, [this] { HandleOpenExample("./Resource/Example/Example2.toml"); });
+    const QPointer example_3_action = examples_menu->addAction("Example 3: Wireframe");
+    connect(example_3_action, &QAction::triggered, [this] { HandleOpenExample("./Resource/Example/Example3.toml"); });
     // . About .
     const QPointer about_action = help_menu->addAction("About");
     connect(about_action, &QAction::triggered, [this] {
         QMessageBox msgBox(this);
         msgBox.setWindowTitle("About");
-        msgBox.setTextFormat(Qt::RichText); // For <a href> to work
+        msgBox.setTextFormat(Qt::RichText); // For `<a href="">...</a>` to work
         msgBox.setText(
             "DiagramPche :: Qt<br><a href='https://github.com/RadekMocek/DiagramPche_Qt'>https://github.com/RadekMocek/DiagramPche_Qt</a>"
         );
@@ -802,6 +805,7 @@ void GUIMainWindow::InitToolbar()
 void GUIMainWindow::InitState()
 {
     m_state_dialog_export.path = QDir::current().filePath("diagram.svg");
+    m_state_dialog_export.padding = 25;
     m_state_dialog_export.action = ActionAfterExport_DoNothing;
 
     constexpr auto IS_CANVAS_BG_LIGHT = true;

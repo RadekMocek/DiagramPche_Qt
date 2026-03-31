@@ -11,6 +11,7 @@ class QLabel;
 class QLineEdit;
 class QPushButton;
 class QRadioButton;
+class QSpinBox;
 QT_END_NAMESPACE
 
 // === === === === === === === === ===
@@ -28,6 +29,8 @@ struct ExportSVGDialogState
 {
     // SVG filename
     QString path;
+    // SVG padding
+    int padding;
     // What to do after successful SVG export
     ActionAfterExport action;
 };
@@ -49,23 +52,25 @@ private:
     void UpdateGUI() const;
 
     // Path input for SVG filename
-    QPointer<QLineEdit> m_group1_input;
+    QPointer<QLineEdit> m_group_path_input;
     // This label informs user if the file at path specified in `m_group1_input` already exists or not; the label is red if the file exists
-    QPointer<QLabel> m_group2_label;
+    QPointer<QLabel> m_group_guard_label;
     // Overwrite checkbox, user has to check this to allow SVG export to file that already exists
-    QPointer<QCheckBox> m_group2_checkbox;
+    QPointer<QCheckBox> m_group_guard_checkbox;
+    // Spinbox to change the SVG padding
+    QPointer<QSpinBox> m_group_padding_spinbox;
     // Radio to choose `ActionAfterExport_DoNothing`
-    QPointer<QRadioButton> m_group3_radio_nothing;
+    QPointer<QRadioButton> m_group_action_radio_nothing;
     // Radio to choose `ActionAfterExport_OpenFolder`
-    QPointer<QRadioButton> m_group3_radio_explorer;
+    QPointer<QRadioButton> m_group_action_radio_explorer;
     // Radio to choose `ActionAfterExport_OpenFile`
-    QPointer<QRadioButton> m_group3_radio_open;
+    QPointer<QRadioButton> m_group_action_radio_open;
     // Button to start the export
     QPointer<QPushButton> m_button_export;
 
-    // Palette used to switch `m_group2_label` color to normal color (black)
+    // Palette used to switch `m_group_guard_label` color to normal color (black)
     QPalette m_palette_normal;
-    // Palette used to switch `m_group2_label` color to error color (red)
+    // Palette used to switch `m_group_guard_label` color to error color (red)
     QPalette m_palette_error;
 
 signals:
