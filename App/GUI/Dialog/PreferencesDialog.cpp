@@ -73,9 +73,10 @@ void PreferencesDialog::InitGUI()
     const QPointer group2_1_layout = new QHBoxLayout();
 
     m_textedit_font_size = new QSpinBox();
-    m_textedit_font_size->setValue(m_state.source_font_size);
     m_textedit_font_size->setMinimum(FONT_SIZE_SOURCE_MIN);
     m_textedit_font_size->setMaximum(FONT_SIZE_SOURCE_MAX);
+    m_textedit_font_size->setSingleStep(FONT_SIZE_SOURCE_STEP);
+    m_textedit_font_size->setValue(m_state.source_font_size);
     group2_1_layout->addWidget(m_textedit_font_size);
 
     group2_1->setLayout(group2_1_layout);

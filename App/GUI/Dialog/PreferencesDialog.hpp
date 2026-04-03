@@ -27,6 +27,7 @@ struct PreferencesDialogState
 // === Config ==== === === === === === === ===
 constexpr auto FONT_SIZE_SOURCE_MIN = 8;
 constexpr auto FONT_SIZE_SOURCE_MAX = 40;
+constexpr auto FONT_SIZE_SOURCE_STEP = 2;
 // === === === === === === === === === === ===
 
 class PreferencesDialog : public QDialog

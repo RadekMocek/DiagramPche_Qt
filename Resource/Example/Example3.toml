@@ -19,7 +19,7 @@ label_pos = "left"
 color = "#c2c2c2ff"
 
 [node.menubar]
-value = "(lišta nabídek) File | View | Help"
+value = "(lišta nabídek) Soubor | Zobrazení | Nápověda"
 xy = ["osbar", "bottom-left", 0, -1]
 size = ["wid", 22]
 label_pos = "left"

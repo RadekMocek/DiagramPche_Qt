@@ -734,9 +734,10 @@ void GUIMainWindow::InitToolbar()
     m_toolbar_source_font_size = addToolBar("Text edit font size");
     m_toolbar_source_font_size->addWidget(new QLabel(" Font size: "));
     m_source_font_size_spinbox = new QSpinBox();
-    m_source_font_size_spinbox->setValue(GetSourceFontSize());
     m_source_font_size_spinbox->setMinimum(FONT_SIZE_SOURCE_MIN);
     m_source_font_size_spinbox->setMaximum(FONT_SIZE_SOURCE_MAX);
+    m_source_font_size_spinbox->setSingleStep(FONT_SIZE_SOURCE_STEP);
+    m_source_font_size_spinbox->setValue(GetSourceFontSize());
     m_toolbar_source_font_size->addWidget(m_source_font_size_spinbox);
     connect(m_source_font_size_spinbox, &QSpinBox::valueChanged, [this](const int value) {
         SetSourceFontSize(value);
