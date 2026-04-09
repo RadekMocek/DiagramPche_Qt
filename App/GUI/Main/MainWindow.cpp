@@ -567,8 +567,16 @@ void GUIMainWindow::InitMainMenuBar()
     connect(example_1_action, &QAction::triggered, [this] { HandleOpenExample("./Resource/Example/Example1.toml"); });
     const QPointer example_2_action = examples_menu->addAction("Example 2: BPMN");
     connect(example_2_action, &QAction::triggered, [this] { HandleOpenExample("./Resource/Example/Example2.toml"); });
-    const QPointer example_3_action = examples_menu->addAction("Example 3: Wireframe");
-    connect(example_3_action, &QAction::triggered, [this] { HandleOpenExample("./Resource/Example/Example3.toml"); });
+    // .: Thesis images :.
+    const QPointer thesis_images_menu = examples_menu->addMenu("Thesis images");
+    const QPointer thesis_image_1_action = thesis_images_menu->addAction("Wireframe");
+    connect(thesis_image_1_action, &QAction::triggered, [this] {
+        HandleOpenExample("./Resource/Example/Thesis/Wireframe.toml");
+    });
+    const QPointer thesis_image_2_action = thesis_images_menu->addAction("Error highlight");
+    connect(thesis_image_2_action, &QAction::triggered, [this] {
+        HandleOpenExample("./Resource/Example/Thesis/ErrorHighlight.toml");
+    });
     // . About .
     const QPointer about_action = help_menu->addAction("About");
     connect(about_action, &QAction::triggered, [this] {

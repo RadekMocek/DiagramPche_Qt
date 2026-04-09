@@ -1,0 +1,58 @@
+[variables]
+ex = 90
+nex = -90
+ey = 95
+ney = -95
+hei = 200
+
+[node.textedit]
+value = "\n\n[node.uzel]\nvalue = \"Uzel diagramu\"\npivot = \"nowhere\""
+size = [300, "hei"]
+label_pos = "top-left"
+
+[node.eh]
+value = ""
+color = [211, 1, 2, 80]
+color_border = [0, 0, 0, 0]
+z = 5
+xy = ["textedit", "top-left", "ex", "ey"]
+size = [80, 20]
+
+[[path]]
+start = ["eh", "top-left", 0, 0]
+end = ["eh", "top-left", 0, "ney"]
+tips = "<>"
+color = "#00627AFF"
+label_bg = "#F0EEE6FF"
+label = ["řádek_chyby × výška_řádku - posun_y + padding_y", 0, 60, 216]
+
+[node.scrollbar]
+pivot = "top-right"
+xy = ["textedit", "top-right", 0, 0]
+value = ""
+size = [15, "hei"]
+color = "#f0f0f0ff"
+
+[node.srollhandle]
+pivot = "top"
+xy = ["scrollbar", "top", 0, 50]
+value = ""
+size = [13, 100]
+color = "#dbdbdbff"
+color_border = "#00000000"
+
+[[path]]
+start = ["eh", "bottom-left", 0, 0]
+end = ["eh", "bottom-left", "nex", 0]
+tips = "<>"
+color = "#00627AFF"
+label_bg = "#F0EEE6FF"
+label = ["sloupec_chyby × šířka_znaku - posun_x + padding_x", 0, -150, -16]
+
+[[path]]
+start = [17, 2]
+end = [17, 198]
+tips = "--"
+color = "#dbdbdbff"
+label = ["padding", 1, 20, 20]
+label_bg = [255, 255, 255, 255]
