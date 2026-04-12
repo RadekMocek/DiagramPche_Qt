@@ -39,6 +39,7 @@ GUIMainWindow::GUIMainWindow()
 {
     setWindowTitle("[*] Untitled – DiagramPche :: Qt");
     resize(1280, 800);
+    setMinimumSize(666, 416);
 
     // Icons
     m_awesome = new fa::QtAwesome(this);
@@ -131,10 +132,12 @@ void GUIMainWindow::ParseAndRedraw()
         auto err_str = QString::fromStdString(m_parser.m_error_description);
         err_str.replace("\n", " ");
         m_error_label->setText(err_str);
+        m_error_label->setToolTip(err_str);
         ErrorHighlight(m_parser.m_error_source_region);
     }
     else {
         m_error_label->setText("");
+        m_error_label->setToolTip("");
         m_source->setExtraSelections(QList<QTextEdit::ExtraSelection>()); // Disable error highlight if any
     }
 
@@ -567,6 +570,8 @@ void GUIMainWindow::InitMainMenuBar()
     connect(example_1_action, &QAction::triggered, [this] { HandleOpenExample("./Resource/Example/Example1.toml"); });
     const QPointer example_2_action = examples_menu->addAction("Example 2: BPMN");
     connect(example_2_action, &QAction::triggered, [this] { HandleOpenExample("./Resource/Example/Example2.toml"); });
+    const QPointer example_3_action = examples_menu->addAction("Example 3: Simple bubble chart");
+    connect(example_3_action, &QAction::triggered, [this] { HandleOpenExample("./Resource/Example/Example3.toml"); });
     // .: Thesis images :.
     const QPointer thesis_images_menu = examples_menu->addMenu("Thesis images");
     const QPointer thesis_image_1_action = thesis_images_menu->addAction("Wireframe");
@@ -678,6 +683,7 @@ void GUIMainWindow::InitCentralWidget()
 
     m_error_label = new QLabel();
     m_error_label->setPalette(error_text_palette);
+    m_error_label->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred);
     main_layout->addWidget(m_error_label, 0);
 }
 
