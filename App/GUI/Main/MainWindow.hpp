@@ -203,6 +203,7 @@ private:
 
     // Secondary canvas toolbar
     QPointer<QWidget> m_secondary_canvas_toolbar_wrapper;
+    QPointer<QLabel> m_secondary_canvas_toolbar_slider_label;
     QPointer<QSlider> m_secondary_canvas_toolbar_slider;
 
     // Modeless windows

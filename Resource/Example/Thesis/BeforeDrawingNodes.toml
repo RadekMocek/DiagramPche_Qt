@@ -1,0 +1,194 @@
+[variables]
+vspace = 20
+wid1 = 240
+wid2 = 290
+wid3 = 181
+heibg = 149
+
+[node.labelsize]
+value = "Vypočte velikost\ntextového popisku uzlu"
+size = ["wid1", 0]
+
+[node.nodesize]
+value = "Z velikosti popisku\nvypočte velikost uzlu"
+pivot = "top"
+xy = ["labelsize", "bottom", 0, "vspace"]
+size = ["wid1", 0]
+
+[node.pos]
+value = "Z parametru 'xy'\nzíská souřadnice\nuzlu => pozice"
+pivot = "top"
+xy = ["nodesize", "bottom", 0, "vspace"]
+size = ["wid1", 0]
+
+[node.cond]
+type = "diamond"
+value = "Je uzel závislý?"
+pivot = "top"
+xy = ["pos", "bottom", 0, "vspace"]
+size = [200, 70]
+
+[node.parentoffset]
+value = "Z mapy 'm_canvas_nodes'\nzíská souřadnice rodiče\na přičte je k pozici"
+pivot = "bottom-left"
+xy = ["cond", "bottom-right", 60, 0]
+
+[node.pivotoffset]
+value = "Podle parametru 'pivot'\na velikosti uzlu vypočte\nposun a přičte jej k pozici"
+pivot = "top-left"
+xy = ["labelsize", "top-right", 290, 0]
+size = ["wid2", 0]
+
+[node.save]
+value = "Uloží pozici daného uzlu\ndo mapy 'm_canvas_nodes'"
+pivot = "top"
+xy = ["pivotoffset", "bottom", 0, "vspace"]
+size = ["wid2", 0]
+
+[node.draw]
+value = "Vykreslí uzel"
+pivot = "top"
+xy = ["save", "bottom", 0, "vspace"]
+size = ["wid2", 0]
+
+[[path]]
+start = ["labelsize", "bottom", 0, 0]
+end = ["nodesize", "top", 0, 0]
+[[path]]
+start = ["nodesize", "bottom", 0, 0]
+end = ["pos", "top", 0, 0]
+[[path]]
+start = ["pos", "bottom", 0, 0]
+end = ["cond", "top", 0, 0]
+
+[[path]]
+start = ["cond", "right", 0, 0]
+end = ["parentoffset", "top", 0, -35]
+points = [
+    ["parentoffset", "left", -20, "", "start", 0],
+    ["", "prev", 0, "", "end", 0]
+]
+label = ["Ne", 0, 18, 0]
+label_bg = [255, 255, 255, 255]
+[[path]]
+start = ["cond", "bottom", 0, 0]
+end = ["parentoffset", "bottom", 0, 0]
+label = ["Ano", 0, 18, 0]
+label_bg = [255, 255, 255, 255]
+shift = 38
+[[path]]
+start = ["parentoffset", "top", 0, 0]
+end = ["pivotoffset", "left", 0, 0]
+points = [["", "start", 0, "", "end", 0]]
+
+[[path]]
+start = ["pivotoffset", "bottom", 0, 0]
+end = ["save", "top", 0, 0]
+[[path]]
+start = ["save", "bottom", 0, 0]
+end = ["draw", "top", 0, 0]
+
+[[path]]
+start = ["labelsize", "top", 0, -18]
+end = ["labelsize", "top", 0, 0]
+label = ["m_parser.m_result_nodes_pq.top()", 0, -10, -25]
+[[path]]
+start = ["draw", "bottom", 0, 0]
+end = ["draw", "bottom", 0, 18]
+label = ["m_parser.m_result_nodes_pq.pop()", 1, -10, 0]
+
+[node.src]
+value = "[node.a]\nxy = [50, 50]\n\n[node.b]\npivot = \"top\"\nxy = [\"a\", \"bottom\", 0, 0]"
+xy = [3, 435]
+
+[node.bg1]
+value = ""
+z = 4
+xy = ["src", "top-right", 0, 0]
+size = ["wid3", "heibg"]
+[node.a1]
+value = "a"
+xy = ["bg1", "top-left", 65, 65]
+color = "#c6daf2cf"
+size = [0, 35]
+[node.b1]
+value = "b"
+xy = ["bg1", "top-left", 15, 15]
+color = "#c6daf2cf"
+size = [0, 35]
+
+[node.bg2]
+value = ""
+z = 4
+xy = ["bg1", "top-right", 0, 0]
+size = ["wid3", "heibg"]
+[node.a2]
+value = "a"
+xy = ["bg2", "top-left", 65, 65]
+color = "#c6daf2cf"
+size = [0, 35]
+[node.b2]
+value = "b"
+xy = ["a2", "bottom", 0, 0]
+color = "#c6daf2cf"
+size = [0, 35]
+
+[node.bg3]
+value = ""
+z = 4
+xy = ["bg2", "top-right", 0, 0]
+size = ["wid3", "heibg"]
+[node.a3]
+value = "a"
+xy = ["bg3", "top-left", 65, 65]
+color = "#c6daf2cf"
+size = [0, 35]
+[node.b3]
+value = "b"
+pivot = "top"
+xy = ["a3", "bottom", 0, 0]
+color = "#c6daf2cf"
+size = [0, 35]
+
+[node.m1a]
+pivot = "top-right"
+xy = ["pos", "top-right", -2, 2]
+value = "1"
+size = [20, 28]
+color = "#f2dbc6cf"
+color_border = "#00000000"
+[node.m1b]
+pivot = "top-right"
+xy = ["bg1", "top-right", -2, 2]
+value = "1"
+size = [20, 28]
+color = "#f2dbc6cf"
+color_border = "#00000000"
+[node.m2a]
+pivot = "top-right"
+xy = ["parentoffset", "top-right", -2, 2]
+value = "2"
+size = [16, 28]
+color = "#f2dbc6cf"
+color_border = "#00000000"
+[node.m2b]
+pivot = "top-right"
+xy = ["bg2", "top-right", -2, 2]
+value = "2"
+size = [20, 28]
+color = "#f2dbc6cf"
+color_border = "#00000000"
+[node.m3a]
+pivot = "top-right"
+xy = ["pivotoffset", "top-right", -2, 2]
+value = "3"
+size = [20, 28]
+color = "#f2dbc6cf"
+color_border = "#00000000"
+[node.m3b]
+pivot = "top-right"
+xy = ["bg3", "top-right", -2, 2]
+value = "3"
+size = [20, 28]
+color = "#f2dbc6cf"
+color_border = "#00000000"

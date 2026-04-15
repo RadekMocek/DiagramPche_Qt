@@ -53,9 +53,6 @@ GUIMainWindow::GUIMainWindow()
 
     ParseAndRedraw();
 
-    // It moves the canvas but not as expected when called here
-    ResetCanvasScrollingAndZoom();
-
     // Fill with initial value
     m_CPU_usage = CPUStats::GetCurrentValue();
 
@@ -104,13 +101,16 @@ GUIMainWindow::GUIMainWindow()
         WidgetbenchStart();
     }
 
-    // Sad but necessary
     QTimer::singleShot(0, this, [this] {
-        // After this ctor, m_source sends signal about text being changed.
+        // After this CTOR, `m_source` sends signal about text being changed.
         // We have to use a timer to mark the document as non-dirty after that happens.
         // I am not sure what exactly happens under the hood but calling just `m_is_source_dirty = false;` without timer won't work.
-        // It has something to do with the syntax highlighter. This issue stops when i turn off syntax highlighting.
+        // It has something to do with the syntax highlighter. This issue stops when I turn off syntax highlighting.
         setWindowModified(false);
+
+        // If this line is called outside this timer, canvas scrolling won't be set properly.
+        // So there is also some stuff happening under the hood with the scene viewer.
+        ResetCanvasScrollingAndZoom();
     });
 }
 
@@ -574,14 +574,22 @@ void GUIMainWindow::InitMainMenuBar()
     connect(example_3_action, &QAction::triggered, [this] { HandleOpenExample("./Resource/Example/Example3.toml"); });
     // .: Thesis images :.
     const QPointer thesis_images_menu = examples_menu->addMenu("Thesis images");
-    const QPointer thesis_image_1_action = thesis_images_menu->addAction("Wireframe");
-    connect(thesis_image_1_action, &QAction::triggered, [this] {
-        HandleOpenExample("./Resource/Example/Thesis/Wireframe.toml");
-    });
-    const QPointer thesis_image_2_action = thesis_images_menu->addAction("Error highlight");
-    connect(thesis_image_2_action, &QAction::triggered, [this] {
-        HandleOpenExample("./Resource/Example/Thesis/ErrorHighlight.toml");
-    });
+
+    constexpr std::array<std::pair<const char*, const char*>, 3> items = {
+        {
+            {"Wireframe", "Wireframe"},
+            {"Error highlight", "ErrorHighlight"},
+            {"Node position", "BeforeDrawingNodes"},
+        }
+    };
+
+    for (const auto& [guiname, filename] : items) {
+        const QPointer action = thesis_images_menu->addAction(guiname);
+        connect(action, &QAction::triggered, [this, filename] {
+            HandleOpenExample(QString("./Resource/Example/Thesis/%1.toml").arg(filename));
+        });
+    }
+
     // . About .
     const QPointer about_action = help_menu->addAction("About");
     connect(about_action, &QAction::triggered, [this] {
@@ -708,6 +716,10 @@ void GUIMainWindow::InitSecondaryCanvasToolbar(const QPointer<QVBoxLayout>& canv
     // Buttons on left, slider on right
     secondary_canvas_toolbar->addStretch(1);
 
+    // Slider label
+    m_secondary_canvas_toolbar_slider_label = new QLabel("Zoom level: 1.00");
+    secondary_canvas_toolbar->addWidget(m_secondary_canvas_toolbar_slider_label);
+
     // Zoom level slider
     m_secondary_canvas_toolbar_slider = new QSlider(Qt::Horizontal);
     m_secondary_canvas_toolbar_slider->setFixedWidth(180);
@@ -718,10 +730,14 @@ void GUIMainWindow::InitSecondaryCanvasToolbar(const QPointer<QVBoxLayout>& canv
     m_secondary_canvas_toolbar_slider->setSingleStep(1);
     m_secondary_canvas_toolbar_slider->setPageStep(1);
     connect(m_secondary_canvas_toolbar_slider, &QSlider::valueChanged, [this](const int slider_value) {
-        const auto new_scale = static_cast<float>(CANVAS_FONT_SIZE_MIN + CANVAS_FONT_SIZE_STEP * slider_value) /
-            static_cast<float>(CANVAS_FONT_SIZE_BASE);
+        const auto new_scale =
+            static_cast<float>(CANVAS_FONT_SIZE_MIN + CANVAS_FONT_SIZE_STEP * slider_value)
+            / static_cast<float>(CANVAS_FONT_SIZE_BASE);
+
         m_viewer->resetTransform();
         m_viewer->scale(new_scale, new_scale);
+
+        m_secondary_canvas_toolbar_slider_label->setText(QString("Zoom level: %1").arg(new_scale, 0, 'f', 2));
     });
 
     canvas_container->addWidget(m_secondary_canvas_toolbar_wrapper);
