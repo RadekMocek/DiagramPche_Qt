@@ -81,7 +81,7 @@ GUIMainWindow::GUIMainWindow()
         }
 
         if (args[3] == "0") {
-            m_highlighter->setDocument(nullptr);
+            m_highlighter_light->setDocument(nullptr);
         }
         else if (args[3] == "2") {
             m_source_wrapper->setCurrentIndex(1);
@@ -321,9 +321,9 @@ void GUIMainWindow::ErrorHighlight(const toml::source_region& EH_region) const
     m_source->setExtraSelections(QList({selection}));
 }
 
-void GUIMainWindow::ApplyPreferences() const
+void GUIMainWindow::ApplyPreferences()
 {
-    m_source->blockSignals(true);
+    const auto is_window_modified = isWindowModified();
 
     // (Not ideal, I am updating everything everytime. More ideal would be to check only for the changes)
     // Keep canvas light?
@@ -334,19 +334,57 @@ void GUIMainWindow::ApplyPreferences() const
     m_source_font_size_spinbox->setValue(m_state_dialog_preferences.source_font_size);
     // Syntax highlight
     if (m_state_dialog_preferences.is_syntax_highlight_enabled) {
-        m_highlighter->setDocument(m_source->document());
+        if (m_is_color_theme_light) {
+            m_highlighter_light->setDocument(m_source->document());
+        }
+        else {
+            m_highlighter_dark->setDocument(m_source->document());
+        }
     }
     else {
-        m_highlighter->setDocument(nullptr);
+        m_highlighter_light->setDocument(nullptr);
+        m_highlighter_dark->setDocument(nullptr);
     }
     // View
     m_view_primary_toolbar_checkable_action->setChecked(m_state_dialog_preferences.do_show_primary_toolbar);
     m_view_canvas_grid_checkable_action->setChecked(m_state_dialog_preferences.do_show_canvas_grid);
     m_view_secondary_toolbar_checkable_action->setChecked(m_state_dialog_preferences.do_show_secondary_toolbar);
 
-    // This is enough to not mark doc as dirty when syntax highlighting is off.
-    // But when it's on, it sends signal after this and marks document as dirty :(.
-    m_source->blockSignals(false);
+    // Changing highlighter will mark document as dirty, so we undo it like this
+    if (!is_window_modified) {
+        QTimer::singleShot(0, this, [this] {
+            setWindowModified(false);
+        });
+    }
+}
+
+void GUIMainWindow::ApplyColorTheme(const bool is_light)
+{
+    const auto is_window_modified = isWindowModified();
+
+    m_is_color_theme_light = is_light;
+
+    if (is_light) {
+        QGuiApplication::styleHints()->setColorScheme(Qt::ColorScheme::Light);
+        if (m_state_dialog_preferences.is_syntax_highlight_enabled) {
+            m_highlighter_light->setDocument(m_source->document());
+            m_highlighter_dark->setDocument(nullptr);
+        }
+    }
+    else {
+        QGuiApplication::styleHints()->setColorScheme(Qt::ColorScheme::Dark);
+        if (m_state_dialog_preferences.is_syntax_highlight_enabled) {
+            m_highlighter_light->setDocument(nullptr);
+            m_highlighter_dark->setDocument(m_source->document());
+        }
+    }
+
+    // Changing highlighter will mark document as dirty, so we undo it like this
+    if (!is_window_modified) {
+        QTimer::singleShot(0, this, [this] {
+            setWindowModified(false);
+        });
+    }
 }
 
 int GUIMainWindow::GetSourceFontSize() const
@@ -477,7 +515,13 @@ void GUIMainWindow::InitMainMenuBar()
         m_state_dialog_preferences.do_show_secondary_toolbar = m_view_secondary_toolbar_checkable_action->isChecked();
         // Show dialog
         m_preferences_dialog = new PreferencesDialog(this, m_state_dialog_preferences);
-        connect(m_preferences_dialog, &PreferencesDialog::ButtonApplyClicked, this, &GUIMainWindow::ApplyPreferences);
+
+        connect(m_preferences_dialog, &PreferencesDialog::ButtonApplyClicked,
+                this, &GUIMainWindow::ApplyPreferences);
+
+        connect(m_preferences_dialog, &PreferencesDialog::ButtonColorThemeClicked,
+                this, &GUIMainWindow::ApplyColorTheme);
+
         m_preferences_dialog->setAttribute(Qt::WA_DeleteOnClose);
         m_preferences_dialog->show();
     });
@@ -546,11 +590,16 @@ void GUIMainWindow::InitMainMenuBar()
         m_benchmark_dialog->setAttribute(Qt::WA_DeleteOnClose);
         connect(m_benchmark_dialog, &BenchmarkDialog::ButtonStartClicked, this, &GUIMainWindow::BenchmarkStart);
         connect(m_benchmark_dialog, &BenchmarkDialog::ButtonStopClicked, this, &GUIMainWindow::BenchmarkStopForce);
+
         connect(m_benchmark_dialog, &BenchmarkDialog::ButtonSwitchSyntaxHighlightClicked,
                 this, &GUIMainWindow::OnSyntaxHighlightSwitchRequest);
 
+        connect(m_benchmark_dialog, &BenchmarkDialog::ButtonSwitchTextEditVisibilityClicked,
+                this, &GUIMainWindow::OnTextEditVisibilitySwitchRequest);
+
         connect(this, &GUIMainWindow::BenchmarkStatsCrateUpdated,
                 m_benchmark_dialog, &BenchmarkDialog::OnBenchmarkStatsCrateUpdate);
+
         connect(this, &GUIMainWindow::BenchmarkDone, m_benchmark_dialog, &BenchmarkDialog::OnBenchmarkDone);
 
         m_benchmark_dialog->show();
@@ -634,13 +683,15 @@ void GUIMainWindow::InitCentralWidget()
     m_splitter->setChildrenCollapsible(false);
 
     // Text editor
+    // (Stacked widget is only used so we can hide the text editor in benchmark, otherwise we could use `QPlainTextEdit` directly)
     m_source_wrapper = new QStackedWidget();
 
     m_source = new QPlainTextEdit();
     m_source->setPlainText(WELCOME_TOML);
     m_source->setLineWrapMode(QPlainTextEdit::NoWrap);
 
-    m_highlighter = new Highlighter(m_source->document());
+    m_highlighter_light = new Highlighter(m_source->document());
+    m_highlighter_dark = new HighlighterDark();
 
     m_source_wrapper->addWidget(m_source); // Index 0
     m_source_wrapper->addWidget(new QWidget()); // Index 1 (for hiding in benchmark and keeping empty space)

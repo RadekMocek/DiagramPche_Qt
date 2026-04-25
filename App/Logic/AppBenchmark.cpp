@@ -228,7 +228,9 @@ QCoro::Task<> GUIMainWindow::BenchmarkStart(const BenchmarkType type)
 
                 const auto bench_id = std::format("b{}", static_cast<int>(type));
 
-                auto bench_info = (m_highlighter->document()) ? "shon" : "shoff";
+                auto bench_info = (m_highlighter_light->document() || m_highlighter_dark->document())
+                                      ? "shon"
+                                      : "shoff";
                 if (m_source_wrapper->currentIndex() == 1) {
                     bench_info = "txoff";
                 }
@@ -260,12 +262,45 @@ QCoro::Task<> GUIMainWindow::BenchmarkStart(const BenchmarkType type)
     }
 }
 
-void GUIMainWindow::OnSyntaxHighlightSwitchRequest() const
+void GUIMainWindow::OnSyntaxHighlightSwitchRequest()
 {
-    if (m_highlighter->document()) {
-        m_highlighter->setDocument(nullptr);
+    const auto is_window_modified = isWindowModified();
+
+    if (m_is_color_theme_light) {
+        if (m_highlighter_light->document()) {
+            m_highlighter_light->setDocument(nullptr);
+            m_state_dialog_preferences.is_syntax_highlight_enabled = false;
+        }
+        else {
+            m_highlighter_light->setDocument(m_source->document());
+            m_state_dialog_preferences.is_syntax_highlight_enabled = true;
+        }
     }
     else {
-        m_highlighter->setDocument(m_source->document());
+        if (m_highlighter_dark->document()) {
+            m_highlighter_dark->setDocument(nullptr);
+            m_state_dialog_preferences.is_syntax_highlight_enabled = false;
+        }
+        else {
+            m_highlighter_dark->setDocument(m_source->document());
+            m_state_dialog_preferences.is_syntax_highlight_enabled = true;
+        }
+    }
+
+    // Changing highlighter will mark document as dirty, so we undo it like this
+    if (!is_window_modified) {
+        QTimer::singleShot(0, this, [this] {
+            setWindowModified(false);
+        });
+    }
+}
+
+void GUIMainWindow::OnTextEditVisibilitySwitchRequest() const
+{
+    if (m_source_wrapper->currentIndex() == 0) {
+        m_source_wrapper->setCurrentIndex(1);
+    }
+    else {
+        m_source_wrapper->setCurrentIndex(0);
     }
 }

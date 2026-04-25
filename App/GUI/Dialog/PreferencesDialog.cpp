@@ -1,10 +1,8 @@
 #include <QCheckBox>
 #include <QGroupBox>
-#include <QGuiApplication>
 #include <QPushButton>
 #include <QRadioButton>
 #include <QSpinBox>
-#include <QStyleHints>
 #include <QTabWidget>
 #include <QVBoxLayout>
 
@@ -35,13 +33,14 @@ void PreferencesDialog::InitGUI()
     const QPointer group1_1_layout = new QHBoxLayout();
 
     const QPointer appearance_button_light = new QPushButton("Light");
-    connect(appearance_button_light, &QPushButton::clicked, [] {
-        QGuiApplication::styleHints()->setColorScheme(Qt::ColorScheme::Light);
+    connect(appearance_button_light, &QPushButton::clicked, [this] {
+        emit ButtonColorThemeClicked(true);
     });
     group1_1_layout->addWidget(appearance_button_light);
+
     const QPointer appearance_button_dark = new QPushButton("Dark");
-    connect(appearance_button_dark, &QPushButton::clicked, [] {
-        QGuiApplication::styleHints()->setColorScheme(Qt::ColorScheme::Dark);
+    connect(appearance_button_dark, &QPushButton::clicked, [this] {
+        emit ButtonColorThemeClicked(false);
     });
     group1_1_layout->addWidget(appearance_button_dark);
 

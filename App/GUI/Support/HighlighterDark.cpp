@@ -1,8 +1,8 @@
-#include "Highlighter.hpp"
+#include "HighlighterDark.hpp"
 
-Highlighter::Highlighter(QTextDocument* parent) : QSyntaxHighlighter(parent)
+HighlighterDark::HighlighterDark(QTextDocument* parent) : QSyntaxHighlighter(parent)
 {
-    const QColor COLOR_KEYWORD = QColor::fromRgb(55, 61, 194, 255);
+    const QColor COLOR_KEYWORD = QColor::fromRgb(255, 61, 194, 255);
     const QColor COLOR_IDENTIFIER = QColor::fromRgb(16, 127, 118, 255);
     const QColor COLOR_COMMENT = QColor::fromRgb(135, 148, 147, 255);
     const QColor COLOR_STRING = QColor::fromRgb(77, 89, 1, 255);
@@ -61,7 +61,7 @@ Highlighter::Highlighter(QTextDocument* parent) : QSyntaxHighlighter(parent)
     // But now when we have comment with a string, the string is still green instead fo gray
 }
 
-void Highlighter::highlightBlock(const QString& text)
+void HighlighterDark::highlightBlock(const QString& text)
 {
     for (const auto& [pattern, format] : std::as_const(m_highlighting_rules)) {
         QRegularExpressionMatchIterator matchIterator = pattern.globalMatch(text);

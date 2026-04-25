@@ -34,10 +34,11 @@ BenchmarkDialog::BenchmarkDialog(QWidget* parent, BenchmarkStatsState& crate) :
     connect(button_syntax_highlight, &QPushButton::clicked, this, &BenchmarkDialog::ButtonSwitchSyntaxHighlightClicked);
     group_init_layout->addWidget(button_syntax_highlight);
 
-    group_init_layout->addWidget(
-        new QLabel("Or you can hide the text editor completely by running\n"
-            "'.\\DiagramPche_Qt.exe b ? 2', where '?' is the benchmark type (0/1/2).")
-    );
+    group_init_layout->addWidget(new QLabel("Or hide the text editor completely:"));
+    const QPointer button_textedit_visibility = new QPushButton("Text editor visibility on/off");
+    connect(button_textedit_visibility, &QPushButton::clicked,
+            this, &BenchmarkDialog::ButtonSwitchTextEditVisibilityClicked);
+    group_init_layout->addWidget(button_textedit_visibility);
 
     group_init_layout->addWidget(new QLabel("\nChoose one of the three benchmarks:"));
     m_combo_benchmark_type = new QComboBox();

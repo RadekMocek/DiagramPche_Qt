@@ -51,4 +51,5 @@ private:
 
 signals:
     void ButtonApplyClicked();
+    void ButtonColorThemeClicked(bool is_light);
 };

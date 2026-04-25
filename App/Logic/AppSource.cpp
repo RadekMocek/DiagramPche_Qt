@@ -14,11 +14,11 @@ void GUIMainWindow::ReplaceInMSource(const toml::source_region& source, const QS
     cursor.insertText(new_str);
 }
 
-// This method is called when user changes node color or type via toolbar and the node TOML definition does not contain
-// the line with "color=" or "type=" (so default is used). In this situation, there is nothing to replace, but we need to
-// insert a new line into the source (that explicitly sets the color/type). The `end` parameter tells the function where
-// the last character of the line "[node.some_id]" is for the particular node. The parameter `new_str` is then inserted
-// to that position. It is expected that `new_str` begins with newline character, so the TOML is still valid after insert.
+// This method is called when user changes node color/type via toolbar, and the node TOML definition does not contain
+// the line with "color=" or "type=" (so default was used). In this situation, there is nothing to replace and we need to
+// insert a new line into the source instead (that explicitly sets the color/type). The `end` parameter tells the function
+// where the last character of the line "[node.some_id]" is for the particular node. The parameter `new_str` is then inserted
+// to that position. It is expected that `new_str` begins with newline character, so the TOML is still valid after the insert.
 void GUIMainWindow::InsertNodeParameterInMSource(const toml::source_position& end, const QString& new_str) const
 {
     const auto block = m_source->document()->findBlockByLineNumber(static_cast<int>(end.line) - 1);

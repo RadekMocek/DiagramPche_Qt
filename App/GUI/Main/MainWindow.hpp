@@ -25,6 +25,7 @@ QT_END_NAMESPACE
 #include "../Dialog/PreferencesDialog.hpp"
 #include "../SceneItem/SceneNode.hpp"
 #include "../Support/Highlighter.hpp"
+#include "../Support/HighlighterDark.hpp"
 
 // App fwd declrs
 class GUIScene;
@@ -97,7 +98,8 @@ private:
     void ExportToSvg() const;
     void ErrorHighlight(const toml::source_region& EH_region) const;
 
-    void ApplyPreferences() const;
+    void ApplyPreferences();
+    void ApplyColorTheme(bool is_light);
 
     [[nodiscard]] int GetSourceFontSize() const;
     void SetSourceFontSize(int new_size) const;
@@ -116,7 +118,7 @@ private:
     void HandleOpenExample(const QString& filename);
     //
     void LoadSourceFromFile(const QString& filename, bool is_example);
-    bool SaveSourceToFile(const QString& filename) const;
+    [[nodiscard]] bool SaveSourceToFile(const QString& filename) const;
     bool SaveSourceToFileFromDialog();
 
     // AppDialog.cpp
@@ -142,7 +144,8 @@ private:
     QCoro::Task<> BenchmarkStart(BenchmarkType type);
     void BenchmarkStopForce() { m_bench_stop_flag = true; }
     void SetGUIEnabled(bool value) const;
-    void OnSyntaxHighlightSwitchRequest() const;
+    void OnSyntaxHighlightSwitchRequest();
+    void OnTextEditVisibilitySwitchRequest() const;
     // - Benchmark widgets
     QCoro::Task<> WidgetbenchStart();
 
@@ -155,14 +158,16 @@ private:
     // Override
     void closeEvent(QCloseEvent* event) override;
 
-    // = Members=
+    // = Members =
     // Splitter between Text editor & Canvas
     QPointer<QSplitter> m_splitter;
 
     // Text editor with the TOML describing the diagram
     QPointer<QStackedWidget> m_source_wrapper;
     QPointer<QPlainTextEdit> m_source;
-    QPointer<Highlighter> m_highlighter; // Syntax highlight
+    QPointer<Highlighter> m_highlighter_light; // Syntax highlight
+    QPointer<HighlighterDark> m_highlighter_dark; // Syntax highlight for dark, could not find any better solution
+    bool m_is_color_theme_light = true;
     std::optional<QString> m_source_filename = std::nullopt;
     std::optional<QString> GetMSourceFilename();
     void SetMSourceFilename(const std::optional<QString>& filename);

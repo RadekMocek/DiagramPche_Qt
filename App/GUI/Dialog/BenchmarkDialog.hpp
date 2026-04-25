@@ -65,6 +65,7 @@ signals:
     void ButtonStartClicked(BenchmarkType type);
     void ButtonStopClicked();
     void ButtonSwitchSyntaxHighlightClicked();
+    void ButtonSwitchTextEditVisibilityClicked();
 
 public slots:
     void OnBenchmarkStatsCrateUpdate() const;
