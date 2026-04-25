@@ -2,11 +2,14 @@
 
 HighlighterDark::HighlighterDark(QTextDocument* parent) : QSyntaxHighlighter(parent)
 {
-    const QColor COLOR_KEYWORD = QColor::fromRgb(255, 61, 194, 255);
-    const QColor COLOR_IDENTIFIER = QColor::fromRgb(16, 127, 118, 255);
-    const QColor COLOR_COMMENT = QColor::fromRgb(135, 148, 147, 255);
-    const QColor COLOR_STRING = QColor::fromRgb(77, 89, 1, 255);
-    const QColor COLOR_NUMBER = QColor::fromRgb(160, 32, 32, 255);
+    // Inspired by https://docs.rs/egui_code_editor/0.2.21/egui_code_editor/struct.ColorTheme.html#associatedconstant.SONOKAI
+    // (https://github.com/sainnhe/sonokai)
+    // (https://github.com/p4ymak/egui_code_editor)
+    const QColor COLOR_KEYWORD = QColor::fromRgb(252, 93, 124, 255);
+    const QColor COLOR_IDENTIFIER = QColor::fromRgb(57, 158, 230, 255);
+    const QColor COLOR_COMMENT = QColor::fromRgb(127, 132, 144, 255);
+    const QColor COLOR_STRING = QColor::fromRgb(231, 198, 100, 255);
+    const QColor COLOR_NUMBER = QColor::fromRgb(179, 157, 243, 255);
 
     // = "Keywords" =
     m_format_keyword.setForeground(COLOR_KEYWORD);

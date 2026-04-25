@@ -70,18 +70,16 @@ An alternative approach would be to choose the _MinGW_ component instead of _MSV
 
 ### Visual problems
 
-* Syntax highlight:
-  * No dedicated color theme for the dark mode
+* Icons stay black after changing to dark mode (ideally, they should switch to white as the rest of the font)
+* Minor syntax highlight issues:
   * Highlights commented string as normal string
   * `points = [["", "start", 0, "", "end", 0]]` – first zero is green (not red) for some reason
   * On Linux the `node`/`path` keywords are not bold (Windows OK), this is not a big issue since other projects do not support bold font in text editor at all
-* Icons stay black after changing to dark mode (ideally, they should switch to white as the rest of the font)
 
 ### UX problems
 
 * On Windows (Linux OK), when dragging canvas via RMB and then releasing RMB outside of canvas on some other widget (e.g. textedit), a context menu for that widget appears, as if we right-clicked on that widget intentionally
-* Turning on syntax highlight in preferences window and hitting apply will mark the document as dirty.
 
 ### Differences to IMGUI projects
 
-* Settings in preferences window, that can also be changed from toolbar/menubar: their values won't get updated immediatelly in settings window if they are changed from those other places (they get updated after reopening the preferences window). Preferences window also has an 'apply all' button. This could be improved, but would require additional logic.
+* Settings in preferences window, that can also be changed from toolbar/menubar: Their values won't get updated immediately in settings window if they are changed from those other places (they get updated after reopening the preferences window). Preferences window also has an 'apply all' button (instead of changing settings immediately). This could be improved, but would require additional logic.

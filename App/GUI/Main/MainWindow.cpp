@@ -328,7 +328,7 @@ void GUIMainWindow::ApplyPreferences()
     // (Not ideal, I am updating everything everytime. More ideal would be to check only for the changes)
     // Keep canvas light?
     m_viewer->m_is_background_light = m_state_dialog_preferences.is_canvas_light;
-    // Redraw so the color change is visible immediatelly and not only after first interaction
+    // Redraw so the color change is visible immediately and not only after first interaction
     m_viewer->viewport()->update();
     // Source font size
     m_source_font_size_spinbox->setValue(m_state_dialog_preferences.source_font_size);
