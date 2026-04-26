@@ -11,7 +11,7 @@ class ScenePath : public QGraphicsItem
 public:
     explicit ScenePath(const ScenePathCrate& crate);
 
-    [[nodiscard]] QRectF boundingRect() const override;
+    QRectF boundingRect() const override;
 
     void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) override;
 

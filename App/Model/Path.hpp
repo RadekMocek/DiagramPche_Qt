@@ -34,7 +34,7 @@ struct Path
     ColorTuple label_bg_color = {0, 0, 0, 0};
 
     //
-    [[nodiscard]] constexpr QPointF GetShiftVector(const Pivot pivot, const bool is_start) const
+    constexpr QPointF GetShiftVector(const Pivot pivot, const bool is_start) const
     {
         const auto sf = static_cast<qreal>((is_start) ? shift_start : shift_end);
         switch (pivot) {

@@ -79,7 +79,7 @@ private:
     // = Methods =
     void ParseAndRedraw();
 
-    [[nodiscard]] std::optional<std::reference_wrapper<const Node>> GetNodeRefFromId(const std::string& id) const;
+    std::optional<std::reference_wrapper<const Node>> GetNodeRefFromId(const std::string& id) const;
 
     // Slots:
     void OnSourceChange();
@@ -101,7 +101,7 @@ private:
     void ApplyPreferences();
     void ApplyColorTheme(bool is_light);
 
-    [[nodiscard]] int GetSourceFontSize() const;
+    int GetSourceFontSize() const;
     void SetSourceFontSize(int new_size) const;
 
     void SetAllToolbarsVisible(bool value) const;
@@ -118,7 +118,7 @@ private:
     void HandleOpenExample(const QString& filename);
     //
     void LoadSourceFromFile(const QString& filename, bool is_example);
-    [[nodiscard]] bool SaveSourceToFile(const QString& filename) const;
+    bool SaveSourceToFile(const QString& filename) const;
     bool SaveSourceToFileFromDialog();
 
     // AppDialog.cpp
@@ -150,7 +150,7 @@ private:
     QCoro::Task<> WidgetbenchStart();
 
     // Icons
-    [[nodiscard]] QIcon Icon(const int character, const bool is_solid = true) const
+    QIcon Icon(const int character, const bool is_solid = true) const
     {
         return m_awesome->icon((is_solid) ? fa::fa_solid : fa::fa_regular, character);
     }

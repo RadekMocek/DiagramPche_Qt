@@ -35,11 +35,11 @@ public:
     void GUIScenePrepareNode(const std::string& node_id, const Node& node);
     void GUIScenePreparePath(const Path& path);
 
-    [[nodiscard]] QRectF GetSceneAABR() const { return m_scene_aabr.ToQRectF(); }
+    QRectF GetSceneAABR() const { return m_scene_aabr.ToQRectF(); }
 
     // Ghost node
-    [[nodiscard]] bool IsDraggingNode() const { return m_drag_state.has_value(); }
-    [[nodiscard]] bool IsCursorOverViewer() const;
+    bool IsDraggingNode() const { return m_drag_state.has_value(); }
+    bool IsCursorOverViewer() const;
     void UpdateGhostNodePositionAndVisibility(QPointF pos);
 
 private:

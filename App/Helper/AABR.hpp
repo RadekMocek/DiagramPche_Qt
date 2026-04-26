@@ -6,10 +6,10 @@
 // You feed it points and it gives smallest Axis Aligned Bounding Rectangle for them
 struct AABRHelper
 {
-    qreal x_min;
-    qreal x_max;
-    qreal y_min;
-    qreal y_max;
+    qreal x_min{};
+    qreal x_max{};
+    qreal y_min{};
+    qreal y_max{};
 
     // Ctor with an initial point
     explicit AABRHelper(const QPointF point) : x_min(point.x()), x_max(point.x()), y_min(point.y()), y_max(point.y()) {}
@@ -32,7 +32,7 @@ struct AABRHelper
     }
 
     // Get the AABR for given points
-    [[nodiscard]] constexpr QRectF ToQRectF() const
+    constexpr QRectF ToQRectF() const
     {
         return {QPointF(x_min, y_min), QPointF(x_max, y_max)};
     }

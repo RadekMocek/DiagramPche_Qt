@@ -21,7 +21,7 @@ public:
 
     void ResetCanvasScrolling(int offset_x = 5, int offset_y = 5);
 
-    [[nodiscard]] bool IsUserDraggingCanvas() const { return m_is_panning; }
+    bool IsUserDraggingCanvas() const { return m_is_panning; }
 
     bool m_do_show_grid = DO_SHOW_GRID_INIT;
     bool m_is_background_light{};

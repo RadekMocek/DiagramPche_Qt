@@ -9,7 +9,7 @@ class ColorPicker : public QPushButton
 public:
     explicit ColorPicker(QWidget* parent);
 
-    //[[nodiscard]] const QColor& GetColorRef() const { return m_color; }
+    // const QColor& GetColorRef() const { return m_color; }
     void SetColor(const QColor& new_color, bool do_emit_change);
 
 private:
