@@ -10,7 +10,7 @@
 class SceneNode : public QGraphicsItem
 {
 public:
-    explicit SceneNode(const SceneNodeCrate& crate);
+    explicit SceneNode(SceneNodeCrate crate);
     QRectF boundingRect() const override;
     QPointF GetExactPointFromPivot(Pivot pivot) const;
     std::string GetID() const { return m_crate.id; }

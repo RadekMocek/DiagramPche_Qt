@@ -60,7 +60,7 @@ private:
 
     // FPS measure
     QPointer<QTimer> m_fps_timer;
-    int m_fps_counter;
+    int m_fps_counter{};
     void drawForeground(QPainter* painter, const QRectF& rect) override;
 
 private slots:

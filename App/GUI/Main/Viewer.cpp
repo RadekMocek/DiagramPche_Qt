@@ -53,8 +53,12 @@ void GUISceneViewer::mouseReleaseEvent(QMouseEvent* event)
 void GUISceneViewer::mouseMoveEvent(QMouseEvent* event)
 {
     if (m_is_panning) {
-        horizontalScrollBar()->setValue(horizontalScrollBar()->value() - (event->position().x() - m_pan_start_x));
-        verticalScrollBar()->setValue(verticalScrollBar()->value() - (event->position().y() - m_pan_start_y));
+        horizontalScrollBar()->setValue(
+            horizontalScrollBar()->value() - static_cast<int>(event->position().x() - m_pan_start_x)
+        );
+        verticalScrollBar()->setValue(
+            verticalScrollBar()->value() - static_cast<int>(event->position().y() - m_pan_start_y)
+        );
         m_pan_start_x = event->position().x();
         m_pan_start_y = event->position().y();
         event->accept();
@@ -91,20 +95,35 @@ void GUISceneViewer::drawBackground(QPainter* painter, const QRectF& rect)
     const int right_gridline_index = static_cast<int>(std::floor(x2 / GRID_STEP_BASE));
     for (auto i = left_gridline_index; i <= right_gridline_index; ++i) {
         const auto x = i * GRID_STEP_BASE;
-        painter->drawLine(x, y1, x, y2);
+        painter->drawLine(
+            static_cast<int>(x),
+            static_cast<int>(y1),
+            static_cast<int>(x),
+            static_cast<int>(y2)
+        );
     }
 
     const int top_gridline_index = static_cast<int>(std::ceil(y1 / GRID_STEP_BASE));
     const int bottom_gridline_index = static_cast<int>(std::floor(y2 / GRID_STEP_BASE));
     for (auto i = top_gridline_index; i <= bottom_gridline_index; ++i) {
         const auto y = i * GRID_STEP_BASE;
-        painter->drawLine(x1, y, x2, y);
+        painter->drawLine(
+            static_cast<int>(x1),
+            static_cast<int>(y),
+            static_cast<int>(x2),
+            static_cast<int>(y)
+        );
     }
 }
 
 bool GUISceneViewer::eventFilter(QObject* watched, QEvent* event)
 {
+    //qDebug() << "GUISceneViewer::eventFilter";
+
     if (m_scene->IsDraggingNode() && event->type() == QEvent::MouseMove) {
+
+        //qDebug() << dynamic_cast<QMouseEvent*>(event)->globalPosition().toPoint();
+
         m_scene->UpdateGhostNodePositionAndVisibility(mapToScene(mapFromGlobal(
             dynamic_cast<QMouseEvent*>(event)->globalPosition().toPoint()
         )));

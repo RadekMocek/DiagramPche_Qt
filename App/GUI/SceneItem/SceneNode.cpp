@@ -2,8 +2,8 @@
 #include "../../Helper/Color.hpp"
 #include "../Main/Scene.hpp"
 
-SceneNode::SceneNode(const SceneNodeCrate& crate) :
-    m_crate(crate)
+SceneNode::SceneNode(SceneNodeCrate crate) :
+    m_crate(std::move(crate))
 {
     setAcceptHoverEvents(true);
 }
@@ -95,12 +95,12 @@ void SceneNode::UpdateGhostNode(const QString& label_value, const NodeType type)
 void SceneNode::hoverEnterEvent(QGraphicsSceneHoverEvent* event)
 {
     //DebugPrint();
-    emit static_cast<GUIScene*>(scene())->NodeHoverEntered(m_crate.id);
+    emit dynamic_cast<GUIScene*>(scene())->NodeHoverEntered(m_crate.id);
     QGraphicsItem::hoverEnterEvent(event);
 }
 
 void SceneNode::hoverLeaveEvent(QGraphicsSceneHoverEvent* event)
 {
-    emit static_cast<GUIScene*>(scene())->NodeHoverLeft();
+    emit dynamic_cast<GUIScene*>(scene())->NodeHoverLeft();
     QGraphicsItem::hoverLeaveEvent(event);
 }

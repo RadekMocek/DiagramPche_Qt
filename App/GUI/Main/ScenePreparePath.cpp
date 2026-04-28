@@ -158,7 +158,7 @@ void GUIScene::GUIScenePreparePath(const Path& path)
             // Path label is set in TOML as [string(1), int(2), int(3), int(4)]
             // (1) is the label's text
             // (2) is the point of the path on which the label is placed, use modulo to not get out of bounds
-            const auto size = GetQtSize(result_pathpoints.size());
+            const auto size = GetQtSize(static_cast<int>(result_pathpoints.size()));
             const auto label_point_curr_idx = GetQtIndex(path.label_point % size);
             // (3) is the shift of the label position to the next point on the path, get next point using modulo as well
             const auto label_point_next_idx = GetQtIndex((path.label_point + 1) % size);
@@ -182,8 +182,8 @@ void GUIScene::GUIScenePreparePath(const Path& path)
             }
 
             // Final shift to make it that when (3)==0, label center sits on the path
-            label_position.rx() -= path_label_rect.width() / 2.0f;
-            label_position.ry() -= path_label_rect.height() / 2.0f;
+            label_position.rx() -= static_cast<float>(path_label_rect.width()) / 2.0f;
+            label_position.ry() -= static_cast<float>(path_label_rect.height()) / 2.0f;
 
             // Done
             result_path_labels.append(label_position);

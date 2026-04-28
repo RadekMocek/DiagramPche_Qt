@@ -34,7 +34,7 @@ private:
     void drawBackground(QPainter* painter, const QRectF& rect) override;
 
     bool m_is_panning{};
-    int m_pan_start_x{}, m_pan_start_y{};
+    qreal m_pan_start_x{}, m_pan_start_y{};
 
     //
 

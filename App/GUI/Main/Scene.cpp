@@ -130,7 +130,8 @@ void GUIScene::OnDragStateChange(const std::optional<NodeType> type)
         // Change to nullopt
         m_drag_state = type;
         // Remove ghost node BEFORE sending the signal
-        // (the signal will change textedit and that will clear the whole scene, can't remove something from an empty scene)
+        // (The signal will change textedit and that will clear the whole scene, can't remove something from an empty scene.)
+        // (That means this line doesn't need to be here but I like to be explicit.)
         removeItem(&m_ghost_node);
         // Emit signal to add node to diagram
         if (IsCursorOverViewer()) {

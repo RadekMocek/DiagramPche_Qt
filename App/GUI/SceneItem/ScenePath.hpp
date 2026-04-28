@@ -9,7 +9,7 @@
 class ScenePath : public QGraphicsItem
 {
 public:
-    explicit ScenePath(const ScenePathCrate& crate);
+    explicit ScenePath(ScenePathCrate crate);
 
     QRectF boundingRect() const override;
 

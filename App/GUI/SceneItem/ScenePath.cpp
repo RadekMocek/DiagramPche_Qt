@@ -1,10 +1,8 @@
 #include "ScenePath.hpp"
 #include "../../Helper/Draw.hpp"
 
-#include <QPainter>
-
-ScenePath::ScenePath(const ScenePathCrate& crate) :
-    m_crate(crate)
+ScenePath::ScenePath(ScenePathCrate crate) :
+    m_crate(std::move(crate))
 {
     //
 }
