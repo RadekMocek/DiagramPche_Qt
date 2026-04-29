@@ -7,6 +7,8 @@ This is part of a IMGUI paradigm research, [go back to main repo](https://github
   * [Dependencies](#dependencies)
   * [Problems](#problems)
 
+![screenshot](./Screenshot.png)
+
 ## Building locally
 
 (This guide works with Qt version 6.10.0. If you have a newer version, replace `6.10.0` in all paths accordingly.)

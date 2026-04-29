@@ -42,12 +42,13 @@ constexpr auto OS_ID = "lin";
 constexpr auto BENCHMARK_LIGHT_PATH = "./Resource/Example/Debug/BenchmarkLight.toml";
 constexpr auto BENCHMARK_HEAVY_PATH = "./Resource/Example/Debug/BenchmarkHeavy.toml";
 
-// === App config  === === === === === === === === === === ===
+// === App config  === === === === === === === === === === === === === ===
+constexpr auto DEFAULT_WINDOW_NAME = "[*]Untitled – DiagramPche :: Qt";
 constexpr auto FONT_FAMILY_DEFAULT = "Inconsolata";
 constexpr auto DO_SHOW_PRIMARY_TOOLBAR_INIT = true;
 constexpr auto DO_SHOW_SECONDARY_TOOLBAR_INIT = true;
 constexpr auto EXIT_AFTER_BENCHMARK_FROM_TERMINAL = true;
-// === === === === === === === === === === === === === === ===
+// === === === === === === === === === === === === === === === === === ===
 
 class GUIMainWindow : public QMainWindow
 {

@@ -37,7 +37,7 @@ constexpr auto SLIDER_MAX = (CANVAS_FONT_SIZE_MAX - CANVAS_FONT_SIZE_MIN) / CANV
 
 GUIMainWindow::GUIMainWindow()
 {
-    setWindowTitle("[*] Untitled – DiagramPche :: Qt");
+    setWindowTitle(DEFAULT_WINDOW_NAME);
     resize(1280, 800);
     setMinimumSize(666, 416);
 
@@ -624,11 +624,12 @@ void GUIMainWindow::InitMainMenuBar()
     // .: Thesis images :.
     const QPointer thesis_images_menu = examples_menu->addMenu("Thesis images");
 
-    constexpr std::array<std::pair<const char*, const char*>, 3> items = {
+    constexpr std::array<std::pair<const char*, const char*>, 4> items = {
         {
             {"Wireframe", "Wireframe"},
             {"Error highlight", "ErrorHighlight"},
             {"Node position", "BeforeDrawingNodes"},
+            {"Slider", "Slider"}
         }
     };
 
@@ -909,10 +910,10 @@ void GUIMainWindow::SetMSourceFilename(const std::optional<QString>& filename)
 {
     m_source_filename = filename;
     if (m_source_filename.has_value()) {
-        setWindowTitle(QString("[*] %1 – DiagramPche :: Qt").arg(m_source_filename.value()));
+        setWindowTitle(QString("[*]%1 – DiagramPche :: Qt").arg(m_source_filename.value()));
     }
     else {
-        setWindowTitle("[*] Untitled – DiagramPche :: Qt");
+        setWindowTitle(DEFAULT_WINDOW_NAME);
     }
 }
 

@@ -1,0 +1,133 @@
+[variables]
+qtw = 490
+qth = 450
+qtbh = 390
+qtbbtop = 100
+qtbb2top = 80
+qtbbw = 176
+imbbw = 210
+
+[node.bg_qt]
+value = "Qt"
+label_pos = "top-left"
+size = ["qtw", "qth"]
+z = 2
+color = "#f0f0f0ff"
+
+[node.mainwin]
+value = "Hlavní okno\nGUIMainWindow\n: QMainWindow"
+label_pos = "top-left"
+xy = ["bg_qt", "top-left", 10, 50]
+size = [170, "qtbh"]
+z = 3
+
+[node.viewer]
+value = "Pohled na scénu\nGUISceneViewer\n: QGraphicsView"
+label_pos = "top-left"
+pivot = "top-right"
+xy = ["bg_qt", "top-right", -10, 50]
+size = [212, "qtbh"]
+z = 3
+
+[node.rx]
+value = "Příjemce\nsignálu"
+pivot = "top"
+xy = ["mainwin", "top", 0, "qtbbtop"]
+
+[node.slider]
+value = "Posuvník\nQSlider"
+pivot = "top"
+xy = ["rx", "bottom", 0, "qtbb2top"]
+
+[node.wheelevent]
+value = "Přepsaná metoda\nwheelEvent"
+pivot = "top"
+xy = ["viewer", "top", 0, "qtbbtop"]
+size = ["qtbbw", 0]
+
+[node.scale]
+value = "resetTransform();\nscale(x, x);"
+pivot = "top"
+xy = ["wheelevent", "bottom", 0, "qtbb2top"]
+size = ["qtbbw", 0]
+
+[[path]]
+start = ["wheelevent", "left", 0, 0]
+end = ["rx", "right", 0, 0]
+label = ["Pošle\nsignál", 0, 60, 0]
+label_bg = "#f0f0f0ff"
+
+[[path]]
+start = ["slider", "right", 0, 0]
+end = ["scale", "left", 0, 0]
+label = ["Callback", 0, 75, 0]
+label_bg = "#f0f0f0ff"
+
+[[path]]
+start = ["rx", "bottom", 0, 0]
+end = ["slider", "top", 0, 0]
+label = ["  Nastaví novou\nhodnotu posuvníku", 0, 30, 0]
+label_bg = [255, 255, 255, 255]
+
+[[path]]
+end = ["slider", "bottom", 0, 0]
+start = ["slider", "bottom", 0, 20]
+label = ["    Uživatel\npoužije posuvník", 0, -20, 0]
+color = "#878787ff"
+
+[[path]]
+end = ["wheelevent", "bottom", 0, 0]
+start = ["wheelevent", "bottom", 0, 20]
+label = ["Uživatel použije\n  kolečko myši", 0, -20, 0]
+color = "#878787ff"
+
+[node.bg_imgui]
+value = "Dear ImGui, egui"
+label_pos = "top-left"
+size = [340, "qth"]
+xy = ["bg_qt", "top-right", 10, 0]
+z = 2
+color = "#f0f0f0ff"
+
+[node.imrest]
+value = "Zbytek\nhlavní\nsmyčky"
+pivot = "left"
+xy = ["bg_imgui", "left", 10, 18]
+
+[node.imdraw]
+value = "Vykreslí diagram\npřiblížený podle\nhodnoty m_zoom_level"
+pivot = "left"
+xy = ["imrest", "right", 20, 0]
+size = ["imbbw", 0]
+
+[node.imslider]
+value = "Vykreslí a obslouží\nposuvník => případná\nzměna m_zoom_level"
+pivot = "top"
+xy = ["imdraw", "bottom", 0, 20]
+size = ["imbbw", 0]
+
+[node.immw]
+value = "Obslouží kolečko\nmyši => případná\nzměna m_zoom_level"
+pivot = "bottom"
+xy = ["imdraw", "top", 0, -20]
+size = ["imbbw", 0]
+
+[[path]]
+start = ["immw", "bottom", 0, 0]
+end = ["imdraw", "top", 0, 0]
+
+[[path]]
+start = ["imdraw", "bottom", 0, 0]
+end = ["imslider", "top", 0, 0]
+
+[[path]]
+start = ["imslider", "bottom", 0, 0]
+end = ["imrest", "bottom", 0, 0]
+points = [["", "end", 0, "", "start", 0]]
+shift = [20, 0]
+
+[[path]]
+start = ["imrest", "top", 0, 0]
+end = ["immw", "top", 0, 0]
+points = [["", "start", 0, "", "end", 0]]
+shift = [0, 20]

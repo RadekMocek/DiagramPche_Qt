@@ -11,6 +11,7 @@ void GUIMainWindow::HandleRegularNew()
     m_source->clear();
     SetMSourceFilename(std::nullopt);
     setWindowModified(false);
+    ResetCanvasScrollingAndZoom();
 }
 
 void GUIMainWindow::HandleRegularOpen()
