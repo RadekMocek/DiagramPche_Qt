@@ -1,10 +1,7 @@
 cmake_minimum_required(VERSION 3.25)
 
-set(PROJECT_NAME "DiagramPche_Qt")
-set(BINARY_NAME "DiagramPche_Qt")
-
 # == Project setup ==
-project("${PROJECT_NAME}")
+project("DiagramPche_Qt")
 #set(CMAKE_BUILD_TYPE Debug)
 set(CMAKE_BUILD_TYPE Release)
 set(CMAKE_CXX_STANDARD 20)
@@ -39,13 +36,13 @@ find_package(Qt6 REQUIRED COMPONENTS Core Widgets Svg)
 file(GLOB_RECURSE SOURCES
         "${PROJECT_SOURCE_DIR}/App/*.cpp"
 )
-add_executable("${BINARY_NAME}"
+add_executable("${CMAKE_PROJECT_NAME}"
         "Run.cpp"
         ${SOURCES}
 )
 
 # == Link libraries ==
-target_link_libraries("${BINARY_NAME}" PRIVATE
+target_link_libraries("${CMAKE_PROJECT_NAME}" PRIVATE
         Qt6::Widgets
         Qt6::Svg
         QtAwesome
@@ -55,11 +52,11 @@ target_link_libraries("${BINARY_NAME}" PRIVATE
 # == Misc ==
 if (MSVC)
     target_compile_definitions("${CMAKE_PROJECT_NAME}" PUBLIC _CRT_SECURE_NO_WARNINGS)
-    #set_target_properties("${CMAKE_PROJECT_NAME}" PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup") # No console
+    set_target_properties("${CMAKE_PROJECT_NAME}" PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup") # No console
 endif ()
 
 if (WIN32)
-    target_link_libraries("${BINARY_NAME}" PRIVATE pdh)
+    target_link_libraries("${CMAKE_PROJECT_NAME}" PRIVATE pdh)
     target_compile_definitions("${CMAKE_PROJECT_NAME}" PUBLIC NOMINMAX)
 endif ()
 
